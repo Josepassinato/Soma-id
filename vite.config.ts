@@ -16,8 +16,8 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       define: {
-        // Backend URL for API calls
-        'window.BACKEND_URL': JSON.stringify(env.BACKEND_URL || 'http://localhost:8001/api'),
+        // Backend URL for API calls - use external URL
+        'window.BACKEND_URL': JSON.stringify(env.VITE_BACKEND_URL || 'https://demobackend.emergentagent.com/api'),
       },
       resolve: {
         alias: {
