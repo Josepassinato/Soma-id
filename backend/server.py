@@ -60,6 +60,7 @@ class ConsultationInput(BaseModel):
 
 class AnalyzeConsultationRequest(BaseModel):
     input: ConsultationInput
+    language: Optional[str] = "pt"  # pt, en, es
 
 class GeneratePromptRequest(BaseModel):
     clientName: str
@@ -68,6 +69,7 @@ class GeneratePromptRequest(BaseModel):
     wallHeight: Optional[int] = 2700
     styleDescription: str
     angle: Optional[str] = "Frontal View"
+    language: Optional[str] = "pt"  # pt, en, es
 
 class GenerateImageRequest(BaseModel):
     prompt: str
@@ -80,6 +82,7 @@ class GenerateTechnicalDataRequest(BaseModel):
     wallHeight: Optional[int] = 2700
     wallDepth: Optional[int] = 600
     styleDescription: str
+    language: Optional[str] = "pt"  # pt, en, es
 
 class HealthCheckRequest(BaseModel):
     pass
