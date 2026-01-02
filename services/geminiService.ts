@@ -147,6 +147,8 @@ export const generateEnchantmentImage = async (prompt: string, materialPhoto: st
  */
 export const generateTechnicalData = async (project: Project): Promise<BlueprintData> => {
   try {
+    const language = getCurrentLanguage();
+    
     const response = await fetch(`${API_URL}/gemini/generate-technical-data`, {
       method: 'POST',
       headers: {
@@ -159,6 +161,7 @@ export const generateTechnicalData = async (project: Project): Promise<Blueprint
         wallHeight: project.wallHeight || 2700,
         wallDepth: project.wallDepth || 600,
         styleDescription: project.styleDescription,
+        language: language,
       }),
     });
 
