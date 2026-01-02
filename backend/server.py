@@ -372,7 +372,7 @@ async def generate_enchantment_prompt(request: GeneratePromptRequest):
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('models/gemini-2.5-pro')
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
         
         style_keywords = get_style_keywords(request.styleDescription)
         
@@ -538,7 +538,7 @@ async def analyze_floor_plan(request: AnalyzeFloorPlanRequest):
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('models/gemini-2.5-pro')
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
         
         # Decode base64 image
         image_data = base64.b64decode(request.imageBase64)
