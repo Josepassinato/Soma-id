@@ -598,7 +598,12 @@ async def floor_plan_chat(request: FloorPlanChatRequest):
         history = chat_sessions[request.sessionId]
         context = "\n".join([f"{msg['role'].upper()}: {msg['content']}" for msg in history])
         
-        system_prompt = """You are the SOMA-ID Floor Plan Assistant. You help users understand their floor plan analysis and guide them to create woodworking projects.
+        # Get language instruction
+        language_instruction = get_language_instruction(request.language or "pt")
+        
+        system_prompt = f"""You are the SOMA-ID Floor Plan Assistant. You help users understand their floor plan analysis and guide them to create woodworking projects.
+
+{language_instruction}
 
 RULES:
 1. Answer questions about the floor plan analysis
@@ -607,7 +612,6 @@ RULES:
 4. Guide users to select which room they want to work on
 5. If user provides new information, update your understanding
 6. Always be helpful and specific about woodworking possibilities
-7. Respond in the same language as the user (Portuguese if they write in Portuguese)
 
 When user selects a room for a project, confirm:
 - Room name and dimensions
@@ -615,12 +619,12 @@ When user selects a room for a project, confirm:
 - Any special requirements
 
 Return your response as JSON:
-{
+{{
   "message": "Your response text",
   "suggestedActions": ["action1", "action2"],
-  "updatedAnalysis": null or {...} if analysis needs updating,
-  "readyToCreateProject": false or { "roomName": "...", "woodworkType": "...", "dimensions": {...} }
-}"""
+  "updatedAnalysis": null or {{...}} if analysis needs updating,
+  "readyToCreateProject": false or {{ "roomName": "...", "woodworkType": "...", "dimensions": {{...}} }}
+}}"""
 
         prompt = f"""{system_prompt}
 
