@@ -90,6 +90,7 @@ class AnalyzeFloorPlanRequest(BaseModel):
     mimeType: Optional[str] = "image/jpeg"
     clientName: Optional[str] = None
     projectContext: Optional[str] = None
+    language: Optional[str] = "pt"  # pt, en, es
 
 class FloorPlanRoom(BaseModel):
     name: str
@@ -117,12 +118,26 @@ class FloorPlanChatRequest(BaseModel):
     message: str
     floorPlanAnalysis: Optional[Dict] = None
     imageBase64: Optional[str] = None
+    language: Optional[str] = "pt"  # pt, en, es
 
 class SelectRoomForProjectRequest(BaseModel):
     sessionId: str
     roomName: str
     woodworkType: str
     floorPlanAnalysis: Dict
+    language: Optional[str] = "pt"  # pt, en, es
+
+
+# ============== LANGUAGE HELPERS ==============
+
+def get_language_instruction(language: str) -> str:
+    """Get language instruction for AI prompts"""
+    instructions = {
+        "pt": "IMPORTANTE: Responda SEMPRE em Português do Brasil. Todos os textos, nomes de cômodos, descrições e perguntas devem estar em português.",
+        "en": "IMPORTANT: Always respond in English. All texts, room names, descriptions and questions must be in English.",
+        "es": "IMPORTANTE: Responda SIEMPRE en Español. Todos los textos, nombres de habitaciones, descripciones y preguntas deben estar en español."
+    }
+    return instructions.get(language, instructions["pt"])
 
 
 # ============== CONSTANTS ==============
