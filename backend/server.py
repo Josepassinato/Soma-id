@@ -405,7 +405,7 @@ async def generate_enchantment_image(request: GenerateImageRequest):
     
     try:
         # Use Gemini 1.5 Pro with vision capabilities
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
         
         parts = []
         
