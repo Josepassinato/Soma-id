@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ExtractedInsights } from '../types';
+import { useTranslation } from '../context/TranslationContext';
 
 interface FloorPlanRoom {
   name: string;
@@ -35,6 +36,7 @@ interface Props {
 const API_URL = '/api';
 
 export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady }) => {
+  const { t, language } = useTranslation();
   const [step, setStep] = useState<'UPLOAD' | 'ANALYZING' | 'RESULTS' | 'CHAT'>('UPLOAD');
   const [imagePreview, setImagePreview] = useState<string>('');
   const [imageBase64, setImageBase64] = useState<string>('');
@@ -49,6 +51,43 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Translated messages based on language
+  const getAnalysisMessage = (roomCount: number, questions: string[]) => {
+    const messages = {
+      pt: `Analisei a planta baixa! Encontrei ${roomCount} cômodos.\n\nTenho algumas dúvidas para confirmar:\n\n${questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}`,
+      en: `I analyzed the floor plan! Found ${roomCount} rooms.\n\nI have some questions to confirm:\n\n${questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}`,
+      es: `¡Analicé el plano de planta! Encontré ${roomCount} habitaciones.\n\nTengo algunas preguntas para confirmar:\n\n${questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}`
+    };
+    return messages[language] || messages.pt;
+  };
+
+  const getWelcomeMessage = (roomCount: number, summary: string) => {
+    const messages = {
+      pt: `Olá! Analisei sua planta baixa e encontrei ${roomCount} cômodos com potencial para marcenaria.\n\n**Resumo:** ${summary}\n\nQual cômodo você gostaria de trabalhar? Ou tem alguma dúvida sobre a análise?`,
+      en: `Hello! I analyzed your floor plan and found ${roomCount} rooms with woodworking potential.\n\n**Summary:** ${summary}\n\nWhich room would you like to work on? Or do you have any questions about the analysis?`,
+      es: `¡Hola! Analicé su plano de planta y encontré ${roomCount} habitaciones con potencial para carpintería.\n\n**Resumen:** ${summary}\n\n¿En qué habitación le gustaría trabajar? ¿O tiene alguna pregunta sobre el análisis?`
+    };
+    return messages[language] || messages.pt;
+  };
+
+  const getWorkOnRoomText = (roomName: string) => {
+    const messages = {
+      pt: `Trabalhar no ${roomName}`,
+      en: `Work on ${roomName}`,
+      es: `Trabajar en ${roomName}`
+    };
+    return messages[language] || messages.pt;
+  };
+
+  const getErrorMessage = () => {
+    const messages = {
+      pt: 'Desculpe, houve um erro ao processar sua mensagem. Tente novamente.',
+      en: 'Sorry, there was an error processing your message. Please try again.',
+      es: 'Lo siento, hubo un error al procesar su mensaje. Por favor, intente de nuevo.'
+    };
+    return messages[language] || messages.pt;
+  };
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
@@ -60,7 +99,6 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
       reader.onloadend = () => {
         const result = reader.result as string;
         setImagePreview(result);
-        // Extract base64 without the data URL prefix
         const base64 = result.split(',')[1];
         setImageBase64(base64);
       };
@@ -81,12 +119,13 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           imageBase64,
-          mimeType: 'image/jpeg'
+          mimeType: 'image/jpeg',
+          language: language
         })
       });
       
       if (!response.ok) {
-        throw new Error('Falha na análise da planta');
+        throw new Error(t('error'));
       }
       
       const result = await response.json();
@@ -96,11 +135,10 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
         setSessionId(result.sessionId);
         setStep('RESULTS');
         
-        // If there are questions, automatically open chat
         if (result.data.questions_for_user?.length > 0) {
           setChatMessages([{
             role: 'assistant',
-            content: `Analisei a planta baixa! Encontrei ${result.data.rooms?.length || 0} cômodos.\n\nTenho algumas dúvidas para confirmar:\n\n${result.data.questions_for_user.map((q: string, i: number) => `${i + 1}. ${q}`).join('\n')}`,
+            content: getAnalysisMessage(result.data.rooms?.length || 0, result.data.questions_for_user),
             suggestedActions: result.data.questions_for_user
           }]);
         }
@@ -129,7 +167,8 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
           sessionId,
           message,
           floorPlanAnalysis: analysis,
-          imageBase64: imageBase64
+          imageBase64: imageBase64,
+          language: language
         })
       });
       
@@ -143,12 +182,10 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
         };
         setChatMessages(prev => [...prev, assistantMessage]);
         
-        // Update analysis if needed
         if (result.data.updatedAnalysis) {
           setAnalysis(prev => ({ ...prev, ...result.data.updatedAnalysis }));
         }
         
-        // Check if ready to create project
         if (result.data.readyToCreateProject) {
           handleRoomSelection(
             result.data.readyToCreateProject.roomName,
@@ -159,7 +196,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
     } catch (err) {
       setChatMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Desculpe, houve um erro ao processar sua mensagem. Tente novamente.'
+        content: getErrorMessage()
       }]);
     } finally {
       setIsProcessing(false);
@@ -177,14 +214,14 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
           sessionId,
           roomName,
           woodworkType,
-          floorPlanAnalysis: analysis
+          floorPlanAnalysis: analysis,
+          language: language
         })
       });
       
       const result = await response.json();
       
       if (result.status === 'success') {
-        // Convert to ExtractedInsights format
         const insights: ExtractedInsights = {
           clientName: result.data.clientName || 'Cliente',
           roomType: result.data.roomType,
@@ -211,8 +248,8 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
     if (chatMessages.length === 0 && analysis) {
       setChatMessages([{
         role: 'assistant',
-        content: `Olá! Analisei sua planta baixa e encontrei ${analysis.rooms?.length || 0} cômodos com potencial para marcenaria.\n\n**Resumo:** ${analysis.summary}\n\nQual cômodo você gostaria de trabalhar? Ou tem alguma dúvida sobre a análise?`,
-        suggestedActions: analysis.rooms?.map(r => `Trabalhar no ${r.name}`) || []
+        content: getWelcomeMessage(analysis.rooms?.length || 0, analysis.summary),
+        suggestedActions: analysis.rooms?.map(r => getWorkOnRoomText(r.name)) || []
       }]);
     }
   };
@@ -222,9 +259,9 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
       {/* Header */}
       <div className="p-6 bg-slate-950 border-b border-cyan-900/30">
         <h2 className="text-2xl font-bold text-white tracking-widest uppercase">
-          <span className="text-cyan-400">Analisador de</span> Planta Baixa
+          <span className="text-cyan-400">{t('floor_plan_analyzer').split(' ')[0]}</span> {t('floor_plan_analyzer').split(' ').slice(1).join(' ')}
         </h2>
-        <p className="text-slate-500 text-xs font-mono mt-1">:: IMPORTAR PROJETO ARQUITETÔNICO ::</p>
+        <p className="text-slate-500 text-xs font-mono mt-1">:: {t('import_arch_project').toUpperCase()} ::</p>
       </div>
 
       {/* Step: UPLOAD */}
@@ -236,18 +273,18 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
           >
             {imagePreview ? (
               <>
-                <img src={imagePreview} className="w-full h-full object-contain" alt="Planta baixa" />
+                <img src={imagePreview} className="w-full h-full object-contain" alt={t('floor_plan')} />
                 <div className="absolute bottom-4 left-4 right-4 bg-black/80 p-3 rounded-lg">
-                  <p className="text-cyan-400 text-xs font-bold">Planta carregada • Clique para alterar</p>
+                  <p className="text-cyan-400 text-xs font-bold">{t('plan_loaded')} • {t('click_to_change')}</p>
                 </div>
               </>
             ) : (
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <span className="text-6xl mb-6">📐</span>
-                <p className="mb-2 text-lg text-slate-300 font-bold uppercase tracking-widest">Upload de Planta Baixa</p>
-                <p className="text-sm text-slate-500">Formatos aceitos: JPG, PNG, PDF</p>
+                <p className="mb-2 text-lg text-slate-300 font-bold uppercase tracking-widest">{t('upload_floor_plan')}</p>
+                <p className="text-sm text-slate-500">{t('accepted_formats')}</p>
                 <p className="text-xs text-slate-600 mt-4 max-w-md text-center">
-                  A IA irá analisar a planta, extrair os cômodos e sugerir oportunidades de marcenaria
+                  {t('ai_will_analyze')}
                 </p>
               </div>
             )}
@@ -271,14 +308,14 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
               onClick={onCancel}
               className="px-6 py-3 text-slate-500 font-black text-[10px] hover:text-white transition uppercase tracking-widest"
             >
-              Voltar
+              {t('back')}
             </button>
             <button 
               onClick={analyzeFloorPlan}
               disabled={!imageBase64}
               className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-black font-black uppercase tracking-widest text-xs shadow-[0_15px_30px_rgba(6,182,212,0.3)] transition-all disabled:opacity-20 transform hover:-translate-y-1"
             >
-              Analisar Planta →
+              {t('analyze_plan')} →
             </button>
           </div>
         </div>
@@ -288,8 +325,8 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
       {step === 'ANALYZING' && (
         <div className="p-16 flex flex-col items-center justify-center min-h-[400px]">
           <div className="w-20 h-20 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-8"></div>
-          <p className="text-white font-bold text-lg uppercase tracking-widest mb-2">Analisando Planta Baixa</p>
-          <p className="text-slate-500 text-sm font-mono">Extraindo cômodos e dimensões...</p>
+          <p className="text-white font-bold text-lg uppercase tracking-widest mb-2">{t('analyzing_floor_plan')}</p>
+          <p className="text-slate-500 text-sm font-mono">{t('extracting_rooms')}</p>
         </div>
       )}
 
@@ -300,21 +337,21 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
           <div className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 p-6 rounded-xl border border-cyan-500/30 mb-6">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-white font-bold text-lg mb-2">Análise Completa</h3>
+                <h3 className="text-white font-bold text-lg mb-2">{t('analysis_complete')}</h3>
                 <p className="text-slate-400 text-sm">{analysis.summary}</p>
               </div>
               <div className="flex gap-4 text-center">
                 <div className="bg-black/40 px-4 py-2 rounded-lg">
                   <p className="text-2xl font-bold text-cyan-400">{analysis.total_bedrooms}</p>
-                  <p className="text-[10px] text-slate-500 uppercase">Quartos</p>
+                  <p className="text-[10px] text-slate-500 uppercase">{t('bedrooms')}</p>
                 </div>
                 <div className="bg-black/40 px-4 py-2 rounded-lg">
                   <p className="text-2xl font-bold text-purple-400">{analysis.total_bathrooms}</p>
-                  <p className="text-[10px] text-slate-500 uppercase">Banheiros</p>
+                  <p className="text-[10px] text-slate-500 uppercase">{t('bathrooms')}</p>
                 </div>
                 <div className="bg-black/40 px-4 py-2 rounded-lg">
                   <p className="text-2xl font-bold text-green-400">{analysis.rooms?.length || 0}</p>
-                  <p className="text-[10px] text-slate-500 uppercase">Cômodos</p>
+                  <p className="text-[10px] text-slate-500 uppercase">{t('rooms')}</p>
                 </div>
               </div>
             </div>
@@ -325,7 +362,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
             <div className="bg-yellow-900/20 border border-yellow-500/30 p-4 rounded-xl mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-2xl">💬</span>
-                <h4 className="text-yellow-400 font-bold uppercase text-sm">Dúvidas para Confirmar</h4>
+                <h4 className="text-yellow-400 font-bold uppercase text-sm">{t('questions_to_confirm')}</h4>
               </div>
               <ul className="space-y-2">
                 {analysis.questions_for_user.map((q, i) => (
@@ -339,7 +376,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
                 onClick={openChat}
                 className="mt-4 px-6 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold text-xs uppercase rounded-lg transition"
               >
-                Responder Dúvidas →
+                {t('answer_questions')} →
               </button>
             </div>
           )}
@@ -347,7 +384,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
           {/* Rooms Grid */}
           <h4 className="text-white font-bold uppercase text-sm mb-4 flex items-center gap-2">
             <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
-            Cômodos Identificados
+            {t('rooms_identified')}
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {analysis.rooms?.map((room, index) => (
@@ -381,7 +418,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
                 
                 {room.woodwork_potential?.length > 0 && (
                   <div className="border-t border-slate-700 pt-3 mt-3">
-                    <p className="text-[10px] text-purple-400 uppercase font-bold mb-2">Oportunidades de Marcenaria:</p>
+                    <p className="text-[10px] text-purple-400 uppercase font-bold mb-2">{t('woodwork_opportunities')}:</p>
                     <div className="flex flex-wrap gap-1">
                       {room.woodwork_potential.map((w, i) => (
                         <span key={i} className="text-[10px] text-purple-300 bg-purple-900/30 px-2 py-0.5 rounded">
@@ -401,14 +438,14 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
               onClick={() => setStep('UPLOAD')}
               className="px-6 py-3 text-slate-500 font-black text-[10px] hover:text-white transition uppercase tracking-widest"
             >
-              ← Nova Planta
+              ← {t('new_plan')}
             </button>
             <div className="flex gap-4">
               <button 
                 onClick={openChat}
                 className="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold uppercase tracking-widest text-xs rounded-lg transition"
               >
-                💬 Chat com IA
+                💬 {t('chat_with_ai')}
               </button>
               {selectedRoom && (
                 <button 
@@ -416,7 +453,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
                   disabled={isProcessing}
                   className="px-8 py-3 bg-cyan-600 hover:bg-cyan-500 text-black font-black uppercase tracking-widest text-xs shadow-lg transition disabled:opacity-50"
                 >
-                  {isProcessing ? 'Processando...' : `Criar Projeto: ${selectedRoom} →`}
+                  {isProcessing ? t('processing') : `${t('create_project_room')}: ${selectedRoom} →`}
                 </button>
               )}
             </div>
@@ -434,15 +471,15 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
                 IA
               </div>
               <div>
-                <h4 className="text-white font-bold text-sm">Assistente SOMA-ID</h4>
-                <p className="text-slate-500 text-xs">Análise de Planta Baixa</p>
+                <h4 className="text-white font-bold text-sm">{t('soma_assistant')}</h4>
+                <p className="text-slate-500 text-xs">{t('floor_plan_analysis')}</p>
               </div>
             </div>
             <button 
               onClick={() => setStep('RESULTS')}
               className="text-slate-500 hover:text-white text-xs uppercase tracking-widest"
             >
-              Ver Análise →
+              {t('view_analysis')} →
             </button>
           </div>
 
@@ -499,7 +536,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && sendChatMessage(chatInput)}
-                placeholder="Digite sua mensagem ou dúvida..."
+                placeholder={t('type_message')}
                 className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none"
               />
               <button
@@ -507,7 +544,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
                 disabled={!chatInput.trim() || isProcessing}
                 className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-black font-bold rounded-xl transition disabled:opacity-50"
               >
-                Enviar
+                {t('send')}
               </button>
             </div>
           </div>
