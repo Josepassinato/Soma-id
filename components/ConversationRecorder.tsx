@@ -154,9 +154,9 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
     <div className="max-w-3xl mx-auto bg-[#0F172A] border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-fade-in">
       <div className="p-6 bg-slate-950 border-b border-cyan-900/30">
         <h2 className="text-2xl font-bold text-white tracking-widest uppercase">
-          <span className="text-cyan-400">Novo Atendimento</span> SOMA-ID
+          <span className="text-cyan-400">{t('new_attendance').replace('+ ', '')}</span> SOMA-ID
         </h2>
-        <p className="text-slate-500 text-xs font-mono mt-1">:: CAPTURA MULTIMODAL DE BRIEFING ::</p>
+        <p className="text-slate-500 text-xs font-mono mt-1">:: {t('briefing_extracted').toUpperCase()} ::</p>
       </div>
 
       {/* TABS */}
@@ -165,31 +165,31 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
           onClick={() => { setActiveTab('RECORD'); resetState(); }}
           className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'RECORD' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
-          🎙️ Áudio Live
+          🎙️ {t('audio_live')}
         </button>
         <button 
           onClick={() => { setActiveTab('UPLOAD_IMAGE'); resetState(); }}
           className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'UPLOAD_IMAGE' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
-          📸 Foto/Upload
+          📸 {t('photo_upload')}
         </button>
         <button 
           onClick={() => { setActiveTab('FLOOR_PLAN'); resetState(); }}
           className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'FLOOR_PLAN' ? 'text-purple-400 border-b-2 border-purple-400 bg-purple-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
-          📐 Planta Baixa
+          📐 {t('floor_plan')}
         </button>
         <button 
           onClick={() => { setActiveTab('UPLOAD_AUDIO'); resetState(); }}
           className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'UPLOAD_AUDIO' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
-          📤 Áudio
+          📤 {t('audio')}
         </button>
         <button 
           onClick={() => { setActiveTab('UPLOAD_PDF'); resetState(); }}
           className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'UPLOAD_PDF' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
-          📄 PDF
+          📄 {t('pdf')}
         </button>
       </div>
 
@@ -198,7 +198,7 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
         <FloorPlanAnalyzer 
           onCancel={onCancel}
           onProjectReady={(insights, roomPhoto) => {
-            onInsightsExtracted({ ...insights, roomPhotoData: roomPhoto }, 'Planta Baixa');
+            onInsightsExtracted({ ...insights, roomPhotoData: roomPhoto }, t('floor_plan'));
           }}
         />
       )}
