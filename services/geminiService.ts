@@ -2,21 +2,9 @@
 import { Project, BlueprintData, ExtractedInsights, ConsultationInput, AiLayoutPlan } from "../types";
 import { EngineeringService } from './engineeringService';
 
-// Backend API URL - use the external URL for production
-const getBackendUrl = (): string => {
-  // Check for Vite env variable first
-  if (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_BACKEND_URL) {
-    return (import.meta as any).env.VITE_BACKEND_URL;
-  }
-  // Check for window variable
-  if (typeof window !== 'undefined' && (window as any).BACKEND_URL) {
-    return (window as any).BACKEND_URL;
-  }
-  // Default: use relative URL which works with proxy
-  return '/api';
-};
-
-const API_URL = getBackendUrl();
+// Backend API URL - use relative URL for Kubernetes ingress routing
+// The ingress automatically routes /api/* requests to the backend service
+const API_URL = '/api';
 
 const cleanResponse = (text: string) => text.replace(/```json/g, '').replace(/```/g, '').trim();
 
