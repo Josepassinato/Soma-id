@@ -6,6 +6,14 @@ import { EngineeringService } from './engineeringService';
 // The ingress automatically routes /api/* requests to the backend service
 const API_URL = '/api';
 
+// Get current language from localStorage
+const getCurrentLanguage = (): string => {
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem('marcenaria_lang') || 'pt';
+  }
+  return 'pt';
+};
+
 const cleanResponse = (text: string) => text.replace(/```json/g, '').replace(/```/g, '').trim();
 
 const extractJson = (text: string): any => {
@@ -24,12 +32,14 @@ const extractJson = (text: string): any => {
  */
 export const analyzeConsultationWithGemini = async (input: ConsultationInput): Promise<ExtractedInsights> => {
   try {
+    const language = getCurrentLanguage();
+    
     const response = await fetch(`${API_URL}/gemini/analyze-consultation`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ input }),
+      body: JSON.stringify({ input, language }),
     });
 
     if (!response.ok) {
