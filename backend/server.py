@@ -84,6 +84,46 @@ class GenerateTechnicalDataRequest(BaseModel):
 class HealthCheckRequest(BaseModel):
     pass
 
+# Floor Plan Analysis Models
+class AnalyzeFloorPlanRequest(BaseModel):
+    imageBase64: str
+    mimeType: Optional[str] = "image/jpeg"
+    clientName: Optional[str] = None
+    projectContext: Optional[str] = None
+
+class FloorPlanRoom(BaseModel):
+    name: str
+    dimensions: Optional[str] = None
+    area_sqft: Optional[float] = None
+    features: List[str] = []
+    woodwork_potential: List[str] = []
+
+class FloorPlanAnalysis(BaseModel):
+    rooms: List[FloorPlanRoom]
+    total_bedrooms: int
+    total_bathrooms: float
+    layout_type: str
+    floor_level: str
+    questions_for_user: List[str] = []
+    woodwork_opportunities: List[Dict[str, Any]] = []
+    summary: str
+
+class ChatMessage(BaseModel):
+    role: str  # 'user' or 'assistant'
+    content: str
+
+class FloorPlanChatRequest(BaseModel):
+    sessionId: str
+    message: str
+    floorPlanAnalysis: Optional[Dict] = None
+    imageBase64: Optional[str] = None
+
+class SelectRoomForProjectRequest(BaseModel):
+    sessionId: str
+    roomName: str
+    woodworkType: str
+    floorPlanAnalysis: Dict
+
 
 # ============== CONSTANTS ==============
 
