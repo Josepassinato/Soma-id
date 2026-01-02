@@ -11,8 +11,8 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        // Backend URL for API calls
+        'window.BACKEND_URL': JSON.stringify(env.BACKEND_URL || 'http://localhost:8001/api'),
       },
       resolve: {
         alias: {
