@@ -2,29 +2,15 @@
 import { supabase } from './supabaseClient';
 import { HealthReport } from '../types';
 import { LayoutValidator } from './layoutValidator';
-import { GoogleGenAI } from "@google/genai";
+import { checkGeminiHealth } from './geminiService';
 
 export const HealthCheckService = {
   
   /**
-   * Testa a conectividade com a API da Gemini.
+   * Testa a conectividade com a API da Gemini via Backend.
    */
   checkLLM: async (): Promise<{ status: boolean; latency: number; error?: string }> => {
-    const start = Date.now();
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      // Teste leve usando o modelo flash
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: 'ping',
-      });
-      return { 
-        status: !!response.text, 
-        latency: Date.now() - start 
-      };
-    } catch (e: any) {
-      return { status: false, latency: 0, error: e.message };
-    }
+    return await checkGeminiHealth();
   },
 
   /**
