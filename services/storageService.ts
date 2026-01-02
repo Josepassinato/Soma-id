@@ -7,15 +7,33 @@ export const StorageService = {
    * Se o Supabase não estiver disponível, retorna a string original (Fallback).
    */
   uploadBase64Image: async (base64Data: string, folder: string = 'projects'): Promise<string> => {
-    if (!supabase || !base64Data.startsWith('data:')) {
-        return base64Data; // Retorna original se não for base64 ou sem supabase
+    if (!supabase || !base64Data) {
+        return base64Data; // Retorna original se não houver dados ou supabase
+    }
+    
+    // Validar se é um Data URL válido
+    if (!base64Data.startsWith('data:')) {
+        console.warn('[StorageService] Dados não são um Data URL válido, retornando original');
+        return base64Data;
     }
 
     try {
-      // 1. Extrair Metadados do Base64
-      const parts = base64Data.split(';');
-      const mimeType = parts[0].split(':')[1];
-      const base64Content = parts[1].split(',')[1];
+      // 1. Extrair Metadados do Base64 com validação
+      const dataUrlRegex = /^data:([^;]+);base64,(.+)$/;
+      const match = base64Data.match(dataUrlRegex);
+      
+      if (!match || match.length < 3) {
+        console.warn('[StorageService] Formato Base64 inválido, retornando original');
+        return base64Data;
+      }
+      
+      const mimeType = match[1];
+      const base64Content = match[2];
+      
+      if (!mimeType || !base64Content) {
+        console.warn('[StorageService] MimeType ou conteúdo Base64 ausente');
+        return base64Data;
+      }
       
       // 2. Converter para Blob
       const byteCharacters = atob(base64Content);
@@ -27,7 +45,7 @@ export const StorageService = {
       const blob = new Blob([byteArray], { type: mimeType });
 
       // 3. Gerar Nome Único
-      const ext = mimeType.split('/')[1];
+      const ext = mimeType.split('/')[1] || 'png';
       const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
 
       // 4. Upload para 'user-content' (Deve ser criado no Supabase)
