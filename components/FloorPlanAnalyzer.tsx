@@ -259,9 +259,9 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
       {/* Header */}
       <div className="p-6 bg-slate-950 border-b border-cyan-900/30">
         <h2 className="text-2xl font-bold text-white tracking-widest uppercase">
-          <span className="text-cyan-400">{t('floor_plan_analyzer').split(' ')[0]}</span> {t('floor_plan_analyzer').split(' ').slice(1).join(' ')}
+          <span className="text-cyan-400">{t('floor_plan_analyzer')}</span>
         </h2>
-        <p className="text-slate-500 text-xs font-mono mt-1">:: {t('import_arch_project').toUpperCase()} ::</p>
+        <p className="text-slate-500 text-xs font-mono mt-1">:: {t('import_arch_project')} ::</p>
       </div>
 
       {/* Step: UPLOAD */}
