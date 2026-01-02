@@ -201,85 +201,88 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
         />
       )}
       
-      <div className="p-10 min-h-[350px] flex flex-col items-center justify-center">
-        
-        {/* VIEW: RECORD */}
-        {activeTab === 'RECORD' && (
-          <div className="flex flex-col items-center space-y-8 w-full">
-            <button 
-              onClick={isRecording ? stopRecording : startRecording}
-              className={`w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300 border-4 ${
-                isRecording 
-                  ? 'bg-red-600 border-red-400 shadow-[0_0_40px_rgba(220,38,38,0.5)] animate-pulse' 
-                  : 'bg-cyan-600 border-cyan-400 hover:bg-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.3)]'
-              }`}
-            >
-              <div className={`w-8 h-8 transition-all ${isRecording ? 'bg-white rounded-sm' : 'bg-black rounded-full'}`}></div>
-            </button>
-            <div className="text-center">
-              <p className="text-sm font-bold text-white uppercase tracking-widest">
-                {isRecording ? "Capturando Briefing..." : audioBlob ? "Voz Gravada com Sucesso" : "Pressione para gravar conversa"}
-              </p>
-              <p className="text-[10px] font-mono text-slate-500 mt-2 uppercase">A IA irá extrair medidas e estilos automaticamente</p>
-            </div>
-          </div>
-        )}
-
-        {/* VIEW: UPLOAD IMAGE */}
-        {activeTab === 'UPLOAD_IMAGE' && (
-          <div className="w-full text-center space-y-6">
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center justify-center w-full h-56 border-2 border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-900/50 hover:bg-slate-800 transition overflow-hidden relative"
-            >
-              {imagePreview ? (
-                <img src={imagePreview} className="w-full h-full object-cover opacity-60" />
-              ) : (
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <span className="text-5xl mb-4">🖼️</span>
-                  <p className="mb-2 text-sm text-slate-300 font-bold uppercase tracking-widest">Selecionar Foto ou Tirar Agora</p>
-                  <p className="text-[10px] text-slate-500 uppercase font-mono">Galeria, Arquivos ou Câmera</p>
-                </div>
-              )}
-              {/* Removido capture="environment" para habilitar a escolha do usuário */}
-              <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'IMAGE')} />
-            </div>
-            {imagePreview && <p className="text-cyan-400 text-[10px] font-black uppercase tracking-widest">Foto Carregada • Clique para Alterar</p>}
-          </div>
-        )}
-
-        {/* VIEW: UPLOAD AUDIO / PDF */}
-        {(activeTab === 'UPLOAD_AUDIO' || activeTab === 'UPLOAD_PDF') && (
-          <div className="w-full text-center">
-            <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-900/50 hover:bg-slate-800 transition">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <span className="text-4xl mb-4">{activeTab === 'UPLOAD_AUDIO' ? '🎵' : '📄'}</span>
-                <p className="mb-2 text-sm text-slate-300 font-bold uppercase tracking-widest">Upload de {activeTab === 'UPLOAD_AUDIO' ? 'Áudio' : 'Briefing PDF'}</p>
-                <p className="text-[10px] text-slate-500 uppercase font-mono">Formatos aceitos: {activeTab === 'UPLOAD_AUDIO' ? 'MP3, WAV, M4A' : 'PDF'}</p>
+      {/* Content for other tabs (not FLOOR_PLAN) */}
+      {activeTab !== 'FLOOR_PLAN' && (
+        <div className="p-10 min-h-[350px] flex flex-col items-center justify-center">
+          
+          {/* VIEW: RECORD */}
+          {activeTab === 'RECORD' && (
+            <div className="flex flex-col items-center space-y-8 w-full">
+              <button 
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300 border-4 ${
+                  isRecording 
+                    ? 'bg-red-600 border-red-400 shadow-[0_0_40px_rgba(220,38,38,0.5)] animate-pulse' 
+                    : 'bg-cyan-600 border-cyan-400 hover:bg-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.3)]'
+                }`}
+              >
+                <div className={`w-8 h-8 transition-all ${isRecording ? 'bg-white rounded-sm' : 'bg-black rounded-full'}`}></div>
+              </button>
+              <div className="text-center">
+                <p className="text-sm font-bold text-white uppercase tracking-widest">
+                  {isRecording ? "Capturando Briefing..." : audioBlob ? "Voz Gravada com Sucesso" : "Pressione para gravar conversa"}
+                </p>
+                <p className="text-[10px] font-mono text-slate-500 mt-2 uppercase">A IA irá extrair medidas e estilos automaticamente</p>
               </div>
-              <input type="file" className="hidden" accept={activeTab === 'UPLOAD_AUDIO' ? 'audio/*' : 'application/pdf'} onChange={(e) => handleFileChange(e, activeTab === 'UPLOAD_AUDIO' ? 'AUDIO' : 'PDF')} />
-            </label>
-            {filePreview && <p className="mt-4 text-cyan-400 text-[10px] font-black font-mono uppercase">Arquivo: {filePreview}</p>}
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* ACTIONS */}
-        <div className="flex justify-between items-center w-full mt-10 pt-8 border-t border-slate-800">
-          <button 
-            onClick={onCancel}
-            className="px-6 py-3 text-slate-500 font-black text-[10px] hover:text-white transition uppercase tracking-widest"
-          >
-            Voltar
-          </button>
-          <button 
-            onClick={handleProcess}
-            disabled={(!audioBlob && !selectedFile) || isProcessing}
-            className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-black font-black uppercase tracking-widest text-xs shadow-[0_15px_30px_rgba(6,182,212,0.3)] transition-all disabled:opacity-20 transform hover:-translate-y-1"
-          >
-            {isProcessing ? "IA Analisando..." : "Analisar Briefing →"}
-          </button>
+          {/* VIEW: UPLOAD IMAGE */}
+          {activeTab === 'UPLOAD_IMAGE' && (
+            <div className="w-full text-center space-y-6">
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="flex flex-col items-center justify-center w-full h-56 border-2 border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-900/50 hover:bg-slate-800 transition overflow-hidden relative"
+              >
+                {imagePreview ? (
+                  <img src={imagePreview} className="w-full h-full object-cover opacity-60" />
+                ) : (
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <span className="text-5xl mb-4">🖼️</span>
+                    <p className="mb-2 text-sm text-slate-300 font-bold uppercase tracking-widest">Selecionar Foto ou Tirar Agora</p>
+                    <p className="text-[10px] text-slate-500 uppercase font-mono">Galeria, Arquivos ou Câmera</p>
+                  </div>
+                )}
+                {/* Removido capture="environment" para habilitar a escolha do usuário */}
+                <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'IMAGE')} />
+              </div>
+              {imagePreview && <p className="text-cyan-400 text-[10px] font-black uppercase tracking-widest">Foto Carregada • Clique para Alterar</p>}
+            </div>
+          )}
+
+          {/* VIEW: UPLOAD AUDIO / PDF */}
+          {(activeTab === 'UPLOAD_AUDIO' || activeTab === 'UPLOAD_PDF') && (
+            <div className="w-full text-center">
+              <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-900/50 hover:bg-slate-800 transition">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <span className="text-4xl mb-4">{activeTab === 'UPLOAD_AUDIO' ? '🎵' : '📄'}</span>
+                  <p className="mb-2 text-sm text-slate-300 font-bold uppercase tracking-widest">Upload de {activeTab === 'UPLOAD_AUDIO' ? 'Áudio' : 'Briefing PDF'}</p>
+                  <p className="text-[10px] text-slate-500 uppercase font-mono">Formatos aceitos: {activeTab === 'UPLOAD_AUDIO' ? 'MP3, WAV, M4A' : 'PDF'}</p>
+                </div>
+                <input type="file" className="hidden" accept={activeTab === 'UPLOAD_AUDIO' ? 'audio/*' : 'application/pdf'} onChange={(e) => handleFileChange(e, activeTab === 'UPLOAD_AUDIO' ? 'AUDIO' : 'PDF')} />
+              </label>
+              {filePreview && <p className="mt-4 text-cyan-400 text-[10px] font-black font-mono uppercase">Arquivo: {filePreview}</p>}
+            </div>
+          )}
+
+          {/* ACTIONS */}
+          <div className="flex justify-between items-center w-full mt-10 pt-8 border-t border-slate-800">
+            <button 
+              onClick={onCancel}
+              className="px-6 py-3 text-slate-500 font-black text-[10px] hover:text-white transition uppercase tracking-widest"
+            >
+              Voltar
+            </button>
+            <button 
+              onClick={handleProcess}
+              disabled={(!audioBlob && !selectedFile) || isProcessing}
+              className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-black font-black uppercase tracking-widest text-xs shadow-[0_15px_30px_rgba(6,182,212,0.3)] transition-all disabled:opacity-20 transform hover:-translate-y-1"
+            >
+              {isProcessing ? "IA Analisando..." : "Analisar Briefing →"}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
