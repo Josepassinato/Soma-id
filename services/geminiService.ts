@@ -65,6 +65,8 @@ export const analyzeConsultationWithGemini = async (input: ConsultationInput): P
  */
 export const generateEnchantmentPrompt = async (project: Project, angle: string = "Frontal View"): Promise<string> => {
   try {
+    const language = getCurrentLanguage();
+    
     const response = await fetch(`${API_URL}/gemini/generate-prompt`, {
       method: 'POST',
       headers: {
@@ -77,6 +79,7 @@ export const generateEnchantmentPrompt = async (project: Project, angle: string 
         wallHeight: project.wallHeight || 2700,
         styleDescription: project.styleDescription,
         angle: angle,
+        language: language,
       }),
     });
 
