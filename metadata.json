@@ -1,0 +1,8 @@
+{
+  "name": "SOMA-ID PRO",
+  "description": "Sistema Industrial de Projetos de Marcenaria com Gemini 2.5 Live e Engenharia Industrial",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
