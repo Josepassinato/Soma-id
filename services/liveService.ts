@@ -1,70 +1,47 @@
 
-import { GoogleGenAI, Modality, Type, FunctionDeclaration } from "@google/genai";
+/**
+ * LIVE SERVICE - Assistente de Voz Industrial
+ * 
+ * NOTA: Este serviço usa a Live API do Gemini que requer conexão WebSocket.
+ * Para produção, implemente um WebSocket proxy no backend para proteger a API key.
+ * 
+ * Por enquanto, este serviço está desabilitado até implementação do proxy.
+ */
 
-const updateDimensionsDeclaration: FunctionDeclaration = {
-  name: 'update_dimensions',
-  parameters: {
-    type: Type.OBJECT,
-    description: 'Atualiza as dimensões físicas da parede ou do projeto.',
-    properties: {
-      width: { type: Type.NUMBER, description: 'Nova largura em milímetros.' },
-      height: { type: Type.NUMBER, description: 'Nova altura em milímetros.' },
-      depth: { type: Type.NUMBER, description: 'Nova profundidade em milímetros.' }
-    }
-  }
-};
-
-const changeMaterialDeclaration: FunctionDeclaration = {
-  name: 'change_material',
-  parameters: {
-    type: Type.OBJECT,
-    description: 'Altera o material ou acabamento do projeto.',
-    properties: {
-      materialName: { type: Type.STRING, description: 'Nome do material (ex: Carvalho, Branco Supremo).' },
-      slot: { type: Type.STRING, enum: ['PRIMARY', 'SECONDARY'], description: 'Se altera as frentes ou o corpo.' }
-    },
-    required: ['materialName']
-  }
-};
+// Tipos para compatibilidade com componentes existentes
+interface LiveCallbacks {
+  onOpen: () => void;
+  onMessage: (msg: any) => void;
+  onClose: () => void;
+  onToolCall: (calls: any[]) => void;
+}
 
 export const LiveService = {
-  connect: async (callbacks: {
-    onOpen: () => void;
-    onMessage: (msg: any) => void;
-    onClose: () => void;
-    onToolCall: (calls: any[]) => void;
-  }) => {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  /**
+   * Conecta ao assistente de voz (DESABILITADO)
+   * 
+   * @deprecated Migração para backend pendente - requer WebSocket proxy
+   */
+  connect: async (callbacks: LiveCallbacks) => {
+    console.warn('[LiveService] Assistente de voz temporariamente desabilitado. Migração para backend em andamento.');
     
-    return ai.live.connect({
-      model: 'gemini-2.5-flash-native-audio-preview-09-2025',
-      config: {
-        responseModalities: [Modality.AUDIO],
-        speechConfig: {
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Puck' } }
-        },
-        tools: [{ 
-            functionDeclarations: [
-                updateDimensionsDeclaration, 
-                changeMaterialDeclaration
-            ] 
-        }],
-        systemInstruction: `Você é o Engenheiro Assistente da MarcenariaAI Pro. 
-        Sua função é auxiliar o marceneiro a ajustar projetos via voz.
-        Seja técnico, breve e execute as funções sempre que o usuário pedir mudanças de medidas ou materiais.
-        Exemplo: "Aumente a largura para 4 metros" -> chame update_dimensions(width: 4000).`
+    // Retorna um mock para não quebrar componentes existentes
+    return {
+      send: (msg: any) => {
+        console.warn('[LiveService] Mensagem não enviada - serviço desabilitado:', msg);
       },
-      callbacks: {
-        onopen: callbacks.onOpen,
-        onclose: callbacks.onClose,
-        onmessage: (msg) => {
-            if (msg.toolCall) {
-                callbacks.onToolCall(msg.toolCall.functionCalls);
-            }
-            callbacks.onMessage(msg);
-        },
-        onerror: (e) => console.error("Live API Error:", e)
-      }
-    });
+      close: () => {
+        console.log('[LiveService] Conexão mock fechada.');
+        callbacks.onClose();
+      },
+      isConnected: false
+    };
+  },
+
+  /**
+   * Verifica se o serviço Live está disponível
+   */
+  isAvailable: () => {
+    return false; // Desabilitado até implementação do WebSocket proxy
   }
 };
