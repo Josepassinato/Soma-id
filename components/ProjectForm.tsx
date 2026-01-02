@@ -299,7 +299,7 @@ export const ProjectForm: React.FC<Props> = ({ onSubmit, onCancel, initialData }
              </div>
              <button 
               onClick={() => onSubmit(formData)} 
-              disabled={!formData.materialPalette?.[0] || !formData.clientName || !formData.roomPhotoData} 
+              disabled={!formData.materialPalette?.[0] || !formData.clientName || (!formData.roomPhotoData && !initialData?.roomPhotoData)} 
               className="px-16 py-6 bg-cyan-500 hover:bg-cyan-400 text-black font-black uppercase tracking-[0.3em] text-sm rounded-2xl shadow-[0_20px_50px_rgba(6,182,212,0.3)] transition-all transform hover:-translate-y-1 active:scale-95 disabled:opacity-30 disabled:grayscale"
             >
               Criar Projeto e Gerar Render →
