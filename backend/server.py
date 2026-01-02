@@ -687,8 +687,13 @@ async def select_room_for_project(request: SelectRoomForProjectRequest):
         if not selected_room:
             raise HTTPException(status_code=404, detail=f"Room '{request.roomName}' not found in analysis")
         
+        # Get language instruction
+        language_instruction = get_language_instruction(request.language or "pt")
+        
         # Generate project brief for the selected room
         prompt = f"""{SYSTEM_INSTRUCTION_DEBURADOR}
+
+{language_instruction}
 
 Based on this floor plan room analysis, create a SOMA-ID project brief:
 
