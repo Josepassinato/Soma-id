@@ -244,7 +244,7 @@ async def generate_enchantment_prompt(request: GeneratePromptRequest):
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        model = genai.GenerativeModel('models/gemini-2.5-pro')
         
         style_keywords = get_style_keywords(request.styleDescription)
         
