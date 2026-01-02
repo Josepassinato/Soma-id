@@ -1,6 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { ExtractedInsights, ConsultationInput } from '../types';
+import { FloorPlanAnalyzer } from './FloorPlanAnalyzer';
 
 interface Props {
   onCancel: () => void;
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtracted, onProcess }) => {
-  const [activeTab, setActiveTab] = useState<'RECORD' | 'UPLOAD_AUDIO' | 'UPLOAD_PDF' | 'UPLOAD_IMAGE'>('RECORD');
+  const [activeTab, setActiveTab] = useState<'RECORD' | 'UPLOAD_AUDIO' | 'UPLOAD_PDF' | 'UPLOAD_IMAGE' | 'FLOOR_PLAN'>('RECORD');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   
