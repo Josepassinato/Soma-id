@@ -222,9 +222,9 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
               </button>
               <div className="text-center">
                 <p className="text-sm font-bold text-white uppercase tracking-widest">
-                  {isRecording ? "Capturando Briefing..." : audioBlob ? "Voz Gravada com Sucesso" : "Pressione para gravar conversa"}
+                  {isRecording ? t('capture_briefing') : audioBlob ? t('voice_recorded') : t('press_to_record')}
                 </p>
-                <p className="text-[10px] font-mono text-slate-500 mt-2 uppercase">A IA irá extrair medidas e estilos automaticamente</p>
+                <p className="text-[10px] font-mono text-slate-500 mt-2 uppercase">{t('ai_will_extract')}</p>
               </div>
             </div>
           )}
@@ -241,14 +241,13 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
                 ) : (
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <span className="text-5xl mb-4">🖼️</span>
-                    <p className="mb-2 text-sm text-slate-300 font-bold uppercase tracking-widest">Selecionar Foto ou Tirar Agora</p>
-                    <p className="text-[10px] text-slate-500 uppercase font-mono">Galeria, Arquivos ou Câmera</p>
+                    <p className="mb-2 text-sm text-slate-300 font-bold uppercase tracking-widest">{t('select_photo')}</p>
+                    <p className="text-[10px] text-slate-500 uppercase font-mono">{t('gallery_files_camera')}</p>
                   </div>
                 )}
-                {/* Removido capture="environment" para habilitar a escolha do usuário */}
                 <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'IMAGE')} />
               </div>
-              {imagePreview && <p className="text-cyan-400 text-[10px] font-black uppercase tracking-widest">Foto Carregada • Clique para Alterar</p>}
+              {imagePreview && <p className="text-cyan-400 text-[10px] font-black uppercase tracking-widest">{t('photo_loaded')} • {t('click_to_change')}</p>}
             </div>
           )}
 
@@ -258,12 +257,12 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
               <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-900/50 hover:bg-slate-800 transition">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <span className="text-4xl mb-4">{activeTab === 'UPLOAD_AUDIO' ? '🎵' : '📄'}</span>
-                  <p className="mb-2 text-sm text-slate-300 font-bold uppercase tracking-widest">Upload de {activeTab === 'UPLOAD_AUDIO' ? 'Áudio' : 'Briefing PDF'}</p>
-                  <p className="text-[10px] text-slate-500 uppercase font-mono">Formatos aceitos: {activeTab === 'UPLOAD_AUDIO' ? 'MP3, WAV, M4A' : 'PDF'}</p>
+                  <p className="mb-2 text-sm text-slate-300 font-bold uppercase tracking-widest">{activeTab === 'UPLOAD_AUDIO' ? t('upload_audio') : t('upload_pdf')}</p>
+                  <p className="text-[10px] text-slate-500 uppercase font-mono">{activeTab === 'UPLOAD_AUDIO' ? t('formats_audio') : t('formats_pdf')}</p>
                 </div>
                 <input type="file" className="hidden" accept={activeTab === 'UPLOAD_AUDIO' ? 'audio/*' : 'application/pdf'} onChange={(e) => handleFileChange(e, activeTab === 'UPLOAD_AUDIO' ? 'AUDIO' : 'PDF')} />
               </label>
-              {filePreview && <p className="mt-4 text-cyan-400 text-[10px] font-black font-mono uppercase">Arquivo: {filePreview}</p>}
+              {filePreview && <p className="mt-4 text-cyan-400 text-[10px] font-black font-mono uppercase">{t('file')}: {filePreview}</p>}
             </div>
           )}
 
@@ -273,14 +272,14 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
               onClick={onCancel}
               className="px-6 py-3 text-slate-500 font-black text-[10px] hover:text-white transition uppercase tracking-widest"
             >
-              Voltar
+              {t('back')}
             </button>
             <button 
               onClick={handleProcess}
               disabled={(!audioBlob && !selectedFile) || isProcessing}
               className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-black font-black uppercase tracking-widest text-xs shadow-[0_15px_30px_rgba(6,182,212,0.3)] transition-all disabled:opacity-20 transform hover:-translate-y-1"
             >
-              {isProcessing ? "IA Analisando..." : "Analisar Briefing →"}
+              {isProcessing ? t('ai_analyzing') : `${t('analyze_briefing')} →`}
             </button>
           </div>
         </div>
