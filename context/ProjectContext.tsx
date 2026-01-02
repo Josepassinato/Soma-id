@@ -55,11 +55,15 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const createProject = async (data: Partial<Project>, extractedData?: ExtractedInsights & { transcript?: string }) => {
     addNotification('info', 'Iniciando pipeline SOMA-ID...');
     try {
-      const { data: { user } } = await supabase!.auth.getUser();
-      if (!user) return;
+      // Safe null check for supabase
+      let userId: string | null = null;
+      if (supabase) {
+        const { data: authData } = await supabase.auth.getUser();
+        userId = authData?.user?.id || null;
+      }
 
-      if (extractedData) {
-         const hasTokens = await TokenService.deductTokens(user.id, TOKEN_COSTS.CONSULTATION, `Briefing: ${data.clientName}`);
+      if (extractedData && userId) {
+         const hasTokens = await TokenService.deductTokens(userId, TOKEN_COSTS.CONSULTATION, `Briefing: ${data.clientName}`);
          if (!hasTokens) {
             setIsPricingOpen(true);
             addNotification('error', 'Saldo insuficiente para análise inicial.');
