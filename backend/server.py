@@ -189,7 +189,7 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
         
         parts = []
         
@@ -334,7 +334,7 @@ async def generate_technical_data(request: GenerateTechnicalDataRequest):
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
         
         prompt = f"""{AGENT_TECHNICAL_PIPELINE_INSTRUCTION}
 
@@ -385,7 +385,7 @@ async def check_gemini_health():
         import time
         start = time.time()
         
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
         response = model.generate_content("Respond with only: OK")
         
         latency = int((time.time() - start) * 1000)
