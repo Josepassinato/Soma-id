@@ -158,32 +158,48 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
       </div>
 
       {/* TABS */}
-      <div className="flex border-b border-slate-800 bg-slate-900/50">
+      <div className="flex border-b border-slate-800 bg-slate-900/50 overflow-x-auto">
         <button 
           onClick={() => { setActiveTab('RECORD'); resetState(); }}
-          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition ${activeTab === 'RECORD' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
+          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'RECORD' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
           🎙️ Áudio Live
         </button>
         <button 
           onClick={() => { setActiveTab('UPLOAD_IMAGE'); resetState(); }}
-          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition ${activeTab === 'UPLOAD_IMAGE' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
+          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'UPLOAD_IMAGE' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
           📸 Foto/Upload
         </button>
         <button 
-          onClick={() => { setActiveTab('UPLOAD_AUDIO'); resetState(); }}
-          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition ${activeTab === 'UPLOAD_AUDIO' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
+          onClick={() => { setActiveTab('FLOOR_PLAN'); resetState(); }}
+          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'FLOOR_PLAN' ? 'text-purple-400 border-b-2 border-purple-400 bg-purple-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
-          📤 Upload Áudio
+          📐 Planta Baixa
+        </button>
+        <button 
+          onClick={() => { setActiveTab('UPLOAD_AUDIO'); resetState(); }}
+          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'UPLOAD_AUDIO' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
+        >
+          📤 Áudio
         </button>
         <button 
           onClick={() => { setActiveTab('UPLOAD_PDF'); resetState(); }}
-          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition ${activeTab === 'UPLOAD_PDF' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
+          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'UPLOAD_PDF' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
-          📄 PDF Briefing
+          📄 PDF
         </button>
       </div>
+
+      {/* VIEW: FLOOR PLAN ANALYZER */}
+      {activeTab === 'FLOOR_PLAN' && (
+        <FloorPlanAnalyzer 
+          onCancel={onCancel}
+          onProjectReady={(insights, roomPhoto) => {
+            onInsightsExtracted({ ...insights, roomPhotoData: roomPhoto }, 'Planta Baixa');
+          }}
+        />
+      )}
       
       <div className="p-10 min-h-[350px] flex flex-col items-center justify-center">
         
