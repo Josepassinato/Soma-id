@@ -9,7 +9,7 @@ export const AppConfig = {
   // ID do Projeto no Google Cloud Platform (GCP)
   gcpProjectId: "SEU_ID_PROJETO_GCP_AQUI",
 
-  // Configuração do Supabase
-  supabaseUrl: "https://eruolbsvomarfxuxchjx.supabase.co",
-  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVydW9sYnN2b21hcmZ4dXhjaGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzMzE2MzUsImV4cCI6MjA4MDkwNzYzNX0.Q6xISX2xNus4aZ6jj_O1EqRM25Mn-Tx94FR_llCVTHo"
+  // Configuração do Supabase - agora usando variáveis de ambiente
+  supabaseUrl: (import.meta as any).env?.VITE_SUPABASE_URL || "https://eruolbsvomarfxuxchjx.supabase.co",
+  supabaseAnonKey: (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "sb_publishable_NPo16I-D1n8nVeiNwybadg_oIUjATMA"
 };
