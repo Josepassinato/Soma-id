@@ -514,7 +514,12 @@ async def analyze_floor_plan(request: AnalyzeFloorPlanRequest):
         # Decode base64 image
         image_data = base64.b64decode(request.imageBase64)
         
+        # Get language instruction
+        language_instruction = get_language_instruction(request.language or "pt")
+        
         prompt = f"""{FLOOR_PLAN_ANALYZER_INSTRUCTION}
+
+{language_instruction}
 
 Analyze this architectural floor plan image.
 {f'Client Name: {request.clientName}' if request.clientName else ''}
