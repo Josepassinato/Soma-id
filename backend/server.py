@@ -293,7 +293,24 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
     try:
         model = genai.GenerativeModel('models/gemini-2.5-flash')
         
+        # Get language instruction
+        language_instruction = get_language_instruction(request.language or "pt")
+        
+        # Language-specific prompts
+        image_prompts = {
+            "pt": "Analise esta foto do ambiente. Identifique o tipo de cômodo, estime a largura da parede principal baseando-se em objetos padrão (portas, tomadas), descreva os materiais existentes e sugira um estilo SOMA-ID que combine.",
+            "en": "Analyze this room photo. Identify the room type, estimate the main wall width based on standard objects (doors, outlets), describe existing materials and suggest a matching SOMA-ID style.",
+            "es": "Analice esta foto del ambiente. Identifique el tipo de habitación, estime el ancho de la pared principal basándose en objetos estándar (puertas, enchufes), describa los materiales existentes y sugiera un estilo SOMA-ID que combine."
+        }
+        
+        audio_prompts = {
+            "pt": "Analise este documento/áudio. Extraia informações sobre o cliente, tipo de ambiente, medidas mencionadas e preferências de estilo.",
+            "en": "Analyze this document/audio. Extract information about the client, room type, mentioned measurements and style preferences.",
+            "es": "Analice este documento/audio. Extraiga información sobre el cliente, tipo de ambiente, medidas mencionadas y preferencias de estilo."
+        }
+        
         parts = []
+        lang = request.language or "pt"
         
         if request.input.type == 'TEXT':
             parts.append(request.input.content)
@@ -304,7 +321,7 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
                 "mime_type": request.input.mimeType or "image/jpeg",
                 "data": image_data
             })
-            parts.append("Analise esta foto do ambiente. Identifique o tipo de cômodo, estime a largura da parede principal baseando-se em objetos padrão (portas, tomadas), descreva os materiais existentes e sugira um estilo SOMA-ID que combine.")
+            parts.append(image_prompts.get(lang, image_prompts["pt"]))
         else:
             # For audio/pdf
             file_data = base64.b64decode(request.input.content)
@@ -312,10 +329,16 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
                 "mime_type": request.input.mimeType,
                 "data": file_data
             })
-            parts.append("Analise este documento/áudio. Extraia informações sobre o cliente, tipo de ambiente, medidas mencionadas e preferências de estilo.")
+            parts.append(audio_prompts.get(lang, audio_prompts["pt"]))
 
-        # Build the prompt with system instruction
-        full_prompt = f"{SYSTEM_INSTRUCTION_DEBURADOR}\n\nAnalyze the following and return a JSON with these fields: clientName (string), roomType (string), wallWidth (number in mm), wallHeight (number in mm), wallDepth (number in mm), styleDescription (string), technicalBriefing (string), suggestedMaterials (array of strings), installationType (PISO or SUSPENSO), analysisStatus (COMPLETO or INCOMPLETO).\n\n"
+        # Build the prompt with system instruction and language requirement
+        full_prompt = f"""{SYSTEM_INSTRUCTION_DEBURADOR}
+
+{language_instruction}
+
+Analyze the following and return a JSON with these fields: clientName (string), roomType (string), wallWidth (number in mm), wallHeight (number in mm), wallDepth (number in mm), styleDescription (string), technicalBriefing (string), suggestedMaterials (array of strings), installationType (PISO or SUSPENSO), analysisStatus (COMPLETO or INCOMPLETO).
+
+"""
         
         if request.input.type == 'TEXT':
             response = model.generate_content(full_prompt + request.input.content)
@@ -324,9 +347,12 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
         
         result = extract_json(response.text)
         
-        # Ensure required fields
-        result.setdefault('clientName', 'Cliente')
-        result.setdefault('roomType', 'Cozinha')
+        # Ensure required fields with language-appropriate defaults
+        default_room_types = {"pt": "Cozinha", "en": "Kitchen", "es": "Cocina"}
+        default_client = {"pt": "Cliente", "en": "Client", "es": "Cliente"}
+        
+        result.setdefault('clientName', default_client.get(lang, 'Cliente'))
+        result.setdefault('roomType', default_room_types.get(lang, 'Cozinha'))
         result.setdefault('wallWidth', 3000)
         result.setdefault('analysisStatus', 'INCOMPLETO')
         result.setdefault('styleDescription', '')
