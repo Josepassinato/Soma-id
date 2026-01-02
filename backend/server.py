@@ -485,6 +485,241 @@ async def check_gemini_health():
         return {"status": "error", "message": str(e), "latency": 0}
 
 
+# ============== FLOOR PLAN ANALYSIS ENDPOINTS ==============
+
+@api_router.post("/floorplan/analyze")
+async def analyze_floor_plan(request: AnalyzeFloorPlanRequest):
+    """Analyze an architectural floor plan and extract rooms/woodwork opportunities"""
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    
+    try:
+        model = genai.GenerativeModel('models/gemini-2.5-pro')
+        
+        # Decode base64 image
+        image_data = base64.b64decode(request.imageBase64)
+        
+        prompt = f"""{FLOOR_PLAN_ANALYZER_INSTRUCTION}
+
+Analyze this architectural floor plan image.
+{f'Client Name: {request.clientName}' if request.clientName else ''}
+{f'Project Context: {request.projectContext}' if request.projectContext else ''}
+
+Extract ALL rooms with their:
+1. Name (exactly as labeled)
+2. Dimensions (convert to mm if in feet/inches)
+3. Area in square feet
+4. Special features (walk-in closet, ceiling type, etc.)
+5. Woodwork potential (what custom furniture/cabinetry can be made)
+
+Also identify:
+- Total bedrooms and bathrooms
+- Layout type (single floor, multi-level, etc.)
+- Which floor this is (ground, upper, etc.)
+
+Generate questions for the user if:
+- Any room's purpose is unclear
+- Dimensions are cut off or unreadable
+- You need style/material preferences
+- Ceiling heights are not visible
+
+Return valid JSON only."""
+
+        response = model.generate_content([
+            {"mime_type": request.mimeType, "data": image_data},
+            prompt
+        ])
+        
+        result = extract_json(response.text)
+        
+        # Create session for follow-up chat
+        session_id = str(uuid.uuid4())
+        chat_sessions[session_id] = [{
+            "role": "system",
+            "content": f"Floor plan analysis completed. Analysis: {json.dumps(result, ensure_ascii=False)}"
+        }]
+        
+        return {
+            "status": "success",
+            "sessionId": session_id,
+            "data": result
+        }
+        
+    except Exception as e:
+        logger.error(f"Error analyzing floor plan: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to analyze floor plan: {str(e)}")
+
+
+@api_router.post("/floorplan/chat")
+async def floor_plan_chat(request: FloorPlanChatRequest):
+    """Chat with AI about the floor plan analysis - ask questions or get clarifications"""
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    
+    try:
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
+        
+        # Get or create session
+        if request.sessionId not in chat_sessions:
+            chat_sessions[request.sessionId] = []
+            if request.floorPlanAnalysis:
+                chat_sessions[request.sessionId].append({
+                    "role": "system",
+                    "content": f"Floor plan analysis context: {json.dumps(request.floorPlanAnalysis, ensure_ascii=False)}"
+                })
+        
+        # Add user message to history
+        chat_sessions[request.sessionId].append({
+            "role": "user",
+            "content": request.message
+        })
+        
+        # Build context for AI
+        history = chat_sessions[request.sessionId]
+        context = "\n".join([f"{msg['role'].upper()}: {msg['content']}" for msg in history])
+        
+        system_prompt = """You are the SOMA-ID Floor Plan Assistant. You help users understand their floor plan analysis and guide them to create woodworking projects.
+
+RULES:
+1. Answer questions about the floor plan analysis
+2. Help clarify room dimensions and purposes
+3. Suggest appropriate woodwork for each room
+4. Guide users to select which room they want to work on
+5. If user provides new information, update your understanding
+6. Always be helpful and specific about woodworking possibilities
+7. Respond in the same language as the user (Portuguese if they write in Portuguese)
+
+When user selects a room for a project, confirm:
+- Room name and dimensions
+- Type of woodwork they want
+- Any special requirements
+
+Return your response as JSON:
+{
+  "message": "Your response text",
+  "suggestedActions": ["action1", "action2"],
+  "updatedAnalysis": null or {...} if analysis needs updating,
+  "readyToCreateProject": false or { "roomName": "...", "woodworkType": "...", "dimensions": {...} }
+}"""
+
+        prompt = f"""{system_prompt}
+
+CONVERSATION HISTORY:
+{context}
+
+Respond to the user's last message."""
+
+        # Include image if provided
+        parts = [prompt]
+        if request.imageBase64:
+            image_data = base64.b64decode(request.imageBase64)
+            parts = [{"mime_type": "image/jpeg", "data": image_data}, prompt]
+        
+        response = model.generate_content(parts)
+        result = extract_json(response.text)
+        
+        # Add assistant response to history
+        chat_sessions[request.sessionId].append({
+            "role": "assistant",
+            "content": result.get("message", response.text)
+        })
+        
+        return {
+            "status": "success",
+            "sessionId": request.sessionId,
+            "data": result
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in floor plan chat: {str(e)}")
+        # Return a simple text response if JSON parsing fails
+        return {
+            "status": "success",
+            "sessionId": request.sessionId,
+            "data": {
+                "message": response.text if 'response' in locals() else str(e),
+                "suggestedActions": [],
+                "readyToCreateProject": False
+            }
+        }
+
+
+@api_router.post("/floorplan/select-room")
+async def select_room_for_project(request: SelectRoomForProjectRequest):
+    """Select a room from the floor plan to create a SOMA-ID project"""
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    
+    try:
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
+        
+        # Find the selected room in the analysis
+        selected_room = None
+        for room in request.floorPlanAnalysis.get("rooms", []):
+            if room.get("name", "").lower() == request.roomName.lower():
+                selected_room = room
+                break
+        
+        if not selected_room:
+            raise HTTPException(status_code=404, detail=f"Room '{request.roomName}' not found in analysis")
+        
+        # Generate project brief for the selected room
+        prompt = f"""{SYSTEM_INSTRUCTION_DEBURADOR}
+
+Based on this floor plan room analysis, create a SOMA-ID project brief:
+
+ROOM DATA:
+- Name: {selected_room.get('name')}
+- Dimensions: {selected_room.get('dimensions', 'Not specified')}
+- Area: {selected_room.get('area_sqft', 'Not calculated')} sq ft
+- Features: {', '.join(selected_room.get('features', []))}
+- Woodwork Type Requested: {request.woodworkType}
+
+FLOOR PLAN CONTEXT:
+- Layout: {request.floorPlanAnalysis.get('layout_type', 'Unknown')}
+- Floor Level: {request.floorPlanAnalysis.get('floor_level', 'Unknown')}
+
+Generate a detailed project brief with:
+1. Estimated wall width in mm (based on room dimensions)
+2. Suggested room type classification for SOMA-ID
+3. Style recommendations
+4. Technical considerations
+5. Material suggestions
+
+Return JSON:
+{{
+  "clientName": "From Floor Plan",
+  "roomType": "SOMA-ID classification",
+  "wallWidth": number in mm,
+  "wallHeight": 2700,
+  "styleDescription": "recommended style",
+  "technicalBriefing": "detailed brief",
+  "suggestedMaterials": ["material1", "material2"],
+  "installationType": "PISO or SUSPENSO",
+  "analysisStatus": "COMPLETO",
+  "sourceRoom": "original room name",
+  "woodworkType": "type requested"
+}}"""
+
+        response = model.generate_content(prompt)
+        result = extract_json(response.text)
+        
+        # Add source information
+        result["fromFloorPlan"] = True
+        result["originalRoomData"] = selected_room
+        
+        return {
+            "status": "success",
+            "data": result
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error selecting room: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to select room: {str(e)}")
+
+
 # ============== INCLUDE ROUTER AND MIDDLEWARE ==============
 
 app.include_router(api_router)
