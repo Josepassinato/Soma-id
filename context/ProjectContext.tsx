@@ -97,14 +97,20 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const processProjectAi = async (project: Project) => {
-    const { data: { user } } = await supabase!.auth.getUser();
-    if (!user) return;
+    // Safe null check for supabase
+    let userId: string | null = null;
+    if (supabase) {
+      const { data: authData } = await supabase.auth.getUser();
+      userId = authData?.user?.id || null;
+    }
 
-    const hasTokens = await TokenService.deductTokens(user.id, TOKEN_COSTS.RENDER, `Digital Twin: ${project.clientName}`);
-    if (!hasTokens) {
-        setIsPricingOpen(true);
-        addNotification('error', 'Tokens insuficientes para o Módulo de Encantamento.');
-        return;
+    if (userId) {
+      const hasTokens = await TokenService.deductTokens(userId, TOKEN_COSTS.RENDER, `Digital Twin: ${project.clientName}`);
+      if (!hasTokens) {
+          setIsPricingOpen(true);
+          addNotification('error', 'Tokens insuficientes para o Módulo de Encantamento.');
+          return;
+      }
     }
 
     // Set status to processing
@@ -142,14 +148,20 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const finalizeProject = async (project: Project) => {
-    const { data: { user } } = await supabase!.auth.getUser();
-    if (!user) return;
+    // Safe null check for supabase
+    let userId: string | null = null;
+    if (supabase) {
+      const { data: authData } = await supabase.auth.getUser();
+      userId = authData?.user?.id || null;
+    }
 
-    const hasTokens = await TokenService.deductTokens(user.id, TOKEN_COSTS.ENGINEERING, `Engenharia Industrial: ${project.clientName}`);
-    if (!hasTokens) {
-        setIsPricingOpen(true);
-        addNotification('error', 'Saldo insuficiente para Engenharia de Fábrica.');
-        return;
+    if (userId) {
+      const hasTokens = await TokenService.deductTokens(userId, TOKEN_COSTS.ENGINEERING, `Engenharia Industrial: ${project.clientName}`);
+      if (!hasTokens) {
+          setIsPricingOpen(true);
+          addNotification('error', 'Saldo insuficiente para Engenharia de Fábrica.');
+          return;
+      }
     }
 
     await updateProjectMutation.mutateAsync({ ...project, status: 'PROCESSANDO' });
