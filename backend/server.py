@@ -17,10 +17,19 @@ import base64
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# MongoDB connection - use environment variable or default
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+db_name = os.environ.get('DB_NAME', 'soma_id_db')
+
+# Initialize MongoDB client with error handling
+try:
+    client = AsyncIOMotorClient(mongo_url)
+    db = client[db_name]
+    logging.info(f"MongoDB client initialized for database: {db_name}")
+except Exception as e:
+    logging.error(f"Failed to initialize MongoDB client: {e}")
+    client = None
+    db = None
 
 # Configure Gemini API
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
