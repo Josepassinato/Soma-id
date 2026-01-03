@@ -21,10 +21,24 @@ export default defineConfig(({ mode }) => {
           }
         }
       },
+      build: {
+        // Increase chunk size warning limit
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              // Split vendor chunks
+              'react-vendor': ['react', 'react-dom'],
+              'supabase': ['@supabase/supabase-js'],
+              'query': ['@tanstack/react-query'],
+            }
+          }
+        }
+      },
       plugins: [react()],
       define: {
-        // Backend URL for API calls - use external URL
-        'window.BACKEND_URL': JSON.stringify(env.VITE_BACKEND_URL || 'https://demobackend.emergentagent.com/api'),
+        // Backend URL for API calls - use relative URL in production
+        'window.BACKEND_URL': JSON.stringify('/api'),
       },
       resolve: {
         alias: {
