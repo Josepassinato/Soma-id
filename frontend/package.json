@@ -1,0 +1,9 @@
+{
+  "name": "soma-id-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "cd .. && yarn dev",
+    "build": "cd .. && yarn build"
+  }
+}
