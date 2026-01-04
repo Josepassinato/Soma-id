@@ -412,56 +412,97 @@ Incorporate tunable lighting, specific wood grain orientations (Freijó, Walnut)
 
 @api_router.post("/gemini/generate-image")
 async def generate_enchantment_image(request: GenerateImageRequest):
-    """Generate an architectural visualization image using Gemini"""
+    """Generate an architectural visualization image using Gemini Image Generation"""
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        # Use Gemini 1.5 Pro with vision capabilities
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
+        # Use Gemini 2.5 Flash Image model for actual image generation
+        model = genai.GenerativeModel(
+            'models/gemini-2.5-flash-preview-image-generation',
+            generation_config={"response_mime_type": "text/plain"}
+        )
         
-        parts = []
-        
-        # Add material photo if provided
+        # Build the image generation prompt
+        material_instruction = ""
         if request.materialPhoto:
-            try:
-                # Handle base64 data URL or plain base64
-                if request.materialPhoto.startswith('data:'):
-                    base64_data = request.materialPhoto.split(',')[1]
-                else:
-                    base64_data = request.materialPhoto
-                    
-                image_data = base64.b64decode(base64_data)
-                parts.append({
-                    "mime_type": "image/png",
-                    "data": image_data
-                })
-                material_instruction = "EXACTLY use the texture and color from the attached image for all woodworking surfaces."
-            except:
-                material_instruction = "Use high-end natural oak/walnut textures with deep grains and matte finish."
+            material_instruction = "Use warm wood tones with natural grain patterns similar to walnut or oak."
         else:
             material_instruction = "Use high-end natural oak/walnut textures with deep grains and matte finish."
         
-        render_prompt = f"""URGENT: ACT AS A WORLD-CLASS ARCHITECTURAL PHOTOGRAPHER.
-RENDER TASK: Generate a detailed description for a 3D Digital Twin based on this: {request.prompt}.
-MATERIAL FIDELITY: {material_instruction}
-SCENE: Ultra-realistic 4K architectural render, soft ambient lighting, high contrast, clean minimalist luxury aesthetic 2025.
+        image_prompt = f"""Generate a photorealistic architectural interior render:
 
-Provide a detailed visual description that could be used for image generation."""
-        
-        parts.append(render_prompt)
-        
-        response = model.generate_content(parts)
-        
-        # Note: Gemini doesn't directly generate images, it generates descriptions
-        # For actual image generation, you'd need to use a different service like DALL-E or Imagen
-        return {
-            "status": "success",
-            "data": {
-                "description": response.text,
-                "note": "Image generation requires an image-specific API. This response contains the visual description."
+SCENE: {request.prompt}
+
+STYLE REQUIREMENTS:
+- Ultra-realistic 4K quality architectural photography
+- Professional interior design magazine quality
+- Soft natural lighting with warm accents
+- Clean minimalist luxury aesthetic 2025
+- {material_instruction}
+
+CAMERA: Wide angle lens, eye-level perspective, professional composition
+MOOD: Sophisticated, inviting, luxurious
+QUALITY: Photorealistic, high detail, no artifacts"""
+
+        # Try to generate image
+        try:
+            # First try with image generation model
+            image_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-image-generation')
+            response = image_model.generate_content(image_prompt)
+            
+            # Check if response contains image
+            if response.candidates and response.candidates[0].content.parts:
+                for part in response.candidates[0].content.parts:
+                    if hasattr(part, 'inline_data') and part.inline_data:
+                        # Found image data
+                        image_data = part.inline_data.data
+                        mime_type = part.inline_data.mime_type
+                        image_base64 = base64.b64encode(image_data).decode('utf-8')
+                        
+                        return {
+                            "status": "success",
+                            "data": {
+                                "image": f"data:{mime_type};base64,{image_base64}",
+                                "description": response.text if hasattr(response, 'text') else "Render generated successfully",
+                                "generated": True
+                            }
+                        }
+            
+            # If no image in response, return description
+            return {
+                "status": "success",
+                "data": {
+                    "description": response.text if hasattr(response, 'text') else image_prompt,
+                    "generated": False,
+                    "note": "Image generation model returned text description instead of image"
+                }
             }
-        }
+            
+        except Exception as img_error:
+            logger.warning(f"Image generation failed, falling back to description: {img_error}")
+            
+            # Fallback to text description
+            text_model = genai.GenerativeModel('models/gemini-2.5-flash')
+            response = text_model.generate_content(f"""Create a detailed visual description for this architectural render:
+            
+{image_prompt}
+
+Describe in vivid detail what the image should look like, including:
+- Materials and textures
+- Lighting and shadows
+- Colors and tones
+- Furniture and fixtures
+- Overall atmosphere""")
+            
+            return {
+                "status": "success",
+                "data": {
+                    "description": response.text,
+                    "generated": False,
+                    "note": "Fallback to text description - image generation not available"
+                }
+            }
         
     except Exception as e:
         logger.error(f"Error generating image: {str(e)}")
