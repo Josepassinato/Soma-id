@@ -103,7 +103,7 @@ export const generateEnchantmentPrompt = async (project: Project, angle: string 
 
 /**
  * Generate architectural visualization image via backend
- * Note: Returns a description since Gemini doesn't directly generate images
+ * Uses Gemini Nano Banana for actual image generation
  */
 export const generateEnchantmentImage = async (prompt: string, materialPhoto: string): Promise<string> => {
   try {
@@ -126,13 +126,15 @@ export const generateEnchantmentImage = async (prompt: string, materialPhoto: st
     const result = await response.json();
     
     if (result.status === 'success') {
-      // Since Gemini doesn't generate images directly, return description
-      // In production, you'd integrate with DALL-E, Imagen, or similar
-      console.log('Image generation note:', result.data.note);
+      // Check if we have an actual generated image
+      if (result.data.generated && result.data.image) {
+        console.log('Image generated successfully');
+        return result.data.image; // This is already a data URI (data:image/png;base64,...)
+      }
       
-      // Return a placeholder or the description
-      // For actual image, integrate with an image generation API
-      return `data:text/plain;base64,${btoa(result.data.description)}`;
+      // Fallback: no image was generated, throw error to inform user
+      console.warn('Image generation note:', result.data.note);
+      throw new Error('A geração de imagem retornou apenas uma descrição. Por favor, tente novamente.');
     }
     
     throw new Error('Invalid response from server');
