@@ -134,6 +134,10 @@ const translations = {
     close: "Fechar",
     next: "Próximo",
     previous: "Anterior",
+    // Additional Description Field
+    additional_description: "Informações Adicionais (Opcional)",
+    additional_description_placeholder: "Ex: Cliente quer móvel planejado estilo moderno, largura de 3 metros, cor carvalho...",
+    additional_description_hint: "Adicione detalhes que ajudem a IA a entender melhor o projeto",
     // Project Form
     next_step: "Próxima Etapa",
     generate_digital_twin: "Geração de Digital Twin (Encantamento)",
