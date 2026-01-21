@@ -291,7 +291,25 @@ const translations = {
     // Project Form
     next_step: "Next Step",
     generate_digital_twin: "Digital Twin Generation (Enchantment)",
-    create_and_render: "Create Project and Generate Render"
+    create_and_render: "Create Project and Generate Render",
+    // Auth Page
+    auth_corporate_id: "Corporate SOMA-ID (Email)",
+    auth_access_key: "Access Key (Password)",
+    auth_authenticating: "AUTHENTICATING...",
+    auth_create_access: "CREATE ACCESS",
+    auth_enter_system: "ENTER SYSTEM",
+    auth_or_instant_access: "OR INSTANT ACCESS",
+    auth_biometric_login: "LOGIN WITH BIOMETRICS",
+    auth_quick_sandbox: "Quick SOMA-ID Access (Sandbox Mode)",
+    auth_server_offline: "Authentication server offline.",
+    auth_signup_requested: "Registration requested. Check your email to confirm.",
+    auth_login_success_faceid: "Login successful! Would you like to enable FaceID access on this device?",
+    auth_failed: "Corporate SOMA-ID authentication failed.",
+    auth_validated: "SOMA-ID Validated",
+    auth_initializing: "Initializing...",
+    auth_biometric_failed: "Biometric access failed. Try your password.",
+    auth_industrial_identity: "INDUSTRIAL IDENTITY SYSTEM",
+    auth_engine_version: "Industrial Engine v2.5"
   },
   es: {
     dashboard: "Tablero",
