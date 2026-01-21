@@ -293,11 +293,27 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
                   <p className="text-cyan-400 text-xs font-bold">{t('plan_loaded')} • {t('click_to_change')}</p>
                 </div>
               </>
+            ) : fileBase64 && fileMimeType === 'application/pdf' ? (
+              <>
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-7xl mb-4">📄</span>
+                  <p className="text-lg text-white font-bold uppercase tracking-widest mb-2">PDF {t('loaded')}</p>
+                  <p className="text-sm text-cyan-400 font-mono">{fileName}</p>
+                </div>
+                <div className="absolute bottom-4 left-4 right-4 bg-black/80 p-3 rounded-lg">
+                  <p className="text-cyan-400 text-xs font-bold">{t('pdf_ready')} • {t('click_to_change')}</p>
+                </div>
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <span className="text-6xl mb-6">📐</span>
                 <p className="mb-2 text-lg text-slate-300 font-bold uppercase tracking-widest">{t('upload_floor_plan')}</p>
                 <p className="text-sm text-slate-500">{t('accepted_formats')}</p>
+                <div className="flex gap-2 mt-3">
+                  <span className="px-3 py-1 bg-cyan-900/30 text-cyan-400 text-xs font-mono rounded">JPG</span>
+                  <span className="px-3 py-1 bg-cyan-900/30 text-cyan-400 text-xs font-mono rounded">PNG</span>
+                  <span className="px-3 py-1 bg-purple-900/30 text-purple-400 text-xs font-mono rounded">PDF</span>
+                </div>
                 <p className="text-xs text-slate-600 mt-4 max-w-md text-center">
                   {t('ai_will_analyze')}
                 </p>
@@ -307,7 +323,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
               ref={fileInputRef} 
               type="file" 
               className="hidden" 
-              accept="image/*,.pdf" 
+              accept="image/*,.pdf,application/pdf" 
               onChange={handleFileChange} 
             />
           </div>
@@ -327,7 +343,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
             </button>
             <button 
               onClick={analyzeFloorPlan}
-              disabled={!imageBase64}
+              disabled={!fileBase64}
               className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-black font-black uppercase tracking-widest text-xs shadow-[0_15px_30px_rgba(6,182,212,0.3)] transition-all disabled:opacity-20 transform hover:-translate-y-1"
             >
               {t('analyze_plan')} →
