@@ -612,6 +612,196 @@ async def check_gemini_health():
         return {"status": "error", "message": str(e), "latency": 0}
 
 
+# ============== IMPORT BRIEFING FROM URL ENDPOINT ==============
+
+BRIEFING_EXTRACTION_PROMPT = """You are an expert at extracting cabinetry/woodworking project specifications from documents.
+
+Analyze the provided document (image or text) and extract ALL cabinetry project information.
+
+Return a JSON object with this EXACT structure:
+{
+  "clientName": "extracted client name or empty string",
+  "projectAddress": "extracted address or empty string",
+  "areas": [
+    {
+      "name": "Kitchen" or "Laundry" or "Master Bath Vanity" or other room name,
+      "style": "european_flat" or "european_shaker" or "traditional" or "modern" or "rustic",
+      "doorType": "flat" or "shaker" or "raised_panel" or "glass" or "louvered",
+      "boxMaterial": "plywood_3_4" or "plywood_1_2" or "mdf" or "particle_board",
+      "doorMaterial": "mdf_3_4" or "particle_board" or "solid_wood" or "plywood_veneer",
+      "finish": "wood_textured" or "super_matte" or "high_gloss" or "satin" or "lacquered" or "painted",
+      "hinges": "blum_soft" or "grass_soft" or "standard" or "push_open",
+      "slides": "blum_undermount" or "grass_undermount" or "side_mount" or "full_extension",
+      "dimensions": "e.g., L-shape 6'x6' or Linear 12'",
+      "components": ["Refrigerator Panel", "Double Oven Tall Cabinet", etc.],
+      "notes": "any specific notes for this area"
+    }
+  ],
+  "includedItems": ["Material", "Fabrication", "Assembly", "Installation", etc.],
+  "excludedItems": ["Handles/Pulls", "Countertops", "Accessories", etc.],
+  "generalNotes": "any general project notes"
+}
+
+IMPORTANT MAPPINGS:
+- "Custom European style cabinets - Flat doors" → style: "european_flat", doorType: "flat"
+- "3/4 plywood boxes" → boxMaterial: "plywood_3_4"
+- "3/4 finish doors on MDF" → doorMaterial: "mdf_3_4"
+- "wood textured" → finish: "wood_textured"
+- "super matte" → finish: "super_matte"
+- "high glossy" → finish: "high_gloss"
+- "Blum soft close hinges" → hinges: "blum_soft"
+- "Blum soft close undermount slides" → slides: "blum_undermount"
+
+Common components to look for:
+- Refrigerator Panel
+- Double Oven Tall Cabinet
+- Single Oven Cabinet
+- Double Trash Pull Out
+- Single Trash Pull Out
+- Spice Pull Out
+- Corner Lazy Susan
+- Magic Corner
+- Island
+- Peninsula
+- Wine Rack
+- Glass Display Cabinet
+
+Extract as much information as possible. If something is not explicitly stated, use reasonable defaults based on the document context.
+Return ONLY valid JSON, no markdown formatting."""
+
+@api_router.post("/briefing/import-from-url")
+async def import_briefing_from_url(request: ImportBriefingRequest):
+    """Import and extract briefing data from a shared document URL (Adobe Acrobat, Google Drive, etc.)"""
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    
+    try:
+        logger.info(f"Importing briefing from URL: {request.url}")
+        
+        # Step 1: Fetch the page to find the actual document/image URL
+        async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+            
+            # First, try to get the page
+            response = await client.get(request.url, headers=headers)
+            page_content = response.text
+            
+            # Parse the page to find rendition/image URLs
+            soup = BeautifulSoup(page_content, 'html.parser')
+            
+            image_url = None
+            
+            # Look for Adobe Acrobat rendition URLs
+            # Check meta tags for og:image
+            og_image = soup.find('meta', property='og:image')
+            if og_image and og_image.get('content'):
+                image_url = og_image['content']
+            
+            # Check for rendition images in the page
+            if not image_url:
+                # Look for CDN sharing URLs in the page content
+                cdn_pattern = r'https://cdn-sharing\.adobecc\.com/rendition/[^"\'>\s]+'
+                cdn_matches = re.findall(cdn_pattern, page_content)
+                if cdn_matches:
+                    image_url = cdn_matches[0]
+            
+            # Check for any image sources
+            if not image_url:
+                for img in soup.find_all('img'):
+                    src = img.get('src', '')
+                    if 'rendition' in src.lower() or 'cdn' in src.lower():
+                        image_url = src
+                        break
+            
+            # If still no image, try to find in script tags (Adobe stores data in JSON)
+            if not image_url:
+                for script in soup.find_all('script'):
+                    script_text = script.string or ''
+                    if 'rendition' in script_text.lower():
+                        rendition_match = re.search(r'"renditionUrl"\s*:\s*"([^"]+)"', script_text)
+                        if rendition_match:
+                            image_url = rendition_match.group(1)
+                            break
+                        # Also try assetURLs pattern
+                        asset_match = re.search(r'"assetURLs"\s*:\s*\{[^}]*"rendition"\s*:\s*"([^"]+)"', script_text)
+                        if asset_match:
+                            image_url = asset_match.group(1)
+                            break
+            
+            if not image_url:
+                # Try direct image fetch if URL looks like an image
+                if any(ext in request.url.lower() for ext in ['.jpg', '.jpeg', '.png', '.pdf']):
+                    image_url = request.url
+                else:
+                    raise HTTPException(status_code=400, detail="Could not find document/image in the provided URL")
+            
+            logger.info(f"Found image URL: {image_url[:100]}...")
+            
+            # Step 2: Fetch the actual image/document
+            img_response = await client.get(image_url, headers=headers)
+            if img_response.status_code != 200:
+                raise HTTPException(status_code=400, detail=f"Failed to fetch document image: {img_response.status_code}")
+            
+            image_data = img_response.content
+            content_type = img_response.headers.get('content-type', 'image/jpeg')
+            
+            logger.info(f"Fetched document: {len(image_data)} bytes, type: {content_type}")
+        
+        # Step 3: Use Gemini to analyze the document
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
+        
+        language_instruction = get_language_instruction(request.language or "pt")
+        
+        full_prompt = f"""{BRIEFING_EXTRACTION_PROMPT}
+
+{language_instruction}
+
+Analyze this cabinetry quotation/specification document and extract all project details."""
+        
+        response = model.generate_content([
+            {"mime_type": content_type.split(';')[0], "data": image_data},
+            full_prompt
+        ])
+        
+        # Extract JSON from response
+        result = extract_json(response.text)
+        
+        # Add raw text for reference
+        result['rawExtractedText'] = response.text[:2000] if len(response.text) > 2000 else response.text
+        
+        # Ensure areas have all required fields with defaults
+        if 'areas' in result:
+            for area in result['areas']:
+                area.setdefault('style', 'european_flat')
+                area.setdefault('doorType', 'flat')
+                area.setdefault('boxMaterial', 'plywood_3_4')
+                area.setdefault('doorMaterial', 'mdf_3_4')
+                area.setdefault('finish', 'wood_textured')
+                area.setdefault('hinges', 'blum_soft')
+                area.setdefault('slides', 'blum_undermount')
+                area.setdefault('dimensions', '')
+                area.setdefault('components', [])
+                area.setdefault('notes', '')
+        
+        logger.info(f"Successfully extracted briefing data with {len(result.get('areas', []))} areas")
+        
+        return {
+            "status": "success",
+            "data": result,
+            "source_url": request.url
+        }
+        
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=408, detail="Timeout while fetching URL")
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=400, detail=f"Error fetching URL: {str(e)}")
+    except Exception as e:
+        logger.error(f"Error importing briefing from URL: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to import briefing: {str(e)}")
+
+
 # ============== FLOOR PLAN ANALYSIS ENDPOINTS ==============
 
 @api_router.post("/floorplan/analyze")
