@@ -450,6 +450,10 @@ const translations = {
     close: "Cerrar",
     next: "Siguiente",
     previous: "Anterior",
+    // Additional Description Field
+    additional_description: "Información Adicional (Opcional)",
+    additional_description_placeholder: "Ej: Cliente quiere mueble a medida estilo moderno, 3 metros de ancho, color roble...",
+    additional_description_hint: "Agregue detalles para ayudar a la IA a entender mejor el proyecto",
     // Project Form
     next_step: "Siguiente Paso",
     generate_digital_twin: "Generación de Gemelo Digital (Encanto)",
