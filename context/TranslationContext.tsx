@@ -377,7 +377,21 @@ const translations = {
     dimensions: "Dimensions",
     position: "Position",
     generated_on: "Generated on",
-    view_presentation: "View Presentation"
+    view_presentation: "View Presentation",
+    // QR Code & Share
+    client_access: "Client Access",
+    scan_qr_description: "Scan the QR Code or share the link for the client to view and approve the project online.",
+    share: "Share",
+    copy_link: "Copy Link",
+    copied: "Copied!",
+    scan_to_view: "Scan to view",
+    share_project: "Share Project",
+    project_link: "Project Link",
+    copy: "Copy",
+    share_description: "The client can view and approve the project through this link.",
+    approval: "Approval",
+    client_signature: "Client Signature",
+    date: "Date"
   },
   es: {
     dashboard: "Tablero",
