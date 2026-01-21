@@ -28,6 +28,7 @@ export const ProjectView: React.FC<{
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'SHOWROOM' | 'ENGINEERING'>('SHOWROOM');
   const [showPricing, setShowPricing] = useState(false);
+  const [showPresentation, setShowPresentation] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const isProcessing = project.status === 'PROCESSANDO' || project.status === 'RENDERizando';
