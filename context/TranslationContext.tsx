@@ -265,6 +265,8 @@ const translations = {
     import_arch_project: "Import Architectural Project",
     upload_floor_plan: "Upload Floor Plan",
     accepted_formats: "Accepted formats: JPG, PNG, PDF",
+    loaded: "Loaded",
+    pdf_ready: "PDF ready for analysis",
     ai_will_analyze: "AI will analyze the plan, extract rooms and suggest woodworking opportunities",
     analyze_plan: "Analyze Plan",
     analyzing_floor_plan: "Analyzing Floor Plan",
