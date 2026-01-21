@@ -470,7 +470,7 @@ QUALITY: Photorealistic, high detail, no artifacts"""
             image_base64 = img['data']
             mime_type = img.get('mime_type', 'image/png')
             
-            logger.info(f"Image generated successfully. MIME type: {mime_type}, data length: {len(image_base64)[:10]}...")
+            logger.info(f"Image generated successfully. MIME type: {mime_type}, data starts with: {image_base64[:50] if image_base64 else 'empty'}...")
             
             return {
                 "status": "success",
