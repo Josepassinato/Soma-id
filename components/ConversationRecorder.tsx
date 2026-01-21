@@ -165,6 +165,12 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
       {/* TABS */}
       <div className="flex border-b border-slate-800 bg-slate-900/50 overflow-x-auto">
         <button 
+          onClick={() => { setActiveTab('STRUCTURED'); resetState(); }}
+          className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'STRUCTURED' ? 'text-green-400 border-b-2 border-green-400 bg-green-400/5' : 'text-slate-500 hover:text-slate-300'}`}
+        >
+          📋 {t('briefing')}
+        </button>
+        <button 
           onClick={() => { setActiveTab('RECORD'); resetState(); }}
           className={`flex-1 py-4 text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap px-2 ${activeTab === 'RECORD' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5' : 'text-slate-500 hover:text-slate-300'}`}
         >
@@ -196,6 +202,57 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
         </button>
       </div>
 
+      {/* VIEW: STRUCTURED BRIEFING FORM */}
+      {activeTab === 'STRUCTURED' && (
+        <StructuredBriefingForm 
+          onCancel={onCancel}
+          onSubmit={(briefingData) => {
+            // Convert structured briefing to ExtractedInsights format
+            const insights: ExtractedInsights = {
+              clientName: briefingData.clientName,
+              roomType: briefingData.areas[0]?.name || 'Kitchen',
+              wallWidth: 3000,
+              wallHeight: 2700,
+              wallDepth: 600,
+              styleDescription: briefingData.areas.map(a => `${a.name}: ${a.style}`).join('; '),
+              technicalBriefing: `
+## ${t('project_summary')}
+**${t('client')}:** ${briefingData.clientName}
+**${t('address')}:** ${briefingData.projectAddress || '-'}
+**${t('date')}:** ${briefingData.projectDate}
+
+## ${t('project_areas')}
+${briefingData.areas.map(area => `
+### ${area.name}
+- **${t('style')}:** ${area.style}
+- **${t('door_type')}:** ${area.doorType}
+- **${t('box_material')}:** ${area.boxMaterial}
+- **${t('door_material')}:** ${area.doorMaterial}
+- **${t('finish')}:** ${area.finish}
+- **${t('hinges')}:** ${area.hinges}
+- **${t('slides')}:** ${area.slides}
+- **${t('dimensions')}:** ${area.dimensions || '-'}
+${area.components.length > 0 ? `- **${t('special_components')}:** ${area.components.join(', ')}` : ''}
+${area.notes ? `- **${t('notes')}:** ${area.notes}` : ''}
+`).join('')}
+
+## ${t('included')}
+${briefingData.includedItems.map(i => `- ${i}`).join('\n')}
+
+## ${t('excluded')}
+${briefingData.excludedItems.map(i => `- ${i}`).join('\n')}
+
+${briefingData.generalNotes ? `## ${t('general_notes')}\n${briefingData.generalNotes}` : ''}
+              `.trim(),
+              suggestedMaterials: briefingData.areas.flatMap(a => [a.boxMaterial, a.doorMaterial, a.finish]),
+              installationType: 'PISO',
+              analysisStatus: 'COMPLETO',
+            };
+            onInsightsExtracted(insights, t('structured_briefing'));
+          }}
+        />
+      )}
+
       {/* VIEW: FLOOR PLAN ANALYZER */}
       {activeTab === 'FLOOR_PLAN' && (
         <FloorPlanAnalyzer 
@@ -206,8 +263,8 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
         />
       )}
       
-      {/* Content for other tabs (not FLOOR_PLAN) */}
-      {activeTab !== 'FLOOR_PLAN' && (
+      {/* Content for other tabs (not FLOOR_PLAN and not STRUCTURED) */}
+      {activeTab !== 'FLOOR_PLAN' && activeTab !== 'STRUCTURED' && (
         <div className="p-10 min-h-[350px] flex flex-col items-center justify-center">
           
           {/* VIEW: RECORD */}
