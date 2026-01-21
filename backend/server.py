@@ -315,6 +315,17 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
         # Get language instruction
         language_instruction = get_language_instruction(request.language or "pt")
         
+        # Get user description if provided
+        user_context = ""
+        if request.input.userDescription and request.input.userDescription.strip():
+            user_context_labels = {
+                "pt": "CONTEXTO ADICIONAL DO USUÁRIO",
+                "en": "ADDITIONAL USER CONTEXT",
+                "es": "CONTEXTO ADICIONAL DEL USUARIO"
+            }
+            label = user_context_labels.get(request.language or "pt", user_context_labels["pt"])
+            user_context = f"\n\n{label}: {request.input.userDescription}"
+        
         # Language-specific prompts
         image_prompts = {
             "pt": "Analise esta foto do ambiente. Identifique o tipo de cômodo, estime a largura da parede principal baseando-se em objetos padrão (portas, tomadas), descreva os materiais existentes e sugira um estilo SOMA-ID que combine.",
@@ -340,7 +351,7 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
                 "mime_type": request.input.mimeType or "image/jpeg",
                 "data": image_data
             })
-            parts.append(image_prompts.get(lang, image_prompts["pt"]))
+            parts.append(image_prompts.get(lang, image_prompts["pt"]) + user_context)
         else:
             # For audio/pdf
             file_data = base64.b64decode(request.input.content)
@@ -348,7 +359,7 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
                 "mime_type": request.input.mimeType,
                 "data": file_data
             })
-            parts.append(audio_prompts.get(lang, audio_prompts["pt"]))
+            parts.append(audio_prompts.get(lang, audio_prompts["pt"]) + user_context)
 
         # Build the prompt with system instruction and language requirement
         full_prompt = f"""{SYSTEM_INSTRUCTION_DEBURADOR}
@@ -356,7 +367,7 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
 {language_instruction}
 
 Analyze the following and return a JSON with these fields: clientName (string), roomType (string), wallWidth (number in mm), wallHeight (number in mm), wallDepth (number in mm), styleDescription (string), technicalBriefing (string), suggestedMaterials (array of strings), installationType (PISO or SUSPENSO), analysisStatus (COMPLETO or INCOMPLETO).
-
+{user_context}
 """
         
         if request.input.type == 'TEXT':
