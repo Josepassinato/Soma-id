@@ -137,7 +137,25 @@ const translations = {
     // Project Form
     next_step: "Próxima Etapa",
     generate_digital_twin: "Geração de Digital Twin (Encantamento)",
-    create_and_render: "Criar Projeto e Gerar Render"
+    create_and_render: "Criar Projeto e Gerar Render",
+    // Auth Page
+    auth_corporate_id: "SOMA-ID Corporativo (Email)",
+    auth_access_key: "Chave de Acesso (Senha)",
+    auth_authenticating: "AUTENTICANDO...",
+    auth_create_access: "CRIAR ACESSO",
+    auth_enter_system: "ENTRAR NO SISTEMA",
+    auth_or_instant_access: "OU ACESSO INSTANTÂNEO",
+    auth_biometric_login: "ENTRAR COM BIOMETRIA",
+    auth_quick_sandbox: "Acesso Rápido SOMA-ID (Modo Sandbox)",
+    auth_server_offline: "Servidor de autenticação offline.",
+    auth_signup_requested: "Cadastro solicitado. Verifique seu email para confirmar.",
+    auth_login_success_faceid: "Login bem-sucedido! Deseja ativar o acesso via FaceID neste dispositivo?",
+    auth_failed: "Falha na autenticação corporativa SOMA-ID.",
+    auth_validated: "SOMA-ID Validado",
+    auth_initializing: "Inicializando...",
+    auth_biometric_failed: "Acesso biométrico falhou. Tente sua senha.",
+    auth_industrial_identity: "SISTEMA DE IDENTIDADE INDUSTRIAL",
+    auth_engine_version: "Industrial Engine v2.5"
   },
   en: {
     dashboard: "Dashboard",
