@@ -71,6 +71,7 @@ class ConsultationInput(BaseModel):
     type: str  # TEXT, AUDIO, PDF, IMAGE
     content: str
     mimeType: Optional[str] = None
+    userDescription: Optional[str] = None  # Additional context from user
 
 class AnalyzeConsultationRequest(BaseModel):
     input: ConsultationInput
