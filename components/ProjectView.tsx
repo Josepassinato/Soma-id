@@ -7,6 +7,7 @@ import { useTranslation } from '../context/TranslationContext';
 import { Module1Workflow } from './Module1Workflow';
 import { PricingModal } from './PricingModal';
 import { LiveAssistant } from './LiveAssistant';
+import { ProjectPresentation } from './ProjectPresentation';
 
 const getProgressInfo = (status: Project['status'], t: any) => {
   switch (status) {
