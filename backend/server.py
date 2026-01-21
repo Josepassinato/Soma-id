@@ -13,6 +13,8 @@ import google.generativeai as genai
 import json
 import re
 import base64
+import asyncio
+from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
