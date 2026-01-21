@@ -97,12 +97,25 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const isPDF = file.type === 'application/pdf';
+      setFileName(file.name);
+      setFileMimeType(file.type || (isPDF ? 'application/pdf' : 'image/jpeg'));
+      
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
-        setImagePreview(result);
-        const base64 = result.split(',')[1];
-        setImageBase64(base64);
+        
+        if (isPDF) {
+          // For PDFs, show a placeholder preview and store the base64 data
+          setImagePreview(''); // No image preview for PDFs
+          const base64 = result.split(',')[1];
+          setFileBase64(base64);
+        } else {
+          // For images, show preview
+          setImagePreview(result);
+          const base64 = result.split(',')[1];
+          setFileBase64(base64);
+        }
       };
       reader.readAsDataURL(file);
     }
