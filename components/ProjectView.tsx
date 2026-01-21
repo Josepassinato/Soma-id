@@ -46,6 +46,11 @@ export const ProjectView: React.FC<{
     <div className="max-w-7xl mx-auto pb-20 animate-fade-in relative text-gray-200">
         <PricingModal isOpen={showPricing} onClose={() => setShowPricing(false)} />
         <LiveAssistant project={project} onUpdateProject={handleUpdate} />
+        
+        {/* Project Presentation Modal */}
+        {showPresentation && (
+          <ProjectPresentation project={project} onClose={() => setShowPresentation(false)} />
+        )}
 
         {/* Header do Projeto */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
@@ -69,6 +74,13 @@ export const ProjectView: React.FC<{
                 </div>
             </div>
             <div className="flex gap-4">
+                <button 
+                  onClick={() => setShowPresentation(true)} 
+                  className="px-6 py-4 bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] font-black uppercase tracking-widest rounded-sm transition border border-cyan-500/30 flex items-center gap-2"
+                  data-testid="view-presentation-btn"
+                >
+                  📄 {t('view_presentation')}
+                </button>
                 <button 
                   onClick={onBack} 
                   className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-[11px] font-black uppercase tracking-widest rounded-sm transition border border-white/5"
