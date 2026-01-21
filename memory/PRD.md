@@ -40,7 +40,8 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 6. **Sistema i18n** - Suporte completo PT/EN/ES
 7. **Página de Login Traduzida** - AuthPage.tsx com i18n (CORRIGIDO)
 8. **Campos Editáveis** - BriefingReview.tsx já tem campos editáveis
-9. **Campo de Descrição Adicional** - Usuário pode adicionar contexto para ajudar a IA (NOVO - 21/01/2026)
+9. **Campo de Descrição Adicional** - Usuário pode adicionar contexto para ajudar a IA (21/01/2026)
+10. **Apresentação de Projeto Estilo Promob** - Documento profissional com resumo, medidas, materiais, render (NOVO - 21/01/2026)
 
 ### 🟡 Mocked/Limitado
 - `liveService.ts` - Áudio em tempo real é mock
