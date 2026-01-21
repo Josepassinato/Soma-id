@@ -250,6 +250,21 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
                 <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'IMAGE')} />
               </div>
               {imagePreview && <p className="text-cyan-400 text-[10px] font-black uppercase tracking-widest">{t('photo_loaded')} • {t('click_to_change')}</p>}
+              
+              {/* Campo de descrição para ajudar a IA */}
+              <div className="w-full text-left">
+                <label className="block text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-2">
+                  💡 {t('additional_description')}
+                </label>
+                <textarea
+                  value={userDescription}
+                  onChange={(e) => setUserDescription(e.target.value)}
+                  placeholder={t('additional_description_placeholder')}
+                  className="w-full h-24 bg-slate-900/80 border border-slate-700 rounded-xl p-4 text-white text-sm placeholder-slate-500 outline-none focus:border-cyan-500 transition resize-none"
+                  data-testid="user-description-input"
+                />
+                <p className="text-[9px] text-slate-500 mt-1 font-mono">{t('additional_description_hint')}</p>
+              </div>
             </div>
           )}
 
