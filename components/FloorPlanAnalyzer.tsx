@@ -182,7 +182,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
           sessionId,
           message,
           floorPlanAnalysis: analysis,
-          imageBase64: imageBase64,
+          imageBase64: fileBase64,
           language: language
         })
       });
