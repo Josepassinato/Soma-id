@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../context/TranslationContext';
 
+const API_URL = '/api';
+
 interface CabinetArea {
   id: string;
   name: string;
