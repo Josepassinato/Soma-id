@@ -417,18 +417,14 @@ Incorporate tunable lighting, specific wood grain orientations (Freijó, Walnut)
 
 @api_router.post("/gemini/generate-image")
 async def generate_enchantment_image(request: GenerateImageRequest):
-    """Generate an architectural visualization image using Gemini Image Generation"""
-    if not GEMINI_API_KEY:
-        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    """Generate an architectural visualization image using Gemini Nano Banana via Emergent Integration"""
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="EMERGENT_LLM_KEY not configured for image generation")
     
     try:
-        # Use Gemini 2.5 Flash Image model for actual image generation
-        model = genai.GenerativeModel(
-            'models/gemini-2.5-flash-preview-image-generation',
-            generation_config={"response_mime_type": "text/plain"}
-        )
+        logger.info(f"Starting image generation with prompt: {request.prompt[:100]}...")
         
-        # Build the image generation prompt
+        # Build the detailed image generation prompt
         material_instruction = ""
         if request.materialPhoto:
             material_instruction = "Use warm wood tones with natural grain patterns similar to walnut or oak."
@@ -450,65 +446,52 @@ CAMERA: Wide angle lens, eye-level perspective, professional composition
 MOOD: Sophisticated, inviting, luxurious
 QUALITY: Photorealistic, high detail, no artifacts"""
 
-        # Try to generate image
-        try:
-            # First try with image generation model
-            image_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-image-generation')
-            response = image_model.generate_content(image_prompt)
-            
-            # Check if response contains image
-            if response.candidates and response.candidates[0].content.parts:
-                for part in response.candidates[0].content.parts:
-                    if hasattr(part, 'inline_data') and part.inline_data:
-                        # Found image data
-                        image_data = part.inline_data.data
-                        mime_type = part.inline_data.mime_type
-                        image_base64 = base64.b64encode(image_data).decode('utf-8')
-                        
-                        return {
-                            "status": "success",
-                            "data": {
-                                "image": f"data:{mime_type};base64,{image_base64}",
-                                "description": response.text if hasattr(response, 'text') else "Render generated successfully",
-                                "generated": True
-                            }
-                        }
-            
-            # If no image in response, return description
-            return {
-                "status": "success",
-                "data": {
-                    "description": response.text if hasattr(response, 'text') else image_prompt,
-                    "generated": False,
-                    "note": "Image generation model returned text description instead of image"
-                }
-            }
-            
-        except Exception as img_error:
-            logger.warning(f"Image generation failed, falling back to description: {img_error}")
-            
-            # Fallback to text description
-            text_model = genai.GenerativeModel('models/gemini-2.5-flash')
-            response = text_model.generate_content(f"""Create a detailed visual description for this architectural render:
-            
-{image_prompt}
-
-Describe in vivid detail what the image should look like, including:
-- Materials and textures
-- Lighting and shadows
-- Colors and tones
-- Furniture and fixtures
-- Overall atmosphere""")
-            
-            return {
-                "status": "success",
-                "data": {
-                    "description": response.text,
-                    "generated": False,
-                    "note": "Fallback to text description - image generation not available"
-                }
-            }
+        # Use Emergent Integration for image generation with Gemini Nano Banana
+        import uuid
+        session_id = str(uuid.uuid4())
         
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY, 
+            session_id=session_id, 
+            system_message="You are an expert architectural visualization AI that creates stunning photorealistic interior renders."
+        )
+        chat.with_model("gemini", "gemini-3-pro-image-preview").with_params(modalities=["image", "text"])
+        
+        # Create the message
+        msg = UserMessage(text=image_prompt)
+        
+        # Generate the image
+        logger.info("Calling Gemini Nano Banana for image generation...")
+        text_response, images = await chat.send_message_multimodal_response(msg)
+        
+        if images and len(images) > 0:
+            # Successfully generated image
+            img = images[0]
+            image_base64 = img['data']
+            mime_type = img.get('mime_type', 'image/png')
+            
+            logger.info(f"Image generated successfully. MIME type: {mime_type}, data length: {len(image_base64)[:10]}...")
+            
+            return {
+                "status": "success",
+                "data": {
+                    "image": f"data:{mime_type};base64,{image_base64}",
+                    "description": text_response or "Architectural render generated successfully",
+                    "generated": True
+                }
+            }
+        else:
+            # No image generated, return text response
+            logger.warning("No image generated, returning text description")
+            return {
+                "status": "success",
+                "data": {
+                    "description": text_response or image_prompt,
+                    "generated": False,
+                    "note": "Image generation returned text description instead of image"
+                }
+            }
+            
     except Exception as e:
         logger.error(f"Error generating image: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to generate image: {str(e)}")
