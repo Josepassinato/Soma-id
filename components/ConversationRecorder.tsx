@@ -15,6 +15,7 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
   const [activeTab, setActiveTab] = useState<'RECORD' | 'UPLOAD_AUDIO' | 'UPLOAD_PDF' | 'UPLOAD_IMAGE' | 'FLOOR_PLAN'>('RECORD');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [userDescription, setUserDescription] = useState('');
   
   // State for recording
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
