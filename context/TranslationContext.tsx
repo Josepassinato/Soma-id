@@ -182,7 +182,21 @@ const translations = {
     dimensions: "Dimensões",
     position: "Posição",
     generated_on: "Gerado em",
-    view_presentation: "Ver Apresentação"
+    view_presentation: "Ver Apresentação",
+    // QR Code & Share
+    client_access: "Acesso do Cliente",
+    scan_qr_description: "Escaneie o QR Code ou compartilhe o link para o cliente visualizar e aprovar o projeto online.",
+    share: "Compartilhar",
+    copy_link: "Copiar Link",
+    copied: "Copiado!",
+    scan_to_view: "Escaneie para visualizar",
+    share_project: "Compartilhar Projeto",
+    project_link: "Link do Projeto",
+    copy: "Copiar",
+    share_description: "O cliente pode visualizar e aprovar o projeto através deste link.",
+    approval: "Aprovação",
+    client_signature: "Assinatura do Cliente",
+    date: "Data"
   },
   en: {
     dashboard: "Dashboard",
