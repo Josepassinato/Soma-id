@@ -521,7 +521,30 @@ const translations = {
     auth_initializing: "Inicializando...",
     auth_biometric_failed: "Acceso biométrico fallido. Intente con su contraseña.",
     auth_industrial_identity: "SISTEMA DE IDENTIDAD INDUSTRIAL",
-    auth_engine_version: "Industrial Engine v2.5"
+    auth_engine_version: "Industrial Engine v2.5",
+    // Project Presentation
+    project_presentation: "Presentación del Proyecto",
+    print_export: "Imprimir / Exportar",
+    industrial_identity: "Identidad Industrial",
+    document: "Documento",
+    project_proposal: "Propuesta de Proyecto",
+    not_identified: "No Identificado",
+    project_summary: "Resumen del Proyecto",
+    installation: "Instalación",
+    technical_specs: "Especificaciones Técnicas",
+    dimension: "Dimensión",
+    value: "Valor",
+    unit: "Unidad",
+    dimension_preview: "Vista Previa de Dimensiones",
+    digital_twin_render: "Render Digital Twin",
+    render_generated_by_ai: "Imagen generada por IA - SOMA-ID Engine",
+    reference_photo: "Foto de Referencia",
+    module_list: "Lista de Módulos",
+    module: "Módulo",
+    dimensions: "Dimensiones",
+    position: "Posición",
+    generated_on: "Generado el",
+    view_presentation: "Ver Presentación"
   }
 };
 
