@@ -149,6 +149,7 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
     setFilePreview('');
     setImagePreview('');
     setIsRecording(false);
+    setUserDescription('');
   }
 
   return (
