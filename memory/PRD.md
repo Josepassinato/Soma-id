@@ -88,4 +88,5 @@ REACT_APP_BACKEND_URL=https://xxx.preview.emergentagent.com
 - Integrado Gemini Nano Banana via emergentintegrations
 - Traduzida página de login (AuthPage.tsx)
 - Adicionado campo de descrição adicional para upload de imagens
+- Implementada apresentação de projeto estilo Promob (documento profissional)
 - Todos os testes passando (11/11 backend, frontend OK)
