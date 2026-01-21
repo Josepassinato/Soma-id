@@ -38,6 +38,9 @@ GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
+# Emergent LLM Key for image generation
+EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
+
 # Create the main app without a prefix
 app = FastAPI(title="SOMA-ID Backend API")
 
