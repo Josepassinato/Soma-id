@@ -292,6 +292,10 @@ const translations = {
     close: "Close",
     next: "Next",
     previous: "Previous",
+    // Additional Description Field
+    additional_description: "Additional Information (Optional)",
+    additional_description_placeholder: "E.g.: Client wants modern style custom furniture, 3 meters wide, oak color...",
+    additional_description_hint: "Add details to help the AI better understand the project",
     // Project Form
     next_step: "Next Step",
     generate_digital_twin: "Digital Twin Generation (Enchantment)",
