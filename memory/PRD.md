@@ -33,7 +33,7 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 
 ### ✅ Concluído
 1. **Análise de Briefing** - IA extrai dados de texto/áudio/imagem/PDF
-2. **Analisador de Planta Baixa** - Identifica cômodos e sugere marcenaria
+2. **Analisador de Planta Baixa** - Identifica cômodos e sugere marcenaria (agora com suporte a PDF)
 3. **Chat com IA** - Conversa sobre análise de planta baixa
 4. **Geração de Imagem** - Renders 3D com Gemini Nano Banana (CORRIGIDO)
 5. **Dados Técnicos** - Gera dados para CNC
@@ -42,7 +42,8 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 8. **Campos Editáveis** - BriefingReview.tsx já tem campos editáveis
 9. **Campo de Descrição Adicional** - Usuário pode adicionar contexto para ajudar a IA (21/01/2026)
 10. **Apresentação de Projeto Estilo Promob** - Documento profissional com resumo, medidas, materiais, render (21/01/2026)
-11. **QR Code para Compartilhamento** - Cliente pode visualizar/aprovar projeto via link ou QR Code (NOVO - 21/01/2026)
+11. **QR Code para Compartilhamento** - Cliente pode visualizar/aprovar projeto via link ou QR Code (21/01/2026)
+12. **Suporte a PDF para Plantas Baixas** - Upload e análise de plantas baixas em formato PDF (NOVO - 21/01/2026)
 
 ### 🟡 Mocked/Limitado
 - `liveService.ts` - Áudio em tempo real é mock
