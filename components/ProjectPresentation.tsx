@@ -313,6 +313,77 @@ export const ProjectPresentation: React.FC<Props> = ({ project, onClose }) => {
           </div>
         )}
 
+        {/* QR Code & Share Section */}
+        <div className="p-8 print:p-6 border-b border-gray-200 bg-gradient-to-r from-cyan-50 to-white">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex-1">
+              <h3 className="text-lg font-black text-cyan-700 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <span className="w-1 h-6 bg-cyan-500 rounded"></span>
+                {t('client_access')}
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                {t('scan_qr_description')}
+              </p>
+              <div className="flex gap-3 print:hidden">
+                <button
+                  onClick={handleShare}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded flex items-center gap-2 transition"
+                  data-testid="share-project-btn"
+                >
+                  📤 {t('share')}
+                </button>
+                <button
+                  onClick={handleCopyLink}
+                  className={`px-4 py-2 border text-xs font-bold rounded flex items-center gap-2 transition ${
+                    linkCopied 
+                      ? 'bg-green-100 border-green-400 text-green-700' 
+                      : 'border-cyan-400 text-cyan-600 hover:bg-cyan-50'
+                  }`}
+                  data-testid="copy-link-btn"
+                >
+                  {linkCopied ? '✓ ' + t('copied') : '🔗 ' + t('copy_link')}
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-200">
+                <QRCodeSVG 
+                  value={projectUrl} 
+                  size={120}
+                  level="M"
+                  includeMargin={false}
+                  bgColor="#FFFFFF"
+                  fgColor="#0891B2"
+                />
+              </div>
+              <p className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">
+                {t('scan_to_view')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Approval Section */}
+        <div className="p-8 print:p-6 border-b border-gray-200">
+          <h3 className="text-lg font-black text-cyan-700 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <span className="w-1 h-6 bg-cyan-500 rounded"></span>
+            {t('approval')}
+          </h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-6">
+              <p className="text-xs text-gray-500 uppercase font-bold mb-3">{t('client_signature')}</p>
+              <div className="h-16 border-b-2 border-gray-400"></div>
+              <p className="text-xs text-gray-400 mt-2">{project.clientName || '_________________'}</p>
+            </div>
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-6">
+              <p className="text-xs text-gray-500 uppercase font-bold mb-3">{t('date')}</p>
+              <div className="h-16 border-b-2 border-gray-400 flex items-end pb-1">
+                <span className="text-gray-400 font-mono">____/____/________</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Footer */}
         <div className="bg-gray-100 p-6 print:p-4">
           <div className="flex justify-between items-center text-xs text-gray-500">
@@ -328,6 +399,62 @@ export const ProjectPresentation: React.FC<Props> = ({ project, onClose }) => {
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-black text-gray-800">{t('share_project')}</h3>
+              <button 
+                onClick={() => setShowShareModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="flex justify-center mb-6">
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <QRCodeSVG 
+                  value={projectUrl} 
+                  size={180}
+                  level="H"
+                  includeMargin={true}
+                  bgColor="#FFFFFF"
+                  fgColor="#0891B2"
+                />
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <label className="text-xs text-gray-500 uppercase font-bold mb-2 block">{t('project_link')}</label>
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  readOnly 
+                  value={projectUrl}
+                  className="flex-1 bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-gray-600"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition ${
+                    linkCopied 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-cyan-600 text-white hover:bg-cyan-500'
+                  }`}
+                >
+                  {linkCopied ? '✓' : t('copy')}
+                </button>
+              </div>
+            </div>
+            
+            <p className="text-xs text-gray-400 text-center">
+              {t('share_description')}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Print Styles */}
       <style>{`
