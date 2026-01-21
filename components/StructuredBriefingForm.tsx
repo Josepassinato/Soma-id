@@ -144,9 +144,12 @@ const EXCLUDED_ITEMS = [
 ];
 
 export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) => {
-  const { t } = useTranslation();
-  const [step, setStep] = useState<'CLIENT' | 'AREAS' | 'DETAILS' | 'REVIEW'>('CLIENT');
+  const { t, language } = useTranslation();
+  const [step, setStep] = useState<'IMPORT' | 'CLIENT' | 'AREAS' | 'DETAILS' | 'REVIEW'>('IMPORT');
   const [activeAreaIndex, setActiveAreaIndex] = useState(0);
+  const [importUrl, setImportUrl] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState('');
   
   const [briefing, setBriefing] = useState<BriefingData>({
     clientName: '',
@@ -157,6 +160,75 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) 
     excludedItems: ['Handles/Pulls', 'Accessories (chosen by client)'],
     generalNotes: '',
   });
+
+  // Import briefing from URL
+  const handleImportFromUrl = async () => {
+    if (!importUrl.trim()) return;
+    
+    setIsImporting(true);
+    setImportError('');
+    
+    try {
+      const response = await fetch(`${API_URL}/briefing/import-from-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: importUrl, language })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to import');
+      }
+      
+      const result = await response.json();
+      
+      if (result.status === 'success' && result.data) {
+        const importedData = result.data;
+        
+        // Convert imported areas to our format
+        const convertedAreas: CabinetArea[] = (importedData.areas || []).map((area: any, index: number) => ({
+          id: `imported_${index}_${Date.now()}`,
+          name: area.name || 'Unknown Area',
+          enabled: true,
+          style: area.style || 'european_flat',
+          doorType: area.doorType || 'flat',
+          boxMaterial: area.boxMaterial || 'plywood_3_4',
+          doorMaterial: area.doorMaterial || 'mdf_3_4',
+          finish: area.finish || 'wood_textured',
+          hinges: area.hinges || 'blum_soft',
+          slides: area.slides || 'blum_undermount',
+          dimensions: area.dimensions || '',
+          components: area.components || [],
+          notes: area.notes || '',
+        }));
+        
+        setBriefing({
+          clientName: importedData.clientName || '',
+          projectAddress: importedData.projectAddress || '',
+          projectDate: new Date().toISOString().split('T')[0],
+          areas: convertedAreas,
+          includedItems: importedData.includedItems?.length > 0 
+            ? importedData.includedItems 
+            : ['Material', 'Fabrication', 'Assembly', 'Installation'],
+          excludedItems: importedData.excludedItems?.length > 0 
+            ? importedData.excludedItems 
+            : ['Handles/Pulls', 'Accessories (chosen by client)'],
+          generalNotes: importedData.generalNotes || '',
+        });
+        
+        // Skip to review if we have areas, otherwise to areas selection
+        if (convertedAreas.length > 0) {
+          setStep('REVIEW');
+        } else {
+          setStep('AREAS');
+        }
+      }
+    } catch (err) {
+      setImportError((err as Error).message);
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   const addArea = (roomId: string) => {
     const room = ROOM_AREAS.find(r => r.id === roomId);
