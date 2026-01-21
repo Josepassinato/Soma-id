@@ -68,6 +68,8 @@ const translations = {
     import_arch_project: "Importar Projeto Arquitetônico",
     upload_floor_plan: "Upload de Planta Baixa",
     accepted_formats: "Formatos aceitos: JPG, PNG, PDF",
+    loaded: "Carregado",
+    pdf_ready: "PDF pronto para análise",
     ai_will_analyze: "A IA irá analisar a planta, extrair os cômodos e sugerir oportunidades de marcenaria",
     analyze_plan: "Analisar Planta",
     analyzing_floor_plan: "Analisando Planta Baixa",
