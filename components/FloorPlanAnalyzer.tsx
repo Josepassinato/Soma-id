@@ -122,7 +122,7 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
   };
 
   const analyzeFloorPlan = async () => {
-    if (!imageBase64) return;
+    if (!fileBase64) return;
     
     setStep('ANALYZING');
     setIsProcessing(true);
@@ -133,8 +133,8 @@ export const FloorPlanAnalyzer: React.FC<Props> = ({ onCancel, onProjectReady })
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          imageBase64,
-          mimeType: 'image/jpeg',
+          imageBase64: fileBase64,
+          mimeType: fileMimeType,
           language: language
         })
       });
