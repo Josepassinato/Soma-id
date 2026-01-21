@@ -52,9 +52,9 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 
 ### 🔴 Pendente/Futuro
 1. Implementar WebSockets para áudio real-time
-2. Suporte a PDF para plantas baixas
-3. Histórico de análises
-4. Migrar de `google.generativeai` para `google.genai`
+2. Histórico de análises
+3. Migrar de `google.generativeai` para `google.genai`
+4. Criar página pública `/projeto/:id` para clientes visualizarem
 
 ## Endpoints da API
 
