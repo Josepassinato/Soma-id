@@ -40,6 +40,7 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 6. **Sistema i18n** - Suporte completo PT/EN/ES
 7. **Página de Login Traduzida** - AuthPage.tsx com i18n (CORRIGIDO)
 8. **Campos Editáveis** - BriefingReview.tsx já tem campos editáveis
+9. **Campo de Descrição Adicional** - Usuário pode adicionar contexto para ajudar a IA (NOVO - 21/01/2026)
 
 ### 🟡 Mocked/Limitado
 - `liveService.ts` - Áudio em tempo real é mock
@@ -59,7 +60,7 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 |----------|--------|-----------|
 | `/api/` | GET | Health check |
 | `/api/gemini/health` | GET | Status da API Gemini |
-| `/api/gemini/analyze-consultation` | POST | Analisa briefing |
+| `/api/gemini/analyze-consultation` | POST | Analisa briefing (agora com userDescription) |
 | `/api/gemini/generate-prompt` | POST | Gera prompt para render |
 | `/api/gemini/generate-image` | POST | Gera imagem (Nano Banana) |
 | `/api/gemini/generate-technical-data` | POST | Dados técnicos CNC |
@@ -86,4 +87,5 @@ REACT_APP_BACKEND_URL=https://xxx.preview.emergentagent.com
 - Corrigido bug de geração de imagem congelando
 - Integrado Gemini Nano Banana via emergentintegrations
 - Traduzida página de login (AuthPage.tsx)
+- Adicionado campo de descrição adicional para upload de imagens
 - Todos os testes passando (11/11 backend, frontend OK)
