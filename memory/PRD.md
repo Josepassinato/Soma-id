@@ -90,4 +90,6 @@ REACT_APP_BACKEND_URL=https://xxx.preview.emergentagent.com
 - Traduzida página de login (AuthPage.tsx)
 - Adicionado campo de descrição adicional para upload de imagens
 - Implementada apresentação de projeto estilo Promob (documento profissional)
+- Adicionado QR Code para compartilhamento com cliente
+- Seção de aprovação com campos para assinatura
 - Todos os testes passando (11/11 backend, frontend OK)
