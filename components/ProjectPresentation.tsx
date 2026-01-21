@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Project } from '../types';
 import { useTranslation } from '../context/TranslationContext';
 import { ROOM_TYPES, STYLE_PRESETS } from '../constants';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface Props {
   project: Project;
@@ -11,9 +12,42 @@ interface Props {
 export const ProjectPresentation: React.FC<Props> = ({ project, onClose }) => {
   const { t } = useTranslation();
   const printRef = useRef<HTMLDivElement>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // Generate a unique project URL for client access
+  const projectId = project.id || project.somaId || 'preview';
+  const baseUrl = window.location.origin;
+  const projectUrl = `${baseUrl}/projeto/${projectId}`;
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(projectUrl);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Projeto SOMA-ID - ${project.clientName}`,
+          text: `Visualize a proposta do projeto ${project.somaId || ''}`,
+          url: projectUrl,
+        });
+      } catch (err) {
+        console.log('Share cancelled');
+      }
+    } else {
+      setShowShareModal(true);
+    }
   };
 
   const getRoomTypeLabel = (id: string) => {
