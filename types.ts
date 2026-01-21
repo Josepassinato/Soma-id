@@ -213,6 +213,7 @@ export interface ConsultationInput {
   type: 'TEXT' | 'AUDIO' | 'PDF' | 'IMAGE';
   content: string;
   mimeType?: string;
+  userDescription?: string;
 }
 
 export interface AiLayoutPlan {
