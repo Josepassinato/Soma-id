@@ -445,7 +445,25 @@ const translations = {
     // Project Form
     next_step: "Siguiente Paso",
     generate_digital_twin: "Generación de Gemelo Digital (Encanto)",
-    create_and_render: "Crear Proyecto y Generar Render"
+    create_and_render: "Crear Proyecto y Generar Render",
+    // Auth Page
+    auth_corporate_id: "SOMA-ID Corporativo (Email)",
+    auth_access_key: "Clave de Acceso (Contraseña)",
+    auth_authenticating: "AUTENTICANDO...",
+    auth_create_access: "CREAR ACCESO",
+    auth_enter_system: "ENTRAR AL SISTEMA",
+    auth_or_instant_access: "O ACCESO INSTANTÁNEO",
+    auth_biometric_login: "ENTRAR CON BIOMETRÍA",
+    auth_quick_sandbox: "Acceso Rápido SOMA-ID (Modo Sandbox)",
+    auth_server_offline: "Servidor de autenticación fuera de línea.",
+    auth_signup_requested: "Registro solicitado. Verifique su correo para confirmar.",
+    auth_login_success_faceid: "¡Inicio de sesión exitoso! ¿Desea habilitar el acceso FaceID en este dispositivo?",
+    auth_failed: "Falló la autenticación corporativa SOMA-ID.",
+    auth_validated: "SOMA-ID Validado",
+    auth_initializing: "Inicializando...",
+    auth_biometric_failed: "Acceso biométrico fallido. Intente con su contraseña.",
+    auth_industrial_identity: "SISTEMA DE IDENTIDAD INDUSTRIAL",
+    auth_engine_version: "Industrial Engine v2.5"
   }
 };
 
