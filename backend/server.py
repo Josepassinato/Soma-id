@@ -14,6 +14,8 @@ import json
 import re
 import base64
 import asyncio
+import httpx
+from bs4 import BeautifulSoup
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 
 ROOT_DIR = Path(__file__).parent
