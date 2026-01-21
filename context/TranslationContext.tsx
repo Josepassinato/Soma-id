@@ -462,6 +462,8 @@ const translations = {
     import_arch_project: "Importar Proyecto Arquitectónico",
     upload_floor_plan: "Subir Plano de Planta",
     accepted_formats: "Formatos aceptados: JPG, PNG, PDF",
+    loaded: "Cargado",
+    pdf_ready: "PDF listo para análisis",
     ai_will_analyze: "La IA analizará el plano, extraerá habitaciones y sugerirá oportunidades de carpintería",
     analyze_plan: "Analizar Plano",
     analyzing_floor_plan: "Analizando Plano de Planta",
