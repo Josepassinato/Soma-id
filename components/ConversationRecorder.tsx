@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { ExtractedInsights, ConsultationInput } from '../types';
 import { FloorPlanAnalyzer } from './FloorPlanAnalyzer';
+import { StructuredBriefingForm } from './StructuredBriefingForm';
 import { useTranslation } from '../context/TranslationContext';
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 
 export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtracted, onProcess }) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'RECORD' | 'UPLOAD_AUDIO' | 'UPLOAD_PDF' | 'UPLOAD_IMAGE' | 'FLOOR_PLAN'>('RECORD');
+  const [activeTab, setActiveTab] = useState<'RECORD' | 'UPLOAD_AUDIO' | 'UPLOAD_PDF' | 'UPLOAD_IMAGE' | 'FLOOR_PLAN' | 'STRUCTURED'>('RECORD');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [userDescription, setUserDescription] = useState('');
