@@ -587,26 +587,37 @@ async def check_gemini_health():
 
 @api_router.post("/floorplan/analyze")
 async def analyze_floor_plan(request: AnalyzeFloorPlanRequest):
-    """Analyze an architectural floor plan and extract rooms/woodwork opportunities"""
+    """Analyze an architectural floor plan (image or PDF) and extract rooms/woodwork opportunities"""
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
         model = genai.GenerativeModel('models/gemini-2.5-flash')
         
-        # Decode base64 image
-        image_data = base64.b64decode(request.imageBase64)
+        # Decode base64 data
+        file_data = base64.b64decode(request.imageBase64)
+        
+        # Determine mime type - support both images and PDFs
+        mime_type = request.mimeType or "image/jpeg"
+        is_pdf = mime_type == "application/pdf" or mime_type.endswith("/pdf")
+        
+        logger.info(f"Analyzing floor plan - MIME type: {mime_type}, Is PDF: {is_pdf}, Data size: {len(file_data)} bytes")
         
         # Get language instruction
         language_instruction = get_language_instruction(request.language or "pt")
+        
+        # Build the analysis prompt
+        file_type_instruction = "PDF document containing" if is_pdf else "image of"
         
         prompt = f"""{FLOOR_PLAN_ANALYZER_INSTRUCTION}
 
 {language_instruction}
 
-Analyze this architectural floor plan image.
+Analyze this {file_type_instruction} an architectural floor plan.
 {f'Client Name: {request.clientName}' if request.clientName else ''}
 {f'Project Context: {request.projectContext}' if request.projectContext else ''}
+
+{"NOTE: This is a PDF file. Analyze ALL pages if there are multiple. Extract information from any page that contains floor plan details." if is_pdf else ""}
 
 Extract ALL rooms with their:
 1. Name (exactly as labeled)
@@ -629,7 +640,7 @@ Generate questions for the user if:
 Return valid JSON only."""
 
         response = model.generate_content([
-            {"mime_type": request.mimeType, "data": image_data},
+            {"mime_type": mime_type, "data": file_data},
             prompt
         ])
         
