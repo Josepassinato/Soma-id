@@ -45,7 +45,7 @@ export const TestReportPage: React.FC<Props> = ({ onBack }) => {
           <div className="space-y-6 lg:col-span-1">
               <div className="bg-gradient-to-r from-cyan-900/20 to-transparent p-4 border-l-4 border-cyan-500">
                   <h3 className="text-lg font-bold text-white uppercase tracking-wider">Ciclo E2E</h3>
-                  <p className="text-xs text-gray-400 mt-1">Simulação Voz -> Produção.</p>
+                  <p className="text-xs text-gray-400 mt-1">Simulação Voz → Produção.</p>
               </div>
               <EndToEndTestRunner />
           </div>
