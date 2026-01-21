@@ -93,4 +93,5 @@ REACT_APP_BACKEND_URL=https://xxx.preview.emergentagent.com
 - Implementada apresentação de projeto estilo Promob (documento profissional)
 - Adicionado QR Code para compartilhamento com cliente
 - Seção de aprovação com campos para assinatura
+- Adicionado suporte a PDF para plantas baixas
 - Todos os testes passando (11/11 backend, frontend OK)
