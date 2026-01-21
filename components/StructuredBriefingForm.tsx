@@ -320,22 +320,31 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) 
       </div>
 
       {/* Progress Steps */}
-      <div className="flex border-b border-slate-800">
-        {['CLIENT', 'AREAS', 'DETAILS', 'REVIEW'].map((s, i) => {
-          const stepLabels = {
+      <div className="flex border-b border-slate-800 overflow-x-auto">
+        {['IMPORT', 'CLIENT', 'AREAS', 'DETAILS', 'REVIEW'].map((s, i) => {
+          const stepLabels: Record<string, string> = {
+            IMPORT: t('import_url'),
             CLIENT: t('client_info'),
             AREAS: t('project_areas'),
             DETAILS: t('specifications'),
             REVIEW: t('review'),
           };
+          const stepIcons: Record<string, string> = {
+            IMPORT: '🔗',
+            CLIENT: '👤',
+            AREAS: '🏠',
+            DETAILS: '⚙️',
+            REVIEW: '✓',
+          };
           const isActive = step === s;
-          const isPast = ['CLIENT', 'AREAS', 'DETAILS', 'REVIEW'].indexOf(step) > i;
+          const stepOrder = ['IMPORT', 'CLIENT', 'AREAS', 'DETAILS', 'REVIEW'];
+          const isPast = stepOrder.indexOf(step) > i;
           
           return (
             <button
               key={s}
               onClick={() => setStep(s as any)}
-              className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all ${
+              className={`flex-1 py-3 text-[9px] font-bold uppercase tracking-wider transition-all whitespace-nowrap px-2 ${
                 isActive 
                   ? 'bg-cyan-600/20 text-cyan-400 border-b-2 border-cyan-400' 
                   : isPast 
@@ -343,12 +352,88 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) 
                     : 'text-slate-600 hover:text-slate-400'
               }`}
             >
-              <span className="mr-2">{isPast ? '✓' : i + 1}.</span>
-              {stepLabels[s as keyof typeof stepLabels]}
+              <span className="mr-1">{stepIcons[s]}</span>
+              {stepLabels[s]}
             </button>
           );
         })}
       </div>
+
+      {/* Step: IMPORT FROM URL */}
+      {step === 'IMPORT' && (
+        <div className="p-8 space-y-6">
+          <div className="text-center mb-8">
+            <span className="text-6xl mb-4 block">📄</span>
+            <h3 className="text-xl font-bold text-white mb-2">{t('import_from_link')}</h3>
+            <p className="text-slate-400 text-sm max-w-md mx-auto">
+              {t('import_description')}
+            </p>
+          </div>
+          
+          <div>
+            <label className="block text-xs font-bold text-cyan-400 uppercase tracking-widest mb-2">
+              🔗 {t('document_url')}
+            </label>
+            <input
+              type="url"
+              value={importUrl}
+              onChange={(e) => setImportUrl(e.target.value)}
+              placeholder="https://acrobat.adobe.com/id/urn:aaid:sc:..."
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none font-mono text-sm"
+              data-testid="briefing-import-url"
+            />
+            <p className="text-[10px] text-slate-500 mt-2">
+              {t('supported_links')}: Adobe Acrobat, Google Drive, Dropbox
+            </p>
+          </div>
+
+          {importError && (
+            <div className="p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
+              <p className="text-red-400 text-sm">❌ {importError}</p>
+            </div>
+          )}
+
+          <button
+            onClick={handleImportFromUrl}
+            disabled={!importUrl.trim() || isImporting}
+            className="w-full py-4 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-black uppercase tracking-widest text-sm rounded-xl shadow-lg transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            data-testid="import-briefing-btn"
+          >
+            {isImporting ? (
+              <>
+                <span className="animate-spin">⏳</span>
+                {t('analyzing_document')}...
+              </>
+            ) : (
+              <>
+                🤖 {t('analyze_and_import')}
+              </>
+            )}
+          </button>
+
+          <div className="relative flex py-6 items-center">
+            <div className="flex-grow border-t border-slate-800"></div>
+            <span className="flex-shrink mx-4 text-[10px] text-slate-600 font-bold uppercase tracking-widest">{t('or')}</span>
+            <div className="flex-grow border-t border-slate-800"></div>
+          </div>
+
+          <button
+            onClick={() => setStep('CLIENT')}
+            className="w-full py-3 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 font-bold uppercase tracking-widest text-xs rounded-xl transition"
+          >
+            📝 {t('fill_manually')}
+          </button>
+
+          <div className="flex justify-start pt-4 border-t border-slate-800">
+            <button 
+              onClick={onCancel}
+              className="px-6 py-3 text-slate-500 font-bold text-xs hover:text-white transition uppercase tracking-widest"
+            >
+              {t('cancel')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Step: CLIENT INFO */}
       {step === 'CLIENT' && (
