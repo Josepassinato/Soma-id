@@ -108,22 +108,22 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
       if (activeTab === 'RECORD') {
         if (!audioBlob) throw new Error("Nenhuma gravação encontrada.");
         const base64 = await convertBlobToBase64(audioBlob);
-        input = { type: 'AUDIO', content: base64, mimeType: 'audio/webm' };
+        input = { type: 'AUDIO', content: base64, mimeType: 'audio/webm', userDescription };
       } 
       else if (activeTab === 'UPLOAD_AUDIO') {
         if (!selectedFile) throw new Error("Nenhum arquivo de áudio selecionado.");
         const base64 = await convertBlobToBase64(selectedFile);
-        input = { type: 'AUDIO', content: base64, mimeType: selectedFile.type };
+        input = { type: 'AUDIO', content: base64, mimeType: selectedFile.type, userDescription };
       } 
       else if (activeTab === 'UPLOAD_IMAGE') {
         if (!selectedFile) throw new Error("Nenhuma foto selecionada.");
         const base64 = await convertBlobToBase64(selectedFile);
-        input = { type: 'IMAGE', content: base64, mimeType: selectedFile.type };
+        input = { type: 'IMAGE', content: base64, mimeType: selectedFile.type, userDescription };
       }
       else { // PDF
         if (!selectedFile) throw new Error("Nenhum arquivo PDF selecionado.");
         const base64 = await convertBlobToBase64(selectedFile);
-        input = { type: 'PDF', content: base64, mimeType: 'application/pdf' };
+        input = { type: 'PDF', content: base64, mimeType: 'application/pdf', userDescription };
       }
 
       const insights = await onProcess(input);
