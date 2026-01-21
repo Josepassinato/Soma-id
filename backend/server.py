@@ -129,6 +129,33 @@ class FloorPlanAnalysis(BaseModel):
     woodwork_opportunities: List[Dict[str, Any]] = []
     summary: str
 
+# Import Briefing from URL Models
+class ImportBriefingRequest(BaseModel):
+    url: str
+    language: Optional[str] = "pt"
+
+class CabinetAreaSpec(BaseModel):
+    name: str
+    style: str = "european_flat"
+    doorType: str = "flat"
+    boxMaterial: str = "plywood_3_4"
+    doorMaterial: str = "mdf_3_4"
+    finish: str = "wood_textured"
+    hinges: str = "blum_soft"
+    slides: str = "blum_undermount"
+    dimensions: str = ""
+    components: List[str] = []
+    notes: str = ""
+
+class ImportedBriefingData(BaseModel):
+    clientName: str = ""
+    projectAddress: str = ""
+    areas: List[CabinetAreaSpec] = []
+    includedItems: List[str] = []
+    excludedItems: List[str] = []
+    generalNotes: str = ""
+    rawExtractedText: str = ""
+
 class ChatMessage(BaseModel):
     role: str  # 'user' or 'assistant'
     content: str
