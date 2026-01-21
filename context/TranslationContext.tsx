@@ -572,7 +572,21 @@ const translations = {
     dimensions: "Dimensiones",
     position: "Posición",
     generated_on: "Generado el",
-    view_presentation: "Ver Presentación"
+    view_presentation: "Ver Presentación",
+    // QR Code & Share
+    client_access: "Acceso del Cliente",
+    scan_qr_description: "Escanee el código QR o comparta el enlace para que el cliente vea y apruebe el proyecto en línea.",
+    share: "Compartir",
+    copy_link: "Copiar Enlace",
+    copied: "¡Copiado!",
+    scan_to_view: "Escanee para ver",
+    share_project: "Compartir Proyecto",
+    project_link: "Enlace del Proyecto",
+    copy: "Copiar",
+    share_description: "El cliente puede ver y aprobar el proyecto a través de este enlace.",
+    approval: "Aprobación",
+    client_signature: "Firma del Cliente",
+    date: "Fecha"
   }
 };
 
