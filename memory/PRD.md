@@ -44,6 +44,7 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 10. **Apresentação de Projeto Estilo Promob** - Documento profissional com resumo, medidas, materiais, render (21/01/2026)
 11. **QR Code para Compartilhamento** - Cliente pode visualizar/aprovar projeto via link ou QR Code (21/01/2026)
 12. **Suporte a PDF para Plantas Baixas** - Upload e análise de plantas baixas em formato PDF (NOVO - 21/01/2026)
+13. **Briefing Estruturado** - Formulário de cotação estilo americano com áreas, materiais, ferragens, componentes (NOVO - 21/01/2026)
 
 ### 🟡 Mocked/Limitado
 - `liveService.ts` - Áudio em tempo real é mock
