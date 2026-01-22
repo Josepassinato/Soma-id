@@ -384,19 +384,26 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) 
           
           <div>
             <label className="block text-xs font-bold text-cyan-400 uppercase tracking-widest mb-2">
-              🔗 {t('document_url')}
+              🔗 {t('document_urls')}
             </label>
-            <input
-              type="url"
+            <textarea
               value={importUrl}
               onChange={(e) => setImportUrl(e.target.value)}
-              placeholder="https://acrobat.adobe.com/id/urn:aaid:sc:..."
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none font-mono text-sm"
+              placeholder={`https://acrobat.adobe.com/id/urn:aaid:sc:...\nhttps://acrobat.adobe.com/id/urn:aaid:sc:...\nhttps://drive.google.com/file/d/...`}
+              rows={5}
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none font-mono text-sm resize-none"
               data-testid="briefing-import-url"
             />
-            <p className="text-[10px] text-slate-500 mt-2">
-              {t('supported_links')}: Adobe Acrobat, Google Drive, Dropbox
-            </p>
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-[10px] text-slate-500">
+                {t('paste_multiple_links')}
+              </p>
+              {parseUrls(importUrl).length > 0 && (
+                <span className="text-xs text-cyan-400 font-bold">
+                  {parseUrls(importUrl).length} {t('links_detected')}
+                </span>
+              )}
+            </div>
           </div>
 
           {importError && (
@@ -407,14 +414,14 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) 
 
           <button
             onClick={handleImportFromUrl}
-            disabled={!importUrl.trim() || isImporting}
+            disabled={parseUrls(importUrl).length === 0 || isImporting}
             className="w-full py-4 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-black uppercase tracking-widest text-sm rounded-xl shadow-lg transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             data-testid="import-briefing-btn"
           >
             {isImporting ? (
               <>
                 <span className="animate-spin">⏳</span>
-                {t('analyzing_document')}...
+                {t('analyzing_documents')}...
               </>
             ) : (
               <>
