@@ -671,21 +671,26 @@ Return ONLY valid JSON, no markdown formatting."""
 
 @api_router.post("/briefing/import-from-url")
 async def import_briefing_from_url(request: ImportBriefingRequest):
-    """Import and extract briefing data from a shared document URL (Adobe Acrobat, Google Drive, etc.)"""
+    """Import and extract briefing data from multiple shared document URLs (Adobe Acrobat, Google Drive, etc.)"""
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
-    try:
-        logger.info(f"Importing briefing from URL: {request.url}")
+    # Filter empty URLs
+    urls = [url.strip() for url in request.urls if url.strip()]
+    if not urls:
+        raise HTTPException(status_code=400, detail="No valid URLs provided")
+    
+    logger.info(f"Importing briefing from {len(urls)} URL(s)")
+    
+    async def fetch_document_from_url(url: str, client: httpx.AsyncClient) -> tuple:
+        """Fetch a single document from URL and return (image_data, content_type, url)"""
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
         
-        # Step 1: Fetch the page to find the actual document/image URL
-        async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            }
-            
+        try:
             # First, try to get the page
-            response = await client.get(request.url, headers=headers)
+            response = await client.get(url, headers=headers)
             page_content = response.text
             
             # Parse the page to find rendition/image URLs
@@ -694,20 +699,16 @@ async def import_briefing_from_url(request: ImportBriefingRequest):
             image_url = None
             
             # Look for Adobe Acrobat rendition URLs
-            # Check meta tags for og:image
             og_image = soup.find('meta', property='og:image')
             if og_image and og_image.get('content'):
                 image_url = og_image['content']
             
-            # Check for rendition images in the page
             if not image_url:
-                # Look for CDN sharing URLs in the page content
                 cdn_pattern = r'https://cdn-sharing\.adobecc\.com/rendition/[^"\'>\s]+'
                 cdn_matches = re.findall(cdn_pattern, page_content)
                 if cdn_matches:
                     image_url = cdn_matches[0]
             
-            # Check for any image sources
             if not image_url:
                 for img in soup.find_all('img'):
                     src = img.get('src', '')
@@ -715,7 +716,6 @@ async def import_briefing_from_url(request: ImportBriefingRequest):
                         image_url = src
                         break
             
-            # If still no image, try to find in script tags (Adobe stores data in JSON)
             if not image_url:
                 for script in soup.find_all('script'):
                     script_text = script.string or ''
@@ -724,52 +724,78 @@ async def import_briefing_from_url(request: ImportBriefingRequest):
                         if rendition_match:
                             image_url = rendition_match.group(1)
                             break
-                        # Also try assetURLs pattern
                         asset_match = re.search(r'"assetURLs"\s*:\s*\{[^}]*"rendition"\s*:\s*"([^"]+)"', script_text)
                         if asset_match:
                             image_url = asset_match.group(1)
                             break
             
             if not image_url:
-                # Try direct image fetch if URL looks like an image
-                if any(ext in request.url.lower() for ext in ['.jpg', '.jpeg', '.png', '.pdf']):
-                    image_url = request.url
+                if any(ext in url.lower() for ext in ['.jpg', '.jpeg', '.png', '.pdf']):
+                    image_url = url
                 else:
-                    raise HTTPException(status_code=400, detail="Could not find document/image in the provided URL")
+                    return None, None, url
             
-            logger.info(f"Found image URL: {image_url[:100]}...")
-            
-            # Step 2: Fetch the actual image/document
+            # Fetch the actual image/document
             img_response = await client.get(image_url, headers=headers)
             if img_response.status_code != 200:
-                raise HTTPException(status_code=400, detail=f"Failed to fetch document image: {img_response.status_code}")
+                return None, None, url
             
             image_data = img_response.content
             content_type = img_response.headers.get('content-type', 'image/jpeg')
             
-            logger.info(f"Fetched document: {len(image_data)} bytes, type: {content_type}")
+            logger.info(f"Fetched document from {url[:50]}...: {len(image_data)} bytes")
+            return image_data, content_type, url
+            
+        except Exception as e:
+            logger.error(f"Error fetching {url}: {str(e)}")
+            return None, None, url
+    
+    try:
+        # Fetch all documents in parallel
+        async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
+            tasks = [fetch_document_from_url(url, client) for url in urls]
+            results = await asyncio.gather(*tasks)
         
-        # Step 3: Use Gemini to analyze the document
+        # Filter successful fetches
+        documents = [(data, ctype, url) for data, ctype, url in results if data is not None]
+        
+        if not documents:
+            raise HTTPException(status_code=400, detail="Could not fetch any documents from the provided URLs")
+        
+        logger.info(f"Successfully fetched {len(documents)} of {len(urls)} documents")
+        
+        # Analyze all documents with Gemini
         model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
         language_instruction = get_language_instruction(request.language or "pt")
+        
+        # Build content parts for all documents
+        content_parts = []
+        for i, (image_data, content_type, url) in enumerate(documents):
+            content_parts.append({"mime_type": content_type.split(';')[0], "data": image_data})
+            content_parts.append(f"[Document {i+1} of {len(documents)}]")
         
         full_prompt = f"""{BRIEFING_EXTRACTION_PROMPT}
 
 {language_instruction}
 
-Analyze this cabinetry quotation/specification document and extract all project details."""
+You are analyzing {len(documents)} document(s) that together form a COMPLETE cabinetry project specification.
+COMBINE all information from ALL documents into a SINGLE unified response.
+Documents may contain different rooms/areas or additional details for the same project.
+Merge all areas, components, and specifications into one comprehensive JSON response.
+
+Extract ALL project details from ALL documents provided."""
         
-        response = model.generate_content([
-            {"mime_type": content_type.split(';')[0], "data": image_data},
-            full_prompt
-        ])
+        content_parts.append(full_prompt)
+        
+        response = model.generate_content(content_parts)
         
         # Extract JSON from response
         result = extract_json(response.text)
         
-        # Add raw text for reference
-        result['rawExtractedText'] = response.text[:2000] if len(response.text) > 2000 else response.text
+        # Add metadata
+        result['rawExtractedText'] = response.text[:3000] if len(response.text) > 3000 else response.text
+        result['documentsProcessed'] = len(documents)
+        result['totalUrlsProvided'] = len(urls)
         
         # Ensure areas have all required fields with defaults
         if 'areas' in result:
@@ -785,20 +811,21 @@ Analyze this cabinetry quotation/specification document and extract all project 
                 area.setdefault('components', [])
                 area.setdefault('notes', '')
         
-        logger.info(f"Successfully extracted briefing data with {len(result.get('areas', []))} areas")
+        logger.info(f"Successfully extracted briefing data with {len(result.get('areas', []))} areas from {len(documents)} documents")
         
         return {
             "status": "success",
             "data": result,
-            "source_url": request.url
+            "source_urls": urls,
+            "documents_processed": len(documents)
         }
         
     except httpx.TimeoutException:
-        raise HTTPException(status_code=408, detail="Timeout while fetching URL")
+        raise HTTPException(status_code=408, detail="Timeout while fetching URLs")
     except httpx.RequestError as e:
-        raise HTTPException(status_code=400, detail=f"Error fetching URL: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Error fetching URLs: {str(e)}")
     except Exception as e:
-        logger.error(f"Error importing briefing from URL: {str(e)}")
+        logger.error(f"Error importing briefing from URLs: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to import briefing: {str(e)}")
 
 
