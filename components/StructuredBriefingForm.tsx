@@ -195,6 +195,7 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) 
       
       if (result.status === 'success' && result.data) {
         const importedData = result.data;
+        setDocumentsProcessed(result.documents_processed || 1);
         
         // Convert imported areas to our format
         const convertedAreas: CabinetArea[] = (importedData.areas || []).map((area: any, index: number) => ({
