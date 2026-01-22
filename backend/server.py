@@ -131,7 +131,7 @@ class FloorPlanAnalysis(BaseModel):
 
 # Import Briefing from URL Models
 class ImportBriefingRequest(BaseModel):
-    url: str
+    urls: List[str]  # Changed to list of URLs
     language: Optional[str] = "pt"
 
 class CabinetAreaSpec(BaseModel):
