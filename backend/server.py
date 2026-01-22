@@ -1101,6 +1101,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Root-level health check endpoint for Kubernetes
+@app.get("/health")
+async def kubernetes_health_check():
+    """Health check endpoint for Kubernetes probes"""
+    return {"status": "healthy", "service": "soma-id-backend"}
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
