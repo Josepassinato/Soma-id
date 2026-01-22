@@ -150,6 +150,7 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) 
   const [importUrl, setImportUrl] = useState('');
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState('');
+  const [documentsProcessed, setDocumentsProcessed] = useState(0);
   
   const [briefing, setBriefing] = useState<BriefingData>({
     clientName: '',
@@ -161,18 +162,28 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) 
     generalNotes: '',
   });
 
-  // Import briefing from URL
+  // Parse URLs from textarea (one per line or space-separated)
+  const parseUrls = (text: string): string[] => {
+    return text
+      .split(/[\n\s]+/)
+      .map(url => url.trim())
+      .filter(url => url.startsWith('http'));
+  };
+
+  // Import briefing from multiple URLs
   const handleImportFromUrl = async () => {
-    if (!importUrl.trim()) return;
+    const urls = parseUrls(importUrl);
+    if (urls.length === 0) return;
     
     setIsImporting(true);
     setImportError('');
+    setDocumentsProcessed(0);
     
     try {
       const response = await fetch(`${API_URL}/briefing/import-from-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: importUrl, language })
+        body: JSON.stringify({ urls, language })
       });
       
       if (!response.ok) {
