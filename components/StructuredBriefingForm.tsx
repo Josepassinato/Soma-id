@@ -146,14 +146,15 @@ const EXCLUDED_ITEMS = [
   'Permits',
 ];
 
-export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit }) => {
+export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit, onCreateMultipleProjects }) => {
   const { t, language } = useTranslation();
-  const [step, setStep] = useState<'IMPORT' | 'CLIENT' | 'AREAS' | 'DETAILS' | 'REVIEW'>('IMPORT');
+  const [step, setStep] = useState<'IMPORT' | 'CLIENT' | 'AREAS' | 'DETAILS' | 'REVIEW' | 'MULTI_PROJECT'>('IMPORT');
   const [activeAreaIndex, setActiveAreaIndex] = useState(0);
   const [importUrl, setImportUrl] = useState('');
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState('');
   const [documentsProcessed, setDocumentsProcessed] = useState(0);
+  const [isCreatingProjects, setIsCreatingProjects] = useState(false);
   
   const [briefing, setBriefing] = useState<BriefingData>({
     clientName: '',
