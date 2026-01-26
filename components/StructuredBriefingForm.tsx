@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../context/TranslationContext';
+import { ExtractedInsights } from '../types';
 
 const API_URL = '/api';
 
@@ -7,6 +8,7 @@ interface CabinetArea {
   id: string;
   name: string;
   enabled: boolean;
+  selected: boolean; // For multi-project creation
   style: string;
   doorType: string;
   boxMaterial: string;
@@ -32,6 +34,7 @@ interface BriefingData {
 interface Props {
   onCancel: () => void;
   onSubmit: (briefing: BriefingData) => void;
+  onCreateMultipleProjects?: (projects: ExtractedInsights[]) => void;
 }
 
 const CABINET_STYLES = [
