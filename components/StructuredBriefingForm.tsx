@@ -980,6 +980,172 @@ ${briefing.excludedItems.map(i => `- ${i}`).join('\n')}
           </div>
         </div>
       )}
+
+      {/* Step: MULTI_PROJECT - Create separate projects for each area */}
+      {step === 'MULTI_PROJECT' && (
+        <div className="p-8 space-y-6">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <span className="text-5xl mb-4 block">🏠</span>
+            <h3 className="text-xl font-bold text-white mb-2">{t('multi_environment_project')}</h3>
+            <p className="text-slate-400 text-sm max-w-lg mx-auto">
+              {t('multi_environment_description')}
+            </p>
+          </div>
+
+          {/* Client Info Summary */}
+          {briefing.clientName && (
+            <div className="bg-slate-900/50 border border-cyan-500/30 rounded-xl p-4 mb-6">
+              <div className="flex items-center gap-4">
+                <span className="text-3xl">👤</span>
+                <div>
+                  <p className="text-white font-bold text-lg">{briefing.clientName}</p>
+                  {briefing.projectAddress && (
+                    <p className="text-slate-400 text-sm">{briefing.projectAddress}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Areas List with Selection */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest">
+                {t('environments_detected')} ({briefing.areas.length})
+              </h4>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setBriefing(prev => ({
+                    ...prev,
+                    areas: prev.areas.map(a => ({ ...a, selected: true }))
+                  }))}
+                  className="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold uppercase"
+                >
+                  {t('select_all')}
+                </button>
+                <span className="text-slate-600">|</span>
+                <button
+                  onClick={() => setBriefing(prev => ({
+                    ...prev,
+                    areas: prev.areas.map(a => ({ ...a, selected: false }))
+                  }))}
+                  className="text-[10px] text-slate-400 hover:text-slate-300 font-bold uppercase"
+                >
+                  {t('deselect_all')}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-3">
+              {briefing.areas.map((area, index) => (
+                <div
+                  key={area.id}
+                  onClick={() => toggleAreaSelection(area.id)}
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    area.selected
+                      ? 'bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border-cyan-500/50'
+                      : 'bg-slate-900/30 border-slate-700 hover:border-slate-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition ${
+                      area.selected
+                        ? 'bg-cyan-500 border-cyan-500 text-black'
+                        : 'border-slate-600'
+                    }`}>
+                      {area.selected && <span className="text-sm font-bold">✓</span>}
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="text-xl">{ROOM_AREAS.find(r => r.name === area.name)?.icon || '🏠'}</span>
+                        <span className="text-white font-bold">{area.name}</span>
+                        <span className="px-2 py-0.5 bg-purple-900/30 text-purple-300 text-[9px] font-bold uppercase rounded">
+                          {getLabel(CABINET_STYLES, area.style).split(' - ')[0]}
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 text-[10px] text-slate-400">
+                        <span>{getLabel(FINISHES, area.finish)}</span>
+                        <span>•</span>
+                        <span>{getLabel(HARDWARE_HINGES, area.hinges).split(' ')[0]} Hinges</span>
+                        {area.dimensions && (
+                          <>
+                            <span>•</span>
+                            <span className="text-cyan-400">{area.dimensions}</span>
+                          </>
+                        )}
+                        {area.components.length > 0 && (
+                          <>
+                            <span>•</span>
+                            <span className="text-purple-400">{area.components.length} components</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Selected Count */}
+          <div className="bg-slate-950 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">📁</span>
+              <div>
+                <p className="text-white font-bold">
+                  {briefing.areas.filter(a => a.selected).length} {t('projects_to_create')}
+                </p>
+                <p className="text-slate-500 text-xs">
+                  {t('each_area_separate_project')}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-cyan-400 font-mono text-sm">
+                {documentsProcessed} {t('docs_analyzed')}
+              </p>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-800">
+            <button 
+              onClick={() => setStep('IMPORT')}
+              className="px-6 py-3 text-slate-500 font-bold text-xs hover:text-white transition uppercase tracking-widest"
+            >
+              ← {t('back')}
+            </button>
+            
+            <button 
+              onClick={() => setStep('DETAILS')}
+              className="flex-1 py-3 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 font-bold uppercase tracking-widest text-xs rounded-xl transition"
+            >
+              ✏️ {t('edit_specifications')}
+            </button>
+            
+            <button 
+              onClick={handleCreateMultipleProjects}
+              disabled={briefing.areas.filter(a => a.selected).length === 0 || isCreatingProjects || !onCreateMultipleProjects}
+              className="flex-1 py-4 bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-500 hover:to-cyan-500 text-white font-black uppercase tracking-widest text-xs rounded-xl shadow-lg transition disabled:opacity-30 flex items-center justify-center gap-2"
+              data-testid="create-multiple-projects-btn"
+            >
+              {isCreatingProjects ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  {t('creating')}...
+                </>
+              ) : (
+                <>
+                  🚀 {t('create_projects')} ({briefing.areas.filter(a => a.selected).length})
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
