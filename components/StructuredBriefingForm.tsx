@@ -315,6 +315,7 @@ ${briefing.excludedItems.map(i => `- ${i}`).join('\n')}
       id: `${roomId}_${Date.now()}`,
       name: room.name,
       enabled: true,
+      selected: true,
       style: 'european_flat',
       doorType: 'flat',
       boxMaterial: 'plywood_3_4',
