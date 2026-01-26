@@ -206,6 +206,7 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit, on
           id: `imported_${index}_${Date.now()}`,
           name: area.name || 'Unknown Area',
           enabled: true,
+          selected: true, // All areas selected by default for multi-project
           style: area.style || 'european_flat',
           doorType: area.doorType || 'flat',
           boxMaterial: area.boxMaterial || 'plywood_3_4',
@@ -232,8 +233,10 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit, on
           generalNotes: importedData.generalNotes || '',
         });
         
-        // Skip to review if we have areas, otherwise to areas selection
-        if (convertedAreas.length > 0) {
+        // If multiple areas detected, go to multi-project view
+        if (convertedAreas.length > 1) {
+          setStep('MULTI_PROJECT');
+        } else if (convertedAreas.length === 1) {
           setStep('REVIEW');
         } else {
           setStep('AREAS');
@@ -244,6 +247,64 @@ export const StructuredBriefingForm: React.FC<Props> = ({ onCancel, onSubmit, on
     } finally {
       setIsImporting(false);
     }
+  };
+
+  // Toggle area selection for multi-project creation
+  const toggleAreaSelection = (areaId: string) => {
+    setBriefing(prev => ({
+      ...prev,
+      areas: prev.areas.map(area => 
+        area.id === areaId ? { ...area, selected: !area.selected } : area
+      )
+    }));
+  };
+
+  // Create individual projects for each selected area
+  const handleCreateMultipleProjects = () => {
+    if (!onCreateMultipleProjects) return;
+    
+    setIsCreatingProjects(true);
+    
+    const selectedAreas = briefing.areas.filter(area => area.selected);
+    
+    // Convert each area to an ExtractedInsights object
+    const projects: ExtractedInsights[] = selectedAreas.map(area => ({
+      clientName: briefing.clientName,
+      roomType: area.name,
+      wallWidth: parseInt(area.dimensions?.match(/\d+/)?.[0] || '3000') || 3000,
+      wallHeight: 2700,
+      wallDepth: 600,
+      styleDescription: getLabel(CABINET_STYLES, area.style),
+      technicalBriefing: `
+## ${area.name}
+**${t('client')}:** ${briefing.clientName}
+**${t('address')}:** ${briefing.projectAddress || '-'}
+
+### ${t('specifications')}
+- **${t('style')}:** ${getLabel(CABINET_STYLES, area.style)}
+- **${t('door_type')}:** ${getLabel(DOOR_TYPES, area.doorType)}
+- **${t('box_material')}:** ${getLabel(BOX_MATERIALS, area.boxMaterial)}
+- **${t('door_material')}:** ${getLabel(DOOR_MATERIALS, area.doorMaterial)}
+- **${t('finish')}:** ${getLabel(FINISHES, area.finish)}
+- **${t('hinges')}:** ${getLabel(HARDWARE_HINGES, area.hinges)}
+- **${t('slides')}:** ${getLabel(HARDWARE_SLIDES, area.slides)}
+- **${t('dimensions')}:** ${area.dimensions || '-'}
+${area.components.length > 0 ? `\n### ${t('special_components')}\n${area.components.map(c => `- ${c}`).join('\n')}` : ''}
+${area.notes ? `\n### ${t('notes')}\n${area.notes}` : ''}
+
+### ${t('included')}
+${briefing.includedItems.map(i => `- ${i}`).join('\n')}
+
+### ${t('excluded')}
+${briefing.excludedItems.map(i => `- ${i}`).join('\n')}
+      `.trim(),
+      suggestedMaterials: [area.boxMaterial, area.doorMaterial, area.finish].filter(Boolean),
+      installationType: 'PISO',
+      analysisStatus: 'COMPLETO',
+    }));
+    
+    onCreateMultipleProjects(projects);
+    setIsCreatingProjects(false);
   };
 
   const addArea = (roomId: string) => {
