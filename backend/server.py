@@ -424,12 +424,10 @@ Analyze the following and return a JSON with these fields: clientName (string), 
 @api_router.post("/gemini/generate-prompt")
 async def generate_enchantment_prompt(request: GeneratePromptRequest):
     """Generate an architectural visualization prompt for image generation"""
-    if not GEMINI_API_KEY:
+    if not genai_client:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
         style_keywords = get_style_keywords(request.styleDescription)
         
         prompt = f"""
@@ -443,7 +441,10 @@ OBJECTIVE: Create a hyper-realistic architectural photography prompt for {reques
 Incorporate tunable lighting, specific wood grain orientations (Freijó, Walnut), and 2025 hardware.
 """
         
-        response = model.generate_content(prompt)
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=types.Part.from_text(text=prompt)
+        )
         result = clean_response(response.text)
         
         return {"status": "success", "data": {"prompt": result}}
