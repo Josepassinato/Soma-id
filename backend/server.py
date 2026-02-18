@@ -584,7 +584,7 @@ Return a JSON object with this structure:
 @api_router.get("/gemini/health")
 async def check_gemini_health():
     """Check if Gemini API is working"""
-    if not genai_client:
+    if not EMERGENT_LLM_KEY:
         return {"status": "error", "message": "Gemini API key not configured", "latency": 0}
     
     try:
