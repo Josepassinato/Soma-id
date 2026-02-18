@@ -1,5 +1,5 @@
 
-import { NestingResult, Sheet, DrillingPoint, PartDxfInput, DrillHFace } from "../types";
+import { NestingResult, Sheet, DrillingPoint, PartDxfInput } from "../types";
 
 export class DxfService {
   private output: string = "";
