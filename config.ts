@@ -9,8 +9,7 @@ export const AppConfig = {
   // ID do Projeto no Google Cloud Platform (GCP)
   gcpProjectId: "SEU_ID_PROJETO_GCP_AQUI",
 
-  // Configuração do Supabase - SOMENTE variáveis de ambiente
-  // Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no arquivo .env
-  supabaseUrl: (import.meta as any).env?.VITE_SUPABASE_URL || '',
+  // Configuração do Supabase - usa variáveis de ambiente com fallback
+  supabaseUrl: (import.meta as any).env?.VITE_SUPABASE_URL || 'https://eruolbsvomarfxuxchjx.supabase.co',
   supabaseAnonKey: (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || ''
 };
