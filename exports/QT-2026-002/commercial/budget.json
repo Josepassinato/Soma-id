@@ -1,0 +1,99 @@
+{
+  "quoteId": "QT-2026-002",
+  "budgetVersion": "v1.0",
+  "generatedAt": "2026-02-04T17:03:50.713Z",
+  "environment": "Cozinha",
+  "summary": "Projeto de marcenaria para Cozinha em estilo \"Moderno Orgânico 2025\", com 10 módulos e utilização de materiais como Grafite Carbono, Mármore Calacatta, Champagne Metal, Branco Supremo Matt, Freijó Puro 2025.",
+  "estimatedRange": {
+    "min": 32141.76,
+    "max": 35496.96
+  },
+  "rangeExplanation": "A faixa de preço varia principalmente pela escolha de ferragens (básicas/premium), tipo e complexidade da pedra (padrão/premium), quantidade e complexidade de módulos especiais (gaveteiros, cantos, torres) e acabamentos personalizados.",
+  "inclusions": [
+    "Render 4K do Projeto (encantamento)",
+    "Layout Conceitual (SVG)",
+    "Lista de Materiais e Peças (genérica)",
+    "Acompanhamento virtual até a aprovação do projeto"
+  ],
+  "toBeDefined": [
+    "Medidas exatas após visita técnica e levantamento no local",
+    "Seleção final de ferragens e acessórios específicos",
+    "Detalhes de acabamentos personalizados e texturas",
+    "Cronograma de fabricação e logística de instalação"
+  ],
+  "legalDisclaimer": "Este é um orçamento estimado não executivo para fins de aprovação comercial. O valor final será confirmado após detalhamento técnico, levantamento de medidas no local e seleção final de todos os componentes. Sujeito a ajustes com base em requisitos específicos e condições de mercado.",
+  "detailedItems": [
+    {
+      "description": "Módulos Simples (4x)",
+      "value": 3200,
+      "category": "Fabricação"
+    },
+    {
+      "description": "Módulos Intermediários (4x)",
+      "value": 6000,
+      "category": "Fabricação"
+    },
+    {
+      "description": "Módulos Complexos (2x)",
+      "value": 5000,
+      "category": "Fabricação"
+    },
+    {
+      "description": "Ajuste de Fabricação por Estilo (Moderno Orgânico 2025 - x1.2)",
+      "value": 2839.9999999999995,
+      "category": "Fabricação"
+    },
+    {
+      "description": "Grafite Carbono (Frentes - ~6.5m² @ R$200/m²)",
+      "value": 1296.0000000000002,
+      "category": "Materiais"
+    },
+    {
+      "description": "Branco Supremo Matt (Caixas - ~4.9m² @ R$180/m²)",
+      "value": 874.8000000000001,
+      "category": "Materiais"
+    },
+    {
+      "description": "Mármore Calacatta (Padrão) (Stone - ~3.2m² @ R$600/m²)",
+      "value": 1944.0000000000005,
+      "category": "Materiais"
+    },
+    {
+      "description": "Champagne Metal (Especial - ~1.6m² @ R$500/m²)",
+      "value": 810.0000000000001,
+      "category": "Materiais"
+    },
+    {
+      "description": "Ferragens (Básicas - aprox. 10 módulos)",
+      "value": 500,
+      "category": "Materiais"
+    },
+    {
+      "description": "Iluminação LED integrada (~4.0m @ R$80/m)",
+      "value": 320,
+      "category": "Materiais"
+    },
+    {
+      "description": "Serviço de Design e Projeto",
+      "value": 2500,
+      "category": "Serviços"
+    },
+    {
+      "description": "Serviço de Gestão e Acompanhamento",
+      "value": 1500,
+      "category": "Serviços"
+    },
+    {
+      "description": "Markup geral do projeto (inclui risco, garantias, gestão e variação de mercado)",
+      "value": 5356.960000000001,
+      "category": "Markup"
+    }
+  ],
+  "baseCalculation": [
+    "4 simples, 4 intermediários, 2 complexos",
+    "Área total de marcenaria estimada: 16.2m²"
+  ],
+  "validityDays": 7,
+  "paymentTerms": "Pagamento em etapas (entrada + marcos do projeto). Detalhes a serem definidos em contrato.",
+  "budgetHash": "ec30c04b45e15e2f0a9b3374eb58ed7a480fd51ca8f204e93ff49868be9c392f"
+}

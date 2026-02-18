@@ -1,0 +1,28 @@
+
+--- CONTRATO DE PRESTAÇÃO DE SERVIÇOS SOMA-ID ---
+
+ID do Orçamento Referência: QT-2026-002
+Versão do Contrato: v1.0
+Gerado em (UTC): 2026-02-04T17:25:34.151Z
+
+Cliente: Maria Silva
+Projeto: Cozinha Moderna
+
+Cláusula 1: Objeto do Contrato
+Este contrato tem como objeto a prestação de serviços de projeto e fabricação de marcenaria, conforme detalhado no orçamento de referência ID QT-2026-002.
+
+Cláusula 2: Valores e Pagamento
+Os valores e condições de pagamento estão em conformidade com o orçamento de referência cujo hash SHA256 é: ec30c04b45e15e2f0a9b3374eb58ed7a480fd51ca8f204e93ff49868be9c392f.
+
+Cláusula 3: Prazos e Entregas
+Os prazos serão definidos em cronograma anexo após a aprovação final do projeto executivo.
+
+Cláusula 4: Vigência
+Este contrato tem vigência a partir da data de sua assinatura.
+
+Cláusula 5: Foro
+Fica eleito o foro da Comarca de São Paulo, Estado de São Paulo, para dirimir quaisquer dúvidas ou litígios.
+
+------------------------------------------------
+Hash SHA256 do Orçamento Referência: ec30c04b45e15e2f0a9b3374eb58ed7a480fd51ca8f204e93ff49868be9c392f
+------------------------------------------------

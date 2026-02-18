@@ -1,0 +1,14 @@
+{
+  "contract_id": "CA-2026-87551",
+  "related_quote_id": "QT-2026-002",
+  "budget_hash": "ec30c04b45e15e2f0a9b3374eb58ed7a480fd51ca8f204e93ff49868be9c392f",
+  "contract_hash": "737b790ed6b40b697366345573a3dd7cc120c5553cc57f03e91575ed29735351",
+  "accepted_at": "2026-02-04T17:25:58.136Z",
+  "accepted_by": {
+    "name": "Maria Silva",
+    "email": "maria.silva@example.com",
+    "ip": "192.168.1.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36"
+  },
+  "acceptance_text": "Eu li, entendi e concordo com este Acordo."
+}

@@ -1,0 +1,13 @@
+{
+  "contract_id": "CT-2026-39564",
+  "related_quote_id": "QT-2026-001",
+  "budget_hash": "234d5241bd32f20fda8de647ddbeba2948365b291d2bf6530792b50005665610",
+  "accepted_at": "2026-02-04T16:16:54.816Z",
+  "accepted_by": {
+    "name": "Cliente Teste SOMA-ID",
+    "email": "cliente@soma-id.com",
+    "ip": "189.123.45.67",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+  },
+  "acceptance_text": "Li e concordo com este orçamento estimado e autorizo o início do projeto."
+}

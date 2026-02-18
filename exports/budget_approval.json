@@ -1,0 +1,13 @@
+{
+  "quote_id": "QT-2026-001",
+  "budget_version": "v1.0",
+  "budget_hash": "234cef4006b6f6e7e0adb28e24e7c8b4dba2a3ca081beebc85298eeb2e20320e",
+  "approved_at": "2026-02-04T16:25:02.934Z",
+  "approved_by": {
+    "name": "Cliente Teste SOMA-ID",
+    "email": "cliente@soma-id.com",
+    "ip": "189.123.45.67",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+  },
+  "acceptance_text": "Li e concordo com este orçamento estimado e autorizo o início do projeto."
+}
