@@ -895,17 +895,20 @@ Generate questions for the user if:
 
 Return valid JSON only."""
 
-        content_parts = [
-            types.Part.from_bytes(data=file_data, mime_type=mime_type),
-            types.Part.from_text(text=prompt)
-        ]
+        # Use emergent chat with image support
+        chat = create_gemini_chat(f"floorplan-{uuid.uuid4()}", FLOOR_PLAN_ANALYZER_INSTRUCTION)
         
-        response = genai_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=content_parts
+        message = UserMessage(
+            text=prompt,
+            images=[ImageContent(
+                base64_data=request.imageBase64,
+                media_type=mime_type
+            )]
         )
         
-        result = extract_json(response.text)
+        response = await chat.send_message(message)
+        
+        result = extract_json(response)
         
         # Create session for follow-up chat
         session_id = str(uuid.uuid4())
