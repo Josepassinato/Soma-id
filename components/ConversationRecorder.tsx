@@ -9,9 +9,10 @@ interface Props {
   onCancel: () => void;
   onInsightsExtracted: (insights: ExtractedInsights, sourceType: string) => void;
   onProcess: (input: ConsultationInput) => Promise<ExtractedInsights>;
+  onCreateMultipleProjects?: (projects: ExtractedInsights[]) => void;
 }
 
-export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtracted, onProcess }) => {
+export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtracted, onProcess, onCreateMultipleProjects }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'RECORD' | 'UPLOAD_AUDIO' | 'UPLOAD_PDF' | 'UPLOAD_IMAGE' | 'FLOOR_PLAN' | 'STRUCTURED'>('RECORD');
   const [isRecording, setIsRecording] = useState(false);
