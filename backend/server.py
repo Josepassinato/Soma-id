@@ -1019,12 +1019,10 @@ Respond to the user's last message."""
 @api_router.post("/floorplan/select-room")
 async def select_room_for_project(request: SelectRoomForProjectRequest):
     """Select a room from the floor plan to create a SOMA-ID project"""
-    if not GEMINI_API_KEY:
+    if not genai_client:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
         # Find the selected room in the analysis
         selected_room = None
         for room in request.floorPlanAnalysis.get("rooms", []):
@@ -1078,7 +1076,10 @@ Return JSON:
   "woodworkType": "type requested"
 }}"""
 
-        response = model.generate_content(prompt)
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=types.Part.from_text(text=prompt)
+        )
         result = extract_json(response.text)
         
         # Add source information
