@@ -9,9 +9,6 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Any, Dict
 import uuid
 from datetime import datetime, timezone
-# Use the new google-genai SDK (replacing deprecated google.generativeai)
-from google import genai
-from google.genai import types
 import json
 import re
 import base64
@@ -37,14 +34,18 @@ except Exception as e:
     client = None
     db = None
 
-# Configure Gemini API with new SDK
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
-genai_client = None
-if GEMINI_API_KEY:
-    genai_client = genai.Client(api_key=GEMINI_API_KEY)
-
-# Emergent LLM Key for image generation
+# Emergent LLM Key for all Gemini calls
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
+
+# Helper function to create Gemini chat instance
+def create_gemini_chat(session_id: str, system_message: str = "") -> LlmChat:
+    """Create a Gemini chat instance using Emergent LLM Key"""
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=session_id,
+        system_message=system_message
+    ).with_model("gemini", "gemini-2.5-flash")
+    return chat
 
 # Create the main app without a prefix
 app = FastAPI(title="SOMA-ID Backend API")
