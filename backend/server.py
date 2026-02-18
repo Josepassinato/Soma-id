@@ -585,24 +585,22 @@ Return a JSON object with this structure:
 async def check_gemini_health():
     """Check if Gemini API is working"""
     if not EMERGENT_LLM_KEY:
-        return {"status": "error", "message": "Gemini API key not configured", "latency": 0}
+        return {"status": "error", "message": "Emergent LLM key not configured", "latency": 0}
     
     try:
         import time
         start = time.time()
         
-        response = genai_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=types.Part.from_text(text="Respond with only: OK")
-        )
+        chat = create_gemini_chat(f"health-{uuid.uuid4()}", "You are a helpful assistant.")
+        response = await chat.send_message(UserMessage(text="Respond with only: OK"))
         
         latency = int((time.time() - start) * 1000)
         
         return {
             "status": "healthy",
-            "message": "Gemini API responding",
+            "message": "Gemini API responding via Emergent",
             "latency": latency,
-            "response": response.text[:50]
+            "response": response[:50] if response else "OK"
         }
         
     except Exception as e:
