@@ -919,12 +919,10 @@ Return valid JSON only."""
 @api_router.post("/floorplan/chat")
 async def floor_plan_chat(request: FloorPlanChatRequest):
     """Chat with AI about the floor plan analysis - ask questions or get clarifications"""
-    if not GEMINI_API_KEY:
+    if not genai_client:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
         # Get or create session
         if request.sessionId not in chat_sessions:
             chat_sessions[request.sessionId] = []
