@@ -759,14 +759,14 @@ async def import_briefing_from_url(request: ImportBriefingRequest):
         
         logger.info(f"Successfully fetched {len(documents)} of {len(urls)} documents")
         
-        # Analyze all documents with Gemini using new SDK
+        # Analyze all documents with Gemini via Emergent
         language_instruction = get_language_instruction(request.language or "pt")
         
-        # Build content parts for all documents
-        content_parts = []
+        # Build document descriptions for text-based analysis
+        document_descriptions = []
         for i, (image_data, content_type, url) in enumerate(documents):
-            content_parts.append(types.Part.from_bytes(data=image_data, mime_type=content_type.split(';')[0]))
-            content_parts.append(types.Part.from_text(text=f"[Document {i+1} of {len(documents)}]"))
+            doc_desc = f"[Document {i+1} of {len(documents)} - Type: {content_type}]"
+            document_descriptions.append(doc_desc)
         
         full_prompt = f"""{BRIEFING_EXTRACTION_PROMPT}
 
@@ -777,17 +777,32 @@ COMBINE all information from ALL documents into a SINGLE unified response.
 Documents may contain different rooms/areas or additional details for the same project.
 Merge all areas, components, and specifications into one comprehensive JSON response.
 
+Documents being analyzed:
+{chr(10).join(document_descriptions)}
+
 Extract ALL project details from ALL documents provided."""
         
-        content_parts.append(types.Part.from_text(text=full_prompt))
+        # Use emergent chat for text analysis
+        chat = create_gemini_chat(f"import-{uuid.uuid4()}", "You are an expert at extracting cabinetry project specifications.")
         
-        response = genai_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=content_parts
-        )
+        # For image documents, include them in the message
+        images_content = []
+        for image_data, content_type, url in documents:
+            if 'image' in content_type:
+                images_content.append(ImageContent(
+                    base64_data=base64.b64encode(image_data).decode('utf-8'),
+                    media_type=content_type.split(';')[0]
+                ))
+        
+        if images_content:
+            message = UserMessage(text=full_prompt, images=images_content)
+        else:
+            message = UserMessage(text=full_prompt)
+        
+        response = await chat.send_message(message)
         
         # Extract JSON from response
-        result = extract_json(response.text)
+        result = extract_json(response)
         
         # Add metadata
         result['rawExtractedText'] = response.text[:3000] if len(response.text) > 3000 else response.text
