@@ -112,7 +112,12 @@ const MainContent: React.FC<{ session: Session | null, isGuest?: boolean, onLogo
 
   const renderContent = () => {
     if (view === 'CONVERSATION') {
-      return <ConversationRecorder onCancel={() => setView('LIST')} onInsightsExtracted={handleInsightsExtracted} onProcess={handleDepurar} />;
+      return <ConversationRecorder 
+        onCancel={() => setView('LIST')} 
+        onInsightsExtracted={handleInsightsExtracted} 
+        onProcess={handleDepurar}
+        onCreateMultipleProjects={handleCreateMultipleProjects}
+      />;
     }
     if (view === 'REVIEW' && extractedData) {
       return (
