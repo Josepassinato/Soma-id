@@ -837,12 +837,10 @@ Extract ALL project details from ALL documents provided."""
 @api_router.post("/floorplan/analyze")
 async def analyze_floor_plan(request: AnalyzeFloorPlanRequest):
     """Analyze an architectural floor plan (image or PDF) and extract rooms/woodwork opportunities"""
-    if not GEMINI_API_KEY:
+    if not genai_client:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
         # Decode base64 data
         file_data = base64.b64decode(request.imageBase64)
         
@@ -888,10 +886,15 @@ Generate questions for the user if:
 
 Return valid JSON only."""
 
-        response = model.generate_content([
-            {"mime_type": mime_type, "data": file_data},
-            prompt
-        ])
+        content_parts = [
+            types.Part.from_bytes(data=file_data, mime_type=mime_type),
+            types.Part.from_text(text=prompt)
+        ]
+        
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=content_parts
+        )
         
         result = extract_json(response.text)
         
