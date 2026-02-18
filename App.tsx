@@ -59,6 +59,32 @@ const MainContent: React.FC<{ session: Session | null, isGuest?: boolean, onLogo
     setView('REVIEW');
   };
 
+  // Handler for creating multiple projects from multi-area briefing
+  const handleCreateMultipleProjects = async (projects: ExtractedInsights[]) => {
+    addNotification('info', `Criando ${projects.length} projetos...`);
+    
+    for (let i = 0; i < projects.length; i++) {
+      const projectInsights = projects[i];
+      try {
+        await createProject(
+          {
+            clientName: projectInsights.clientName,
+            roomType: projectInsights.roomType || 'Cozinha',
+            wallWidth: projectInsights.wallWidth || 3000,
+            styleDescription: projectInsights.styleDescription || '',
+          },
+          projectInsights
+        );
+        addNotification('success', `Projeto ${i + 1}/${projects.length} criado: ${projectInsights.roomType}`);
+      } catch (error: any) {
+        addNotification('error', `Erro ao criar projeto ${projectInsights.roomType}: ${error.message}`);
+      }
+    }
+    
+    addNotification('success', `${projects.length} projetos criados com sucesso!`);
+    setView('LIST');
+  };
+
   const handleCreateProject = async (data: any) => {
     // Se vier foto do ambiente da análise inicial, garantir que ela seja passada
     const finalData = {
