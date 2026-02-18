@@ -1346,6 +1346,11 @@ async def kubernetes_health_check():
     """Health check endpoint for Kubernetes probes"""
     return {"status": "healthy", "service": "soma-id-backend"}
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database and seed data on startup"""
+    await seed_catalog_data()
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
