@@ -9,7 +9,9 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Any, Dict
 import uuid
 from datetime import datetime, timezone
-import google.generativeai as genai
+# Use the new google-genai SDK (replacing deprecated google.generativeai)
+from google import genai
+from google.genai import types
 import json
 import re
 import base64
@@ -35,10 +37,11 @@ except Exception as e:
     client = None
     db = None
 
-# Configure Gemini API
+# Configure Gemini API with new SDK
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+genai_client = None
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+    genai_client = genai.Client(api_key=GEMINI_API_KEY)
 
 # Emergent LLM Key for image generation
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
