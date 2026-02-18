@@ -539,12 +539,10 @@ QUALITY: Photorealistic, high detail, no artifacts"""
 @api_router.post("/gemini/generate-technical-data")
 async def generate_technical_data(request: GenerateTechnicalDataRequest):
     """Generate technical blueprint data for manufacturing"""
-    if not GEMINI_API_KEY:
+    if not genai_client:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
         prompt = f"""{AGENT_TECHNICAL_PIPELINE_INSTRUCTION}
 
 Generate a technical plan for:
@@ -574,7 +572,10 @@ Return a JSON object with this structure:
 }}
 """
         
-        response = model.generate_content(prompt)
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=types.Part.from_text(text=prompt)
+        )
         result = extract_json(response.text)
         
         return {"status": "success", "data": result}
