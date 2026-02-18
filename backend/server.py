@@ -338,12 +338,10 @@ async def get_status_checks():
 @api_router.post("/gemini/analyze-consultation")
 async def analyze_consultation(request: AnalyzeConsultationRequest):
     """Analyze a consultation input (text, audio, image, pdf) and extract insights"""
-    if not GEMINI_API_KEY:
+    if not genai_client:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     try:
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
         # Get language instruction
         language_instruction = get_language_instruction(request.language or "pt")
         
@@ -371,28 +369,8 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
             "es": "Analice este documento/audio. Extraiga información sobre el cliente, tipo de ambiente, medidas mencionadas y preferencias de estilo."
         }
         
-        parts = []
         lang = request.language or "pt"
         
-        if request.input.type == 'TEXT':
-            parts.append(request.input.content)
-        elif request.input.type == 'IMAGE':
-            # Decode base64 image
-            image_data = base64.b64decode(request.input.content)
-            parts.append({
-                "mime_type": request.input.mimeType or "image/jpeg",
-                "data": image_data
-            })
-            parts.append(image_prompts.get(lang, image_prompts["pt"]) + user_context)
-        else:
-            # For audio/pdf
-            file_data = base64.b64decode(request.input.content)
-            parts.append({
-                "mime_type": request.input.mimeType,
-                "data": file_data
-            })
-            parts.append(audio_prompts.get(lang, audio_prompts["pt"]) + user_context)
-
         # Build the prompt with system instruction and language requirement
         full_prompt = f"""{SYSTEM_INSTRUCTION_DEBURADOR}
 
@@ -402,10 +380,26 @@ Analyze the following and return a JSON with these fields: clientName (string), 
 {user_context}
 """
         
+        # Build content parts based on input type
+        content_parts = []
+        
         if request.input.type == 'TEXT':
-            response = model.generate_content(full_prompt + request.input.content)
+            content_parts.append(types.Part.from_text(text=full_prompt + request.input.content))
+        elif request.input.type == 'IMAGE':
+            # Decode base64 image
+            image_data = base64.b64decode(request.input.content)
+            content_parts.append(types.Part.from_bytes(data=image_data, mime_type=request.input.mimeType or "image/jpeg"))
+            content_parts.append(types.Part.from_text(text=full_prompt + image_prompts.get(lang, image_prompts["pt"]) + user_context))
         else:
-            response = model.generate_content([full_prompt] + parts)
+            # For audio/pdf
+            file_data = base64.b64decode(request.input.content)
+            content_parts.append(types.Part.from_bytes(data=file_data, mime_type=request.input.mimeType))
+            content_parts.append(types.Part.from_text(text=full_prompt + audio_prompts.get(lang, audio_prompts["pt"]) + user_context))
+
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=content_parts
+        )
         
         result = extract_json(response.text)
         
