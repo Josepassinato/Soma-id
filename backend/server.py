@@ -989,23 +989,27 @@ CONVERSATION HISTORY:
 
 Respond to the user's last message."""
 
-        # Include image if provided
-        content_parts = []
-        if request.imageBase64:
-            image_data = base64.b64decode(request.imageBase64)
-            content_parts.append(types.Part.from_bytes(data=image_data, mime_type="image/jpeg"))
-        content_parts.append(types.Part.from_text(text=prompt))
+        # Create chat and include image if provided
+        chat = create_gemini_chat(f"floorplan-chat-{uuid.uuid4()}", system_prompt)
         
-        response = genai_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=content_parts
-        )
-        result = extract_json(response.text)
+        if request.imageBase64:
+            message = UserMessage(
+                text=prompt,
+                images=[ImageContent(
+                    base64_data=request.imageBase64,
+                    media_type="image/jpeg"
+                )]
+            )
+        else:
+            message = UserMessage(text=prompt)
+        
+        response = await chat.send_message(message)
+        result = extract_json(response)
         
         # Add assistant response to history
         chat_sessions[request.sessionId].append({
             "role": "assistant",
-            "content": result.get("message", response.text)
+            "content": result.get("message", response)
         })
         
         return {
@@ -1021,7 +1025,7 @@ Respond to the user's last message."""
             "status": "success",
             "sessionId": request.sessionId,
             "data": {
-                "message": response.text if 'response' in locals() else str(e),
+                "message": response if 'response' in locals() else str(e),
                 "suggestedActions": [],
                 "readyToCreateProject": False
             }
