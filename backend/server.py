@@ -673,7 +673,7 @@ Return ONLY valid JSON, no markdown formatting."""
 @api_router.post("/briefing/import-from-url")
 async def import_briefing_from_url(request: ImportBriefingRequest):
     """Import and extract briefing data from multiple shared document URLs (Adobe Acrobat, Google Drive, etc.)"""
-    if not GEMINI_API_KEY:
+    if not genai_client:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
     
     # Filter empty URLs
