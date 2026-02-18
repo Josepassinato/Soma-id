@@ -765,15 +765,14 @@ async def import_briefing_from_url(request: ImportBriefingRequest):
         
         logger.info(f"Successfully fetched {len(documents)} of {len(urls)} documents")
         
-        # Analyze all documents with Gemini
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
+        # Analyze all documents with Gemini using new SDK
         language_instruction = get_language_instruction(request.language or "pt")
         
         # Build content parts for all documents
         content_parts = []
         for i, (image_data, content_type, url) in enumerate(documents):
-            content_parts.append({"mime_type": content_type.split(';')[0], "data": image_data})
-            content_parts.append(f"[Document {i+1} of {len(documents)}]")
+            content_parts.append(types.Part.from_bytes(data=image_data, mime_type=content_type.split(';')[0]))
+            content_parts.append(types.Part.from_text(text=f"[Document {i+1} of {len(documents)}]"))
         
         full_prompt = f"""{BRIEFING_EXTRACTION_PROMPT}
 
@@ -786,9 +785,12 @@ Merge all areas, components, and specifications into one comprehensive JSON resp
 
 Extract ALL project details from ALL documents provided."""
         
-        content_parts.append(full_prompt)
+        content_parts.append(types.Part.from_text(text=full_prompt))
         
-        response = model.generate_content(content_parts)
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=content_parts
+        )
         
         # Extract JSON from response
         result = extract_json(response.text)
