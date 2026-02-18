@@ -588,15 +588,17 @@ Return a JSON object with this structure:
 @api_router.get("/gemini/health")
 async def check_gemini_health():
     """Check if Gemini API is working"""
-    if not GEMINI_API_KEY:
+    if not genai_client:
         return {"status": "error", "message": "Gemini API key not configured", "latency": 0}
     
     try:
         import time
         start = time.time()
         
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
-        response = model.generate_content("Respond with only: OK")
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=types.Part.from_text(text="Respond with only: OK")
+        )
         
         latency = int((time.time() - start) * 1000)
         
