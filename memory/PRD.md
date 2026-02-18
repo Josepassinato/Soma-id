@@ -6,6 +6,7 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 - Analisar plantas baixas arquitetônicas e identificar oportunidades de marcenaria
 - Gerar renders 3D/Digital Twins de ambientes
 - Produzir dados técnicos para fabricação CNC
+- Gerenciar orçamentos e contratos com rastreabilidade
 
 ## Stack Tecnológica
 - **Frontend**: React + TypeScript + Vite + TailwindCSS
@@ -25,6 +26,13 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 ├── components/            # React Components
 ├── context/               # React Contexts (Auth, Project, Translation)
 ├── services/              # Frontend API services
+│   ├── dxfService.ts      # Geração de DXF industrial (v0.1)
+│   ├── layoutService.ts   # Geração de SVG de layout (NOVO)
+│   └── ...
+├── docs/                  # Documentação técnica
+│   ├── DXF_CONTRACT_v0.1.md
+│   └── SOMA-ID_PRD_Fase_2_Projeto_Tecnico.md
+├── pricing_data.ts        # Dados de custos e complexidade (NOVO)
 ├── tests/                 # Backend tests
 └── test_reports/          # Test results
 ```
@@ -33,19 +41,34 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 
 ### ✅ Concluído
 1. **Análise de Briefing** - IA extrai dados de texto/áudio/imagem/PDF
-2. **Analisador de Planta Baixa** - Identifica cômodos e sugere marcenaria (agora com suporte a PDF)
+2. **Analisador de Planta Baixa** - Identifica cômodos e sugere marcenaria (com suporte a PDF)
 3. **Chat com IA** - Conversa sobre análise de planta baixa
-4. **Geração de Imagem** - Renders 3D com Gemini Nano Banana (CORRIGIDO)
+4. **Geração de Imagem** - Renders 3D com Gemini Nano Banana
 5. **Dados Técnicos** - Gera dados para CNC
 6. **Sistema i18n** - Suporte completo PT/EN/ES
-7. **Página de Login Traduzida** - AuthPage.tsx com i18n (CORRIGIDO)
-8. **Campos Editáveis** - BriefingReview.tsx já tem campos editáveis
-9. **Campo de Descrição Adicional** - Usuário pode adicionar contexto para ajudar a IA (21/01/2026)
-10. **Apresentação de Projeto Estilo Promob** - Documento profissional com resumo, medidas, materiais, render (21/01/2026)
-11. **QR Code para Compartilhamento** - Cliente pode visualizar/aprovar projeto via link ou QR Code (21/01/2026)
-12. **Suporte a PDF para Plantas Baixas** - Upload e análise de plantas baixas em formato PDF (NOVO - 21/01/2026)
-13. **Briefing Estruturado** - Formulário de cotação estilo americano com áreas, materiais, ferragens, componentes (21/01/2026)
-14. **Importação Automática de Briefing via URL** - Cole link do documento e a IA extrai especificações automaticamente (NOVO - 21/01/2026)
+7. **Página de Login Traduzida** - AuthPage.tsx com i18n
+8. **Campos Editáveis** - BriefingReview.tsx com campos editáveis
+9. **Campo de Descrição Adicional** - Usuário pode adicionar contexto para ajudar a IA
+10. **Apresentação de Projeto Estilo Promob** - Documento profissional com resumo, medidas, materiais, render
+11. **QR Code para Compartilhamento** - Cliente pode visualizar/aprovar projeto via link ou QR Code
+12. **Suporte a PDF para Plantas Baixas** - Upload e análise de plantas baixas em formato PDF
+13. **Briefing Estruturado** - Formulário de cotação com áreas, materiais, ferragens, componentes
+14. **Importação Automática de Briefing via URL** - Cole link do documento e a IA extrai especificações
+
+### ✅ Atualizado em 18/02/2026 - Inventário Melhorado
+15. **DXF Service Industrial v0.1** - Geração de DXF compatível com Promob/CAM
+    - `generatePartDxf()` - Exporta peça individual com metadados
+    - `generateNestingDxf()` - Exporta plano de corte completo
+    - Lint automático para validação de qualidade
+    - Suporte a furos horizontais (DRILL_H) e verticais (DRILL_V)
+16. **Layout Service** - Geração de layouts SVG para visualização
+17. **Pricing Data** - Sistema de custos configurável
+    - Custos por material (Madeira, Unicolor, Especial, Stone)
+    - Fatores de complexidade por estilo
+    - Custos por tipo de módulo (simples, intermediário, complexo)
+    - Distribuição de módulos por tipo de ambiente
+18. **Novos Tipos TypeScript** - EdgeBand, DrillH, DrillHFace, PartDxfInput
+19. **Documentação Industrial** - PRD Fase 2 e DXF Contract v0.1
 
 ### 🟡 Mocked/Limitado
 - `liveService.ts` - Áudio em tempo real é mock
@@ -57,20 +80,23 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 2. Histórico de análises
 3. Migrar de `google.generativeai` para `google.genai`
 4. Criar página pública `/projeto/:id` para clientes visualizarem
+5. Completar funcionalidade de criação de múltiplos projetos por ambiente
 
 ## Endpoints da API
 
 | Endpoint | Método | Descrição |
 |----------|--------|-----------|
 | `/api/` | GET | Health check |
+| `/health` | GET | Health check raiz |
 | `/api/gemini/health` | GET | Status da API Gemini |
-| `/api/gemini/analyze-consultation` | POST | Analisa briefing (agora com userDescription) |
+| `/api/gemini/analyze-consultation` | POST | Analisa briefing |
 | `/api/gemini/generate-prompt` | POST | Gera prompt para render |
 | `/api/gemini/generate-image` | POST | Gera imagem (Nano Banana) |
 | `/api/gemini/generate-technical-data` | POST | Dados técnicos CNC |
 | `/api/floorplan/analyze` | POST | Analisa planta baixa |
 | `/api/floorplan/chat` | POST | Chat sobre planta |
 | `/api/floorplan/select-room` | POST | Seleciona cômodo |
+| `/api/briefing/import-from-url` | POST | Importa briefing de URLs |
 
 ## Variáveis de Ambiente
 
@@ -87,13 +113,11 @@ EMERGENT_LLM_KEY=sk-emergent-xxx
 REACT_APP_BACKEND_URL=https://floor-plan-ai-1.preview.emergentagent.com
 ```
 
-## Última Atualização: 21/01/2026
-- Corrigido bug de geração de imagem congelando
-- Integrado Gemini Nano Banana via emergentintegrations
-- Traduzida página de login (AuthPage.tsx)
-- Adicionado campo de descrição adicional para upload de imagens
-- Implementada apresentação de projeto estilo Promob (documento profissional)
-- Adicionado QR Code para compartilhamento com cliente
-- Seção de aprovação com campos para assinatura
-- Adicionado suporte a PDF para plantas baixas
-- Todos os testes passando (11/11 backend, frontend OK)
+## Última Atualização: 18/02/2026
+- Integrado inventário melhorado do repositório GitHub
+- Atualizado dxfService.ts com generatePartDxf() e validações
+- Adicionado layoutService.ts para geração de SVG
+- Adicionado pricing_data.ts com sistema de custos
+- Novos tipos TypeScript para suporte industrial
+- Documentação técnica (DXF Contract v0.1, PRD Fase 2)
+- Adicionada dependência @google/generative-ai
