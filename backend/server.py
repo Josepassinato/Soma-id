@@ -1092,11 +1092,9 @@ Return JSON:
   "woodworkType": "type requested"
 }}"""
 
-        response = genai_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=types.Part.from_text(text=prompt)
-        )
-        result = extract_json(response.text)
+        chat = create_gemini_chat(f"select-room-{uuid.uuid4()}", SYSTEM_INSTRUCTION_DEBURADOR)
+        response = await chat.send_message(UserMessage(text=prompt))
+        result = extract_json(response)
         
         # Add source information
         result["fromFloorPlan"] = True
