@@ -1098,6 +1098,236 @@ Return JSON:
         raise HTTPException(status_code=500, detail=f"Failed to select room: {str(e)}")
 
 
+# ============== CATALOG DATA (MONGODB) ==============
+
+# Default catalog data - will be seeded to MongoDB on startup
+STANDARD_CATALOG = [
+    {
+        "id": "base_gaveteiro_3g",
+        "name": "Gaveteiro 3 Gavetas",
+        "category": "base",
+        "defaultDepth": 580,
+        "defaultHeight": 870,
+        "minWidth": 400,
+        "maxWidth": 1000,
+        "hardware": ["3 pares Corrediças Telescópicas 500mm", "4 Pés Reguláveis"],
+        "components": [
+            {"name": "Lateral", "widthFormula": "$D", "heightFormula": "$H - 150", "quantity": 2, "materialInfo": "corpo", "edgeBand": "1L1C", "grainDirection": "vertical"},
+            {"name": "Base Inferior", "widthFormula": "$W - (2*$T)", "heightFormula": "$D", "quantity": 1, "materialInfo": "corpo", "edgeBand": "1C", "grainDirection": "horizontal"},
+            {"name": "Frente Gaveta P", "widthFormula": "$W - $G", "heightFormula": "176", "quantity": 2, "materialInfo": "frente", "edgeBand": "4L", "grainDirection": "horizontal"},
+            {"name": "Frente Gavetão G", "widthFormula": "$W - $G", "heightFormula": "356", "quantity": 1, "materialInfo": "frente", "edgeBand": "4L", "grainDirection": "horizontal"}
+        ]
+    },
+    {
+        "id": "base_armario_2p",
+        "name": "Armário Base 2 Portas",
+        "category": "base",
+        "defaultDepth": 580,
+        "defaultHeight": 870,
+        "minWidth": 600,
+        "maxWidth": 1200,
+        "hardware": ["4 Dobradiças 110°", "2 Prateleiras Reguláveis", "4 Pés Reguláveis"],
+        "components": [
+            {"name": "Lateral", "widthFormula": "$D", "heightFormula": "$H - 150", "quantity": 2, "materialInfo": "corpo", "edgeBand": "1L1C", "grainDirection": "vertical"},
+            {"name": "Base Inferior", "widthFormula": "$W - (2*$T)", "heightFormula": "$D", "quantity": 1, "materialInfo": "corpo", "edgeBand": "1C", "grainDirection": "horizontal"},
+            {"name": "Prateleira", "widthFormula": "$W - (2*$T) - 3", "heightFormula": "$D - 30", "quantity": 2, "materialInfo": "corpo", "edgeBand": "1C", "grainDirection": "horizontal"},
+            {"name": "Porta", "widthFormula": "($W/2) - $G", "heightFormula": "$H - 150 - $G", "quantity": 2, "materialInfo": "frente", "edgeBand": "4L", "grainDirection": "vertical"}
+        ]
+    },
+    {
+        "id": "torre_forno",
+        "name": "Torre para Forno e Micro-ondas",
+        "category": "torre",
+        "defaultDepth": 600,
+        "defaultHeight": 2100,
+        "minWidth": 600,
+        "maxWidth": 600,
+        "hardware": ["8 Dobradiças 110°", "2 Prateleiras Fixas para Eletros"],
+        "components": [
+            {"name": "Lateral", "widthFormula": "$D", "heightFormula": "$H", "quantity": 2, "materialInfo": "corpo", "edgeBand": "1L", "grainDirection": "vertical"},
+            {"name": "Base Forno", "widthFormula": "$W - (2*$T)", "heightFormula": "$D", "quantity": 1, "materialInfo": "corpo", "edgeBand": "1C", "grainDirection": "horizontal"},
+            {"name": "Porta Superior", "widthFormula": "$W - $G", "heightFormula": "600", "quantity": 1, "materialInfo": "frente", "edgeBand": "4L", "grainDirection": "vertical"},
+            {"name": "Porta Inferior", "widthFormula": "$W - $G", "heightFormula": "500", "quantity": 1, "materialInfo": "frente", "edgeBand": "4L", "grainDirection": "vertical"}
+        ]
+    },
+    {
+        "id": "aereo_basculante",
+        "name": "Aéreo com Basculante",
+        "category": "aereo",
+        "defaultDepth": 350,
+        "defaultHeight": 700,
+        "minWidth": 600,
+        "maxWidth": 1500,
+        "hardware": ["2 Pistões a Gás", "4 Dobradiças 110°"],
+        "components": [
+            {"name": "Lateral", "widthFormula": "$D", "heightFormula": "$H", "quantity": 2, "materialInfo": "corpo", "edgeBand": "1L1C", "grainDirection": "vertical"},
+            {"name": "Topo/Fundo", "widthFormula": "$W - (2*$T)", "heightFormula": "$D", "quantity": 2, "materialInfo": "corpo", "edgeBand": "1C", "grainDirection": "horizontal"},
+            {"name": "Porta Basculante", "widthFormula": "$W - $G", "heightFormula": "$H - $G", "quantity": 1, "materialInfo": "frente", "edgeBand": "4L", "grainDirection": "horizontal"}
+        ]
+    }
+]
+
+MOCK_MATERIALS = [
+    # MADEIRAS
+    {"id": "mdf_freijo", "name": "Freijó Puro 2025", "category": "Madeira", "texture": "Natural", "color": "#8e6c4e"},
+    {"id": "mdf_carvalho", "name": "Carvalho Dover", "category": "Madeira", "texture": "Poro Aberto", "color": "#c5b49d"},
+    {"id": "mdf_noce", "name": "Noce Autunno", "category": "Madeira", "texture": "Deep Wood", "color": "#5d4037"},
+    {"id": "mdf_teca", "name": "Teca Natural", "category": "Madeira", "texture": "Natural", "color": "#7d5a3c"},
+    # UNICOLORES MATTE
+    {"id": "mdf_branco", "name": "Branco Supremo Matt", "category": "Unicolor", "texture": "Matt", "color": "#F5F5F5"},
+    {"id": "mdf_grafite", "name": "Grafite Carbono", "category": "Unicolor", "texture": "Matt", "color": "#4a4a4a"},
+    {"id": "mdf_sage", "name": "Verde Sage 2025", "category": "Unicolor", "texture": "Matt", "color": "#879b8a"},
+    {"id": "mdf_naval", "name": "Azul Naval Profundo", "category": "Unicolor", "texture": "Matt", "color": "#1a2a3a"},
+    {"id": "mdf_argila", "name": "Terracota Argila", "category": "Unicolor", "texture": "Matt", "color": "#a0522d"},
+    {"id": "mdf_areia", "name": "Areia Acetinado", "category": "Unicolor", "texture": "Satin", "color": "#e0d5c1"},
+    {"id": "mdf_preto", "name": "Preto Absoluto", "category": "Unicolor", "texture": "Matt", "color": "#1a1a1a"},
+    {"id": "mdf_creme", "name": "Creme Clássico", "category": "Unicolor", "texture": "Matt", "color": "#f5f5dc"},
+    # ESPECIAIS & METAIS
+    {"id": "metal_latao", "name": "Latão Escovado", "category": "Metal", "texture": "Metálico", "color": "#d4af37"},
+    {"id": "metal_champagne", "name": "Champagne Metal", "category": "Metal", "texture": "Metálico", "color": "#fad6a5"},
+    {"id": "metal_bronze", "name": "Bronze Antigo", "category": "Metal", "texture": "Metálico", "color": "#8b4513"},
+    {"id": "vidro_canelado", "name": "Vidro Canelado", "category": "Vidro", "texture": "Texturizado", "color": "#ffffff"},
+    {"id": "vidro_fume", "name": "Vidro Fumê", "category": "Vidro", "texture": "Transparente", "color": "#4a4a4a"},
+    {"id": "pedra_calacatta", "name": "Mármore Calacatta", "category": "Stone", "texture": "Polido", "color": "#ffffff"},
+    {"id": "pedra_nero", "name": "Nero Marquina", "category": "Stone", "texture": "Polido", "color": "#1a1a1a"},
+    {"id": "pedra_quartzo", "name": "Quartzo Branco", "category": "Stone", "texture": "Polido", "color": "#f8f8f8"}
+]
+
+# Seed MongoDB on startup
+async def seed_catalog_data():
+    """Seed MongoDB with default catalog and materials data"""
+    if db is None:
+        logger.warning("MongoDB not available, skipping seed")
+        return
+    
+    try:
+        # Seed modules/catalog
+        modules_collection = db.modules
+        existing_modules = await modules_collection.count_documents({})
+        if existing_modules == 0:
+            await modules_collection.insert_many(STANDARD_CATALOG)
+            logger.info(f"✅ Seeded {len(STANDARD_CATALOG)} modules to MongoDB")
+        else:
+            logger.info(f"📦 {existing_modules} modules already in MongoDB")
+        
+        # Seed materials
+        materials_collection = db.materials
+        existing_materials = await materials_collection.count_documents({})
+        if existing_materials == 0:
+            await materials_collection.insert_many(MOCK_MATERIALS)
+            logger.info(f"✅ Seeded {len(MOCK_MATERIALS)} materials to MongoDB")
+        else:
+            logger.info(f"🎨 {existing_materials} materials already in MongoDB")
+            
+    except Exception as e:
+        logger.error(f"Error seeding catalog data: {e}")
+
+# API Endpoints for Catalog Data
+@api_router.get("/catalog/modules")
+async def get_catalog_modules():
+    """Get all cabinet modules from MongoDB"""
+    try:
+        if db is None:
+            return {"status": "success", "data": STANDARD_CATALOG, "source": "fallback"}
+        
+        modules_collection = db.modules
+        modules = await modules_collection.find({}, {"_id": 0}).to_list(length=100)
+        
+        if not modules:
+            return {"status": "success", "data": STANDARD_CATALOG, "source": "fallback"}
+        
+        return {"status": "success", "data": modules, "source": "mongodb"}
+    except Exception as e:
+        logger.error(f"Error fetching modules: {e}")
+        return {"status": "success", "data": STANDARD_CATALOG, "source": "fallback"}
+
+@api_router.get("/catalog/modules/{module_id}")
+async def get_module_by_id(module_id: str):
+    """Get a specific module by ID"""
+    try:
+        if db is None:
+            module = next((m for m in STANDARD_CATALOG if m["id"] == module_id), None)
+            if module:
+                return {"status": "success", "data": module}
+            raise HTTPException(status_code=404, detail="Module not found")
+        
+        modules_collection = db.modules
+        module = await modules_collection.find_one({"id": module_id}, {"_id": 0})
+        
+        if not module:
+            # Try fallback
+            module = next((m for m in STANDARD_CATALOG if m["id"] == module_id), None)
+            if module:
+                return {"status": "success", "data": module}
+            raise HTTPException(status_code=404, detail="Module not found")
+        
+        return {"status": "success", "data": module}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching module: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/catalog/materials")
+async def get_catalog_materials():
+    """Get all materials from MongoDB"""
+    try:
+        if db is None:
+            return {"status": "success", "data": MOCK_MATERIALS, "source": "fallback"}
+        
+        materials_collection = db.materials
+        materials = await materials_collection.find({}, {"_id": 0}).to_list(length=100)
+        
+        if not materials:
+            return {"status": "success", "data": MOCK_MATERIALS, "source": "fallback"}
+        
+        return {"status": "success", "data": materials, "source": "mongodb"}
+    except Exception as e:
+        logger.error(f"Error fetching materials: {e}")
+        return {"status": "success", "data": MOCK_MATERIALS, "source": "fallback"}
+
+@api_router.get("/catalog/materials/{material_id}")
+async def get_material_by_id(material_id: str):
+    """Get a specific material by ID"""
+    try:
+        if db is None:
+            material = next((m for m in MOCK_MATERIALS if m["id"] == material_id), None)
+            if material:
+                return {"status": "success", "data": material}
+            raise HTTPException(status_code=404, detail="Material not found")
+        
+        materials_collection = db.materials
+        material = await materials_collection.find_one({"id": material_id}, {"_id": 0})
+        
+        if not material:
+            material = next((m for m in MOCK_MATERIALS if m["id"] == material_id), None)
+            if material:
+                return {"status": "success", "data": material}
+            raise HTTPException(status_code=404, detail="Material not found")
+        
+        return {"status": "success", "data": material}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching material: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/catalog/materials/categories")
+async def get_material_categories():
+    """Get all unique material categories"""
+    try:
+        if db is None:
+            categories = list(set(m["category"] for m in MOCK_MATERIALS))
+            return {"status": "success", "data": ["Todos"] + sorted(categories)}
+        
+        materials_collection = db.materials
+        categories = await materials_collection.distinct("category")
+        return {"status": "success", "data": ["Todos"] + sorted(categories)}
+    except Exception as e:
+        logger.error(f"Error fetching categories: {e}")
+        categories = list(set(m["category"] for m in MOCK_MATERIALS))
+        return {"status": "success", "data": ["Todos"] + sorted(categories)}
+
 # ============== INCLUDE ROUTER AND MIDDLEWARE ==============
 
 app.include_router(api_router)
