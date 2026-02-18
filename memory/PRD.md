@@ -84,7 +84,7 @@ EMERGENT_LLM_KEY=sk-emergent-xxx
 
 ### Frontend (.env)
 ```
-REACT_APP_BACKEND_URL=https://xxx.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://floor-plan-ai-1.preview.emergentagent.com
 ```
 
 ## Última Atualização: 21/01/2026

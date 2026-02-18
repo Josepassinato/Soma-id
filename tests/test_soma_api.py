@@ -8,7 +8,7 @@ import os
 import time
 
 # Use the public URL for testing
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://marcenaria-soma.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://floor-plan-ai-1.preview.emergentagent.com')
 
 class TestHealthEndpoints:
     """Health check endpoint tests"""
