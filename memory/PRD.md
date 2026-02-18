@@ -12,8 +12,8 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 - **Frontend**: React + TypeScript + Vite + TailwindCSS
 - **Backend**: FastAPI (Python)
 - **Database**: MongoDB
-- **AI**: Google Gemini (texto/visão) + Gemini Nano Banana (geração de imagens)
-- **Auth**: Supabase
+- **AI**: Google Gemini SDK (`google-genai`) + Emergent Integration (geração de imagens)
+- **Auth**: Supabase (variáveis de ambiente obrigatórias)
 - **i18n**: PT, EN, ES
 
 ## Arquitetura
@@ -22,17 +22,18 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 ├── backend/               # FastAPI Backend
 │   ├── .env               # MONGO_URL, GEMINI_API_KEY, EMERGENT_LLM_KEY
 │   ├── requirements.txt
-│   └── server.py          # Main API endpoints
+│   └── server.py          # Main API endpoints (usa google-genai SDK)
 ├── components/            # React Components
 ├── context/               # React Contexts (Auth, Project, Translation)
 ├── services/              # Frontend API services
 │   ├── dxfService.ts      # Geração de DXF industrial (v0.1)
-│   ├── layoutService.ts   # Geração de SVG de layout (NOVO)
+│   ├── layoutService.ts   # Geração de SVG de layout
 │   └── ...
 ├── docs/                  # Documentação técnica
 │   ├── DXF_CONTRACT_v0.1.md
 │   └── SOMA-ID_PRD_Fase_2_Projeto_Tecnico.md
-├── pricing_data.ts        # Dados de custos e complexidade (NOVO)
+├── pricing_data.ts        # Dados de custos e complexidade
+├── config.ts              # Configuração (Supabase via env vars apenas)
 ├── tests/                 # Backend tests
 └── test_reports/          # Test results
 ```
@@ -43,7 +44,7 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 1. **Análise de Briefing** - IA extrai dados de texto/áudio/imagem/PDF
 2. **Analisador de Planta Baixa** - Identifica cômodos e sugere marcenaria (com suporte a PDF)
 3. **Chat com IA** - Conversa sobre análise de planta baixa
-4. **Geração de Imagem** - Renders 3D com Gemini Nano Banana
+4. **Geração de Imagem** - Renders 3D com Emergent Integration
 5. **Dados Técnicos** - Gera dados para CNC
 6. **Sistema i18n** - Suporte completo PT/EN/ES
 7. **Página de Login Traduzida** - AuthPage.tsx com i18n
@@ -55,20 +56,19 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 13. **Briefing Estruturado** - Formulário de cotação com áreas, materiais, ferragens, componentes
 14. **Importação Automática de Briefing via URL** - Cole link do documento e a IA extrai especificações
 
-### ✅ Atualizado em 18/02/2026 - Inventário Melhorado
-15. **DXF Service Industrial v0.1** - Geração de DXF compatível com Promob/CAM
+### ✅ Corrigido em 18/02/2026
+15. **Credenciais Supabase** - Removidas credenciais hardcoded de config.ts (usa apenas variáveis de ambiente)
+16. **SDK Gemini Migrado** - Migrado de `google.generativeai` (deprecated) para `google-genai`
+17. **Criação de Múltiplos Projetos** - Implementada funcionalidade completa para criar projetos separados por ambiente
+
+### ✅ Inventário Melhorado (18/02/2026)
+18. **DXF Service Industrial v0.1** - Geração de DXF compatível com Promob/CAM
     - `generatePartDxf()` - Exporta peça individual com metadados
     - `generateNestingDxf()` - Exporta plano de corte completo
     - Lint automático para validação de qualidade
     - Suporte a furos horizontais (DRILL_H) e verticais (DRILL_V)
-16. **Layout Service** - Geração de layouts SVG para visualização
-17. **Pricing Data** - Sistema de custos configurável
-    - Custos por material (Madeira, Unicolor, Especial, Stone)
-    - Fatores de complexidade por estilo
-    - Custos por tipo de módulo (simples, intermediário, complexo)
-    - Distribuição de módulos por tipo de ambiente
-18. **Novos Tipos TypeScript** - EdgeBand, DrillH, DrillHFace, PartDxfInput
-19. **Documentação Industrial** - PRD Fase 2 e DXF Contract v0.1
+19. **Layout Service** - Geração de layouts SVG para visualização
+20. **Pricing Data** - Sistema de custos configurável
 
 ### 🟡 Mocked/Limitado
 - `liveService.ts` - Áudio em tempo real é mock
@@ -78,20 +78,19 @@ SOMA-ID é uma aplicação de marcenaria industrial que usa IA (Google Gemini) p
 ### 🔴 Pendente/Futuro
 1. Implementar WebSockets para áudio real-time
 2. Histórico de análises
-3. Migrar de `google.generativeai` para `google.genai`
-4. Criar página pública `/projeto/:id` para clientes visualizarem
-5. Completar funcionalidade de criação de múltiplos projetos por ambiente
+3. Criar página pública `/projeto/:id` para clientes visualizarem
+4. Popular tabelas Supabase (`modules`, `catalog`)
 
 ## Endpoints da API
 
 | Endpoint | Método | Descrição |
 |----------|--------|-----------|
 | `/api/` | GET | Health check |
-| `/health` | GET | Health check raiz |
+| `/health` | GET | Health check raiz (Kubernetes) |
 | `/api/gemini/health` | GET | Status da API Gemini |
 | `/api/gemini/analyze-consultation` | POST | Analisa briefing |
 | `/api/gemini/generate-prompt` | POST | Gera prompt para render |
-| `/api/gemini/generate-image` | POST | Gera imagem (Nano Banana) |
+| `/api/gemini/generate-image` | POST | Gera imagem (Emergent) |
 | `/api/gemini/generate-technical-data` | POST | Dados técnicos CNC |
 | `/api/floorplan/analyze` | POST | Analisa planta baixa |
 | `/api/floorplan/chat` | POST | Chat sobre planta |
@@ -111,13 +110,13 @@ EMERGENT_LLM_KEY=sk-emergent-xxx
 ### Frontend (.env)
 ```
 REACT_APP_BACKEND_URL=https://floor-plan-ai-1.preview.emergentagent.com
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_ANON_KEY=xxx
 ```
 
 ## Última Atualização: 18/02/2026
-- Integrado inventário melhorado do repositório GitHub
-- Atualizado dxfService.ts com generatePartDxf() e validações
-- Adicionado layoutService.ts para geração de SVG
-- Adicionado pricing_data.ts com sistema de custos
-- Novos tipos TypeScript para suporte industrial
-- Documentação técnica (DXF Contract v0.1, PRD Fase 2)
-- Adicionada dependência @google/generative-ai
+- ✅ Removidas credenciais Supabase hardcoded de config.ts
+- ✅ Migrado SDK de `google.generativeai` para `google-genai` (novo SDK oficial)
+- ✅ Implementada criação de múltiplos projetos por ambiente
+- ✅ Integrado inventário melhorado do GitHub (DXF, Layout, Pricing)
+- ✅ Documentação técnica atualizada
