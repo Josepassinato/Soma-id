@@ -339,8 +339,8 @@ async def get_status_checks():
 @api_router.post("/gemini/analyze-consultation")
 async def analyze_consultation(request: AnalyzeConsultationRequest):
     """Analyze a consultation input (text, audio, image, pdf) and extract insights"""
-    if not genai_client:
-        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
     
     try:
         # Get language instruction
@@ -372,8 +372,8 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
         
         lang = request.language or "pt"
         
-        # Build the prompt with system instruction and language requirement
-        full_prompt = f"""{SYSTEM_INSTRUCTION_DEBURADOR}
+        # Build the system prompt
+        system_prompt = f"""{SYSTEM_INSTRUCTION_DEBURADOR}
 
 {language_instruction}
 
@@ -381,28 +381,27 @@ Analyze the following and return a JSON with these fields: clientName (string), 
 {user_context}
 """
         
-        # Build content parts based on input type
-        content_parts = []
+        # Create chat instance
+        chat = create_gemini_chat(f"analyze-{uuid.uuid4()}", system_prompt)
         
+        # Build message based on input type
         if request.input.type == 'TEXT':
-            content_parts.append(types.Part.from_text(text=full_prompt + request.input.content))
+            message = UserMessage(text=request.input.content)
         elif request.input.type == 'IMAGE':
-            # Decode base64 image
             image_data = base64.b64decode(request.input.content)
-            content_parts.append(types.Part.from_bytes(data=image_data, mime_type=request.input.mimeType or "image/jpeg"))
-            content_parts.append(types.Part.from_text(text=full_prompt + image_prompts.get(lang, image_prompts["pt"]) + user_context))
+            message = UserMessage(
+                text=image_prompts.get(lang, image_prompts["pt"]) + user_context,
+                images=[ImageContent(
+                    base64_data=request.input.content,
+                    media_type=request.input.mimeType or "image/jpeg"
+                )]
+            )
         else:
-            # For audio/pdf
-            file_data = base64.b64decode(request.input.content)
-            content_parts.append(types.Part.from_bytes(data=file_data, mime_type=request.input.mimeType))
-            content_parts.append(types.Part.from_text(text=full_prompt + audio_prompts.get(lang, audio_prompts["pt"]) + user_context))
+            # For audio/pdf - treat as text description for now
+            message = UserMessage(text=audio_prompts.get(lang, audio_prompts["pt"]) + f"\n\nConteúdo: {request.input.content[:1000]}" + user_context)
 
-        response = genai_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=content_parts
-        )
-        
-        result = extract_json(response.text)
+        response = await chat.send_message(message)
+        result = extract_json(response)
         
         # Ensure required fields with language-appropriate defaults
         default_room_types = {"pt": "Cozinha", "en": "Kitchen", "es": "Cocina"}
