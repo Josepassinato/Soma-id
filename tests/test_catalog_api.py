@@ -108,16 +108,16 @@ class TestCatalogMaterials:
 class TestHealthEndpoint:
     """Health check endpoint tests"""
     
-    def test_kubernetes_health(self):
-        """Test the Kubernetes health endpoint at /health"""
-        response = requests.get(f"{BASE_URL}/health")
+    def test_api_root(self):
+        """Test the API root endpoint at /api/"""
+        response = requests.get(f"{BASE_URL}/api/")
         
         assert response.status_code == 200
         data = response.json()
         
-        assert "status" in data
-        assert data["status"] == "healthy"
-        print(f"✓ Kubernetes health check OK: {data}")
+        assert "message" in data
+        assert "SOMA-ID" in data["message"]
+        print(f"✓ API root check OK: {data}")
 
 
 if __name__ == "__main__":
