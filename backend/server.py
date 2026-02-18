@@ -978,12 +978,16 @@ CONVERSATION HISTORY:
 Respond to the user's last message."""
 
         # Include image if provided
-        parts = [prompt]
+        content_parts = []
         if request.imageBase64:
             image_data = base64.b64decode(request.imageBase64)
-            parts = [{"mime_type": "image/jpeg", "data": image_data}, prompt]
+            content_parts.append(types.Part.from_bytes(data=image_data, mime_type="image/jpeg"))
+        content_parts.append(types.Part.from_text(text=prompt))
         
-        response = model.generate_content(parts)
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=content_parts
+        )
         result = extract_json(response.text)
         
         # Add assistant response to history
