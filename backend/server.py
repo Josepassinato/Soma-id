@@ -424,28 +424,24 @@ Analyze the following and return a JSON with these fields: clientName (string), 
 @api_router.post("/gemini/generate-prompt")
 async def generate_enchantment_prompt(request: GeneratePromptRequest):
     """Generate an architectural visualization prompt for image generation"""
-    if not genai_client:
-        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
     
     try:
         style_keywords = get_style_keywords(request.styleDescription)
         
-        prompt = f"""
-{AGENT_ENCHANTMENT_VISUALIZER_INSTRUCTION}
-
-TASK: Research 2025 architectural trends for {request.styleDescription}.
+        system_prompt = AGENT_ENCHANTMENT_VISUALIZER_INSTRUCTION
+        
+        prompt = f"""TASK: Research 2025 architectural trends for {request.styleDescription}.
 PROJECT: {request.clientName} | {request.roomType}.
 SPECIFICATIONS: Wall width {request.wallWidth}mm, Height {request.wallHeight}mm.
 STYLE CONTEXT: {style_keywords}.
 OBJECTIVE: Create a hyper-realistic architectural photography prompt for {request.angle}. 
-Incorporate tunable lighting, specific wood grain orientations (Freijó, Walnut), and 2025 hardware.
-"""
+Incorporate tunable lighting, specific wood grain orientations (Freijó, Walnut), and 2025 hardware."""
         
-        response = genai_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=types.Part.from_text(text=prompt)
-        )
-        result = clean_response(response.text)
+        chat = create_gemini_chat(f"prompt-{uuid.uuid4()}", system_prompt)
+        response = await chat.send_message(UserMessage(text=prompt))
+        result = clean_response(response)
         
         return {"status": "success", "data": {"prompt": result}}
         
