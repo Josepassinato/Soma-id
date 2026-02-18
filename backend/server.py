@@ -805,7 +805,7 @@ Extract ALL project details from ALL documents provided."""
         result = extract_json(response)
         
         # Add metadata
-        result['rawExtractedText'] = response.text[:3000] if len(response.text) > 3000 else response.text
+        result['rawExtractedText'] = response[:3000] if len(response) > 3000 else response
         result['documentsProcessed'] = len(documents)
         result['totalUrlsProvided'] = len(urls)
         
