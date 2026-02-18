@@ -568,11 +568,9 @@ Return a JSON object with this structure:
 }}
 """
         
-        response = genai_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=types.Part.from_text(text=prompt)
-        )
-        result = extract_json(response.text)
+        chat = create_gemini_chat(f"tech-{uuid.uuid4()}", AGENT_TECHNICAL_PIPELINE_INSTRUCTION)
+        response = await chat.send_message(UserMessage(text=prompt))
+        result = extract_json(response)
         
         return {"status": "success", "data": result}
         
