@@ -535,8 +535,8 @@ QUALITY: Photorealistic, high detail, no artifacts"""
 @api_router.post("/gemini/generate-technical-data")
 async def generate_technical_data(request: GenerateTechnicalDataRequest):
     """Generate technical blueprint data for manufacturing"""
-    if not genai_client:
-        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
     
     try:
         prompt = f"""{AGENT_TECHNICAL_PIPELINE_INSTRUCTION}
@@ -669,8 +669,8 @@ Return ONLY valid JSON, no markdown formatting."""
 @api_router.post("/briefing/import-from-url")
 async def import_briefing_from_url(request: ImportBriefingRequest):
     """Import and extract briefing data from multiple shared document URLs (Adobe Acrobat, Google Drive, etc.)"""
-    if not genai_client:
-        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
     
     # Filter empty URLs
     urls = [url.strip() for url in request.urls if url.strip()]
@@ -833,8 +833,8 @@ Extract ALL project details from ALL documents provided."""
 @api_router.post("/floorplan/analyze")
 async def analyze_floor_plan(request: AnalyzeFloorPlanRequest):
     """Analyze an architectural floor plan (image or PDF) and extract rooms/woodwork opportunities"""
-    if not genai_client:
-        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
     
     try:
         # Decode base64 data
@@ -915,8 +915,8 @@ Return valid JSON only."""
 @api_router.post("/floorplan/chat")
 async def floor_plan_chat(request: FloorPlanChatRequest):
     """Chat with AI about the floor plan analysis - ask questions or get clarifications"""
-    if not genai_client:
-        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
     
     try:
         # Get or create session
@@ -1015,8 +1015,8 @@ Respond to the user's last message."""
 @api_router.post("/floorplan/select-room")
 async def select_room_for_project(request: SelectRoomForProjectRequest):
     """Select a room from the floor plan to create a SOMA-ID project"""
-    if not genai_client:
-        raise HTTPException(status_code=500, detail="Gemini API key not configured")
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
     
     try:
         # Find the selected room in the analysis
