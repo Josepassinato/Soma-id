@@ -258,6 +258,32 @@ export interface ModuleAccess {
   industrial: boolean;
 }
 
+export interface EdgeBand { front: 0|1; left: 0|1; right: 0|1; back: 0|1; }
+
+export type DrillHFace = "L" | "R" | "T" | "B";
+
+export interface DrillH {
+  face: DrillHFace;
+  x: number; // Posição X do centro do furo (na superfície da peça)
+  y: number; // Posição Y do centro do furo (na superfície da peça)
+  diameter: number;
+  depthMm: number;
+  zFromFaceMm?: number; // Offset da "altura" a partir da face, opcional
+}
+
+export interface PartDxfInput {
+  projectId: string;
+  moduleId: string;
+  partId: string;
+  width: number;   // mm
+  height: number;  // mm
+  thicknessMm: number;
+  material: string;
+  edgeBand?: EdgeBand;
+  drillingPoints?: Array<{ x: number; y: number; diameter: number }>;
+  drillHoles?: DrillH[];
+}
+
 export interface CheckoutSession {
   sessionId: string;
   url: string;
