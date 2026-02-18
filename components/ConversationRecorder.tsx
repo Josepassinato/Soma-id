@@ -207,6 +207,7 @@ export const ConversationRecorder: React.FC<Props> = ({ onCancel, onInsightsExtr
       {activeTab === 'STRUCTURED' && (
         <StructuredBriefingForm 
           onCancel={onCancel}
+          onCreateMultipleProjects={onCreateMultipleProjects}
           onSubmit={(briefingData) => {
             // Convert structured briefing to ExtractedInsights format
             const insights: ExtractedInsights = {
