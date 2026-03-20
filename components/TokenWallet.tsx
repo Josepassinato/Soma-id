@@ -9,7 +9,8 @@ export const TokenWallet: React.FC<{ onOpenPricing: () => void }> = ({ onOpenPri
   const { t } = useTranslation();
 
   const fetchBalance = async () => {
-    const { data: { user } } = await supabase!.auth.getUser();
+    if (!supabase) return;
+    const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const b = await TokenService.getBalance(user.id);
       setBalance(b);

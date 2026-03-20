@@ -63,7 +63,7 @@ export const PasskeyService = {
 
       const credential = await navigator.credentials.create(options) as any;
       if (credential) {
-        const { error } = await supabase!
+        const { error } = await supabase
           .from('profiles')
           .update({ 
             biometric_id: credential.id,
@@ -95,7 +95,7 @@ export const PasskeyService = {
       };
       const assertion = await navigator.credentials.get(options) as any;
       if (assertion) {
-        const { data, error } = await supabase!
+        const { data, error } = await supabase
           .from('profiles')
           .select('id, email')
           .eq('biometric_id', assertion.id)

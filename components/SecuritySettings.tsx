@@ -41,15 +41,17 @@ export const SecuritySettings: React.FC<Props> = ({ isOpen, onClose }) => {
     setError(null);
     try {
       if (isEnrolled) {
-        const { data: { user } } = await supabase!.auth.getUser();
-        const { error: dbError } = await supabase!.from('profiles').update({ biometric_id: null }).eq('id', user?.id);
+        if (!supabase) return;
+        const { data: { user } } = await supabase.auth.getUser();
+        const { error: dbError } = await supabase.from('profiles').update({ biometric_id: null }).eq('id', user?.id);
         if (!dbError) {
           setIsEnrolled(false);
         } else {
           setError("Falha ao comunicar com o servidor de segurança.");
         }
       } else {
-        const { data: { user } } = await supabase!.auth.getUser();
+        if (!supabase) return;
+        const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const result = await PasskeyService.register(user.id, user.email!);
           if (result.success) {
