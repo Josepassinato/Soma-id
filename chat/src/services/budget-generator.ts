@@ -39,96 +39,96 @@ export interface BudgetResult {
   precoVenda: number;
   custoPorModulo: { modulo: string; custo: number }[];
   custoPorM2: number;
-  moeda: "BRL";
+  moeda: "USD";
 }
 
 // ============================================================
-// Default pricing table (BRL)
+// Default pricing table (USD — US market, South Florida)
 // ============================================================
 
 const DEFAULT_PRICING = {
   chapas: {
-    MDF_15mm_branco: { price: 185, unit: "chapa", dimensions: "2750x1850mm" },
-    MDF_15mm_cores: { price: 210, unit: "chapa", dimensions: "2750x1850mm" },
-    MDF_18mm_branco: { price: 220, unit: "chapa", dimensions: "2750x1850mm" },
-    MDF_18mm_cores: { price: 250, unit: "chapa", dimensions: "2750x1850mm" },
-    MDF_6mm_fundo: { price: 85, unit: "chapa", dimensions: "2750x1850mm" },
+    MDF_15mm_branco: { price: 45, unit: "sheet", dimensions: "2750x1850mm" },
+    MDF_15mm_cores: { price: 52, unit: "sheet", dimensions: "2750x1850mm" },
+    MDF_18mm_branco: { price: 55, unit: "sheet", dimensions: "2750x1850mm" },
+    MDF_18mm_cores: { price: 62, unit: "sheet", dimensions: "2750x1850mm" },
+    MDF_6mm_fundo: { price: 22, unit: "sheet", dimensions: "2750x1850mm" },
   } as Record<string, { price: number; unit: string; dimensions?: string }>,
   fitas: {
-    "15mm": { price: 2.8, unit: "metro" },
-    "18mm": { price: 3.2, unit: "metro" },
+    "15mm": { price: 0.55, unit: "ft" },
+    "18mm": { price: 0.65, unit: "ft" },
   } as Record<string, { price: number; unit: string }>,
   ferragens: {
     dobradica_110: {
-      price: 8.5,
+      price: 4.50,
       unit: "un",
-      name: "Dobradiça Blum 110° soft-close",
+      name: "Blum 110° soft-close hinge",
     },
     corredica_350: {
-      price: 32,
-      unit: "par",
-      name: "Corrediça telescópica 350mm",
+      price: 12,
+      unit: "pair",
+      name: "Telescopic slide 350mm",
     },
     corredica_450: {
-      price: 38,
-      unit: "par",
-      name: "Corrediça telescópica 450mm",
+      price: 15,
+      unit: "pair",
+      name: "Telescopic slide 450mm",
     },
     corredica_500: {
-      price: 42,
-      unit: "par",
-      name: "Corrediça telescópica 500mm",
+      price: 18,
+      unit: "pair",
+      name: "Telescopic slide 500mm full-ext.",
     },
-    puxador: { price: 15, unit: "un", name: "Puxador" },
-    pe_regulavel: { price: 15, unit: "jogo x4", name: "Pés reguláveis 100mm (x4)" },
+    puxador: { price: 6, unit: "un", name: "Pull handle" },
+    pe_regulavel: { price: 5, unit: "set x4", name: "Adjustable feet 100mm (x4)" },
     barra_cromada: {
-      price: 35,
+      price: 12,
       unit: "un",
-      name: "Barra oval cromada 25mm",
+      name: "Chrome oval rod 25mm",
     },
     suporte_prateleira: {
-      price: 1.2,
+      price: 0.50,
       unit: "un",
-      name: "Pino metálico suporte",
+      name: "Metal shelf pin",
     },
     led_metro: {
-      price: 25,
-      unit: "metro",
-      name: "Fita LED 3000K + driver",
+      price: 8,
+      unit: "meter",
+      name: "LED strip 3000K + driver",
     },
     sensor_porta: {
-      price: 18,
+      price: 6,
       unit: "un",
-      name: "Sensor abertura porta",
+      name: "Door sensor switch",
     },
     espelho_m2: {
-      price: 180,
-      unit: "m2",
-      name: "Espelho 4mm com moldura",
+      price: 55,
+      unit: "sqft",
+      name: "4mm mirror with frame",
     },
     vidro_temperado_m2: {
-      price: 220,
-      unit: "m2",
-      name: "Vidro temperado 8mm",
+      price: 65,
+      unit: "sqft",
+      name: "8mm tempered glass",
     },
     corredica_sapateira: {
-      price: 28,
-      unit: "par",
-      name: "Corrediça sapateira inclinada",
+      price: 10,
+      unit: "pair",
+      name: "Tilted shoe rack slide",
     },
   } as Record<string, { price: number; unit: string; name: string }>,
   maoDeObra: {
-    corte_chapa: { price: 50, unit: "chapa", name: "Corte de chapa" },
+    corte_chapa: { price: 15, unit: "sheet", name: "Sheet cutting" },
     fita_borda: {
-      price: 4.5,
-      unit: "metro",
-      name: "Aplicação fita de borda",
+      price: 1.50,
+      unit: "meter",
+      name: "Edge banding application",
     },
-    montagem_hora: { price: 85, unit: "hora", name: "Montagem" },
+    montagem_hora: { price: 45, unit: "hour", name: "Assembly" },
     instalacao_hora: {
-      price: 95,
-      unit: "hora",
-      name: "Instalação no local",
+      price: 55,
+      unit: "hour",
+      name: "On-site installation",
     },
   } as Record<string, { price: number; unit: string; name: string }>,
   margem: 0.3,
@@ -496,7 +496,7 @@ export function generateBudget(
     precoVenda,
     custoPorModulo,
     custoPorM2,
-    moeda: "BRL",
+    moeda: "USD",
   };
 }
 

@@ -72,7 +72,7 @@ function esc(s: string): string {
 }
 
 function fmtCost(n: number): string {
-  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function modType(mod: BlueprintModule): string {
@@ -1515,7 +1515,7 @@ export function generateHtmlReport(briefing: ParsedBriefing, results: EngineResu
   const designer = esc(briefing.project?.designer || "-");
   const dateDue = esc(briefing.project?.date_due || "-");
   const dateIn = esc(briefing.project?.date_in || "-");
-  const costBrl = (s as any).estimated_cost_brl || Math.round(s.estimated_cost_usd * 5.5);
+  const costUsd = s.estimated_cost_usd || (s as any).estimated_cost_brl / 5.5 || 0;
   const effColor = s.efficiency_percent >= 80 ? "#27ae60" : s.efficiency_percent >= 60 ? "#e6a817" : "#e74c3c";
 
   // Collect all modules
@@ -2009,8 +2009,8 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
     <div class="metric purple"><div class="val">${s.hardware_items}</div><div class="lbl">Ferragens</div></div>
   </div>
   <div class="cost-box">
-    <div class="amount">R$ ${fmtCost(costBrl)}</div>
-    <div class="desc">Custo estimado de materiais (USD ${fmtCost(s.estimated_cost_usd)})</div>
+    <div class="amount">$${fmtCost(costUsd)}</div>
+    <div class="desc">Estimated material cost (USD)</div>
   </div>
 
   <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:#333">Lista Completa de Pecas</h3>
@@ -2290,7 +2290,7 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
       ${s.total_modules} modulos | ${s.total_parts} pecas | ${s.total_sheets} chapas |
       Eficiencia ${s.efficiency_percent}% | ${s.hardware_items} ferragens |
       ${s.critical_conflicts} conflitos criticos | ${s.warnings} avisos |
-      Custo estimado: R$ ${fmtCost(costBrl)}
+      Custo estimado: $${fmtCost(costUsd)}
     </p>
   </div>
 
@@ -2307,51 +2307,51 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
 
     // Summary cards
     html += '<div class="metrics">';
-    html += '<div class="metric green"><div class="val">R$ ' + fmtCost(budget.subtotalMaterial) + '</div><div class="lbl">Materiais</div></div>';
-    html += '<div class="metric blue"><div class="val">R$ ' + fmtCost(budget.subtotalFerragens) + '</div><div class="lbl">Ferragens</div></div>';
-    html += '<div class="metric orange"><div class="val">R$ ' + fmtCost(budget.subtotalMaoDeObra) + '</div><div class="lbl">Mao de Obra</div></div>';
-    html += '<div class="metric gold"><div class="val">R$ ' + fmtCost(budget.custoTotal) + '</div><div class="lbl">Custo Total</div></div>';
+    html += '<div class="metric green"><div class="val">$' + fmtCost(budget.subtotalMaterial) + '</div><div class="lbl">Materiais</div></div>';
+    html += '<div class="metric blue"><div class="val">$' + fmtCost(budget.subtotalFerragens) + '</div><div class="lbl">Ferragens</div></div>';
+    html += '<div class="metric orange"><div class="val">$' + fmtCost(budget.subtotalMaoDeObra) + '</div><div class="lbl">Mao de Obra</div></div>';
+    html += '<div class="metric gold"><div class="val">$' + fmtCost(budget.custoTotal) + '</div><div class="lbl">Custo Total</div></div>';
     html += '<div class="metric purple"><div class="val">' + Math.round(budget.margem * 100) + '%</div><div class="lbl">Margem</div></div>';
     html += '</div>';
 
     // Preço de Venda destaque
-    html += '<div class="cost-box"><div class="amount">R$ ' + fmtCost(budget.precoVenda) + '</div><div class="desc">Preco de Venda Sugerido (custo + ' + Math.round(budget.margem * 100) + '% margem)</div></div>';
+    html += '<div class="cost-box"><div class="amount">$' + fmtCost(budget.precoVenda) + '</div><div class="desc">Preco de Venda Sugerido (custo + ' + Math.round(budget.margem * 100) + '% margem)</div></div>';
 
     // Tabela materiais
     html += '<h3 style="font-size:14px;font-weight:700;margin:16px 0 8px">Materiais</h3><table><tr><th>#</th><th>Item</th><th>Qtd</th><th>Unid.</th><th>Preco Unit.</th><th>Total</th></tr>';
     budget.materiais.forEach((m, i) => {
-      html += '<tr><td>' + (i + 1) + '</td><td>' + esc(m.item) + '</td><td>' + m.qtd + '</td><td>' + esc(m.unit) + '</td><td>R$ ' + fmtCost(m.unitPrice) + '</td><td>R$ ' + fmtCost(m.total) + '</td></tr>';
+      html += '<tr><td>' + (i + 1) + '</td><td>' + esc(m.item) + '</td><td>' + m.qtd + '</td><td>' + esc(m.unit) + '</td><td>$' + fmtCost(m.unitPrice) + '</td><td>$' + fmtCost(m.total) + '</td></tr>';
     });
-    html += '<tr class="total-row"><td colspan="5">Subtotal Materiais</td><td>R$ ' + fmtCost(budget.subtotalMaterial) + '</td></tr></table>';
+    html += '<tr class="total-row"><td colspan="5">Subtotal Materiais</td><td>$' + fmtCost(budget.subtotalMaterial) + '</td></tr></table>';
 
     // Tabela ferragens
     html += '<h3 style="font-size:14px;font-weight:700;margin:16px 0 8px">Ferragens</h3><table><tr><th>#</th><th>Item</th><th>Qtd</th><th>Unid.</th><th>Preco Unit.</th><th>Total</th></tr>';
     budget.ferragens.forEach((f, i) => {
-      html += '<tr><td>' + (i + 1) + '</td><td>' + esc(f.item) + '</td><td>' + f.qtd + '</td><td>' + esc(f.unit) + '</td><td>R$ ' + fmtCost(f.unitPrice) + '</td><td>R$ ' + fmtCost(f.total) + '</td></tr>';
+      html += '<tr><td>' + (i + 1) + '</td><td>' + esc(f.item) + '</td><td>' + f.qtd + '</td><td>' + esc(f.unit) + '</td><td>$' + fmtCost(f.unitPrice) + '</td><td>$' + fmtCost(f.total) + '</td></tr>';
     });
-    html += '<tr class="total-row"><td colspan="5">Subtotal Ferragens</td><td>R$ ' + fmtCost(budget.subtotalFerragens) + '</td></tr></table>';
+    html += '<tr class="total-row"><td colspan="5">Subtotal Ferragens</td><td>$' + fmtCost(budget.subtotalFerragens) + '</td></tr></table>';
 
     // Tabela mão de obra
     html += '<h3 style="font-size:14px;font-weight:700;margin:16px 0 8px">Mao de Obra</h3><table><tr><th>#</th><th>Item</th><th>Qtd</th><th>Unid.</th><th>Preco Unit.</th><th>Total</th></tr>';
     budget.maoDeObra.forEach((m, i) => {
-      html += '<tr><td>' + (i + 1) + '</td><td>' + esc(m.item) + '</td><td>' + m.qtd.toFixed(1) + '</td><td>' + esc(m.unit) + '</td><td>R$ ' + fmtCost(m.unitPrice) + '</td><td>R$ ' + fmtCost(m.total) + '</td></tr>';
+      html += '<tr><td>' + (i + 1) + '</td><td>' + esc(m.item) + '</td><td>' + m.qtd.toFixed(1) + '</td><td>' + esc(m.unit) + '</td><td>$' + fmtCost(m.unitPrice) + '</td><td>$' + fmtCost(m.total) + '</td></tr>';
     });
-    html += '<tr class="total-row"><td colspan="5">Subtotal Mao de Obra</td><td>R$ ' + fmtCost(budget.subtotalMaoDeObra) + '</td></tr></table>';
+    html += '<tr class="total-row"><td colspan="5">Subtotal Mao de Obra</td><td>$' + fmtCost(budget.subtotalMaoDeObra) + '</td></tr></table>';
 
     // Custo por módulo
     if (budget.custoPorModulo.length > 0) {
       html += '<h3 style="font-size:14px;font-weight:700;margin:16px 0 8px">Custo por Modulo</h3><table><tr><th>Modulo</th><th>Custo Estimado</th></tr>';
       budget.custoPorModulo.forEach(cm => {
-        html += '<tr><td>' + esc(cm.modulo) + '</td><td>R$ ' + fmtCost(cm.custo) + '</td></tr>';
+        html += '<tr><td>' + esc(cm.modulo) + '</td><td>$' + fmtCost(cm.custo) + '</td></tr>';
       });
       html += '</table>';
     }
 
     // Custo por m²
-    html += '<div style="margin-top:12px;padding:10px;background:#f5f5f5;border-radius:4px;font-size:12px"><strong>Custo por m&sup2; de chapa:</strong> R$ ' + fmtCost(budget.custoPorM2) + '/m&sup2;</div>';
+    html += '<div style="margin-top:12px;padding:10px;background:#f5f5f5;border-radius:4px;font-size:12px"><strong>Custo por m&sup2; de chapa:</strong> $' + fmtCost(budget.custoPorM2) + '/m&sup2;</div>';
 
     // Disclaimer
-    html += '<div style="margin-top:16px;padding:12px;background:#FFF8E1;border-left:4px solid #e6a817;border-radius:4px;font-size:11px;color:#666"><strong>Aviso:</strong> Orcamento estimado com base em precos de referencia do mercado brasileiro (2026). Valores sujeitos a confirmacao com fornecedores locais. Frete, impostos e custos especificos do projeto nao inclusos.</div>';
+    html += '<div style="margin-top:16px;padding:12px;background:#FFF8E1;border-left:4px solid #e6a817;border-radius:4px;font-size:11px;color:#666"><strong>Aviso:</strong> Estimated budget based on US market reference prices (2026). Values subject to confirmation with local suppliers. Shipping, taxes, and project-specific costs not included.</div>';
 
     return html;
   })() : '<p style="color:#888;font-style:italic">Orcamento nao disponivel. Erro no calculo.</p>'}
