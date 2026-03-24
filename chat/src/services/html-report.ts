@@ -489,6 +489,11 @@ function renderWallSvg(
     moduleGroups.push({ startX: currentGroupStart, endX: currentGroupEnd, label: currentGroupLabel });
   }
 
+  // Stroke scale factor: SVG uses mm coordinates but renders at max 900px
+  // A 5000mm wall at 900px means 1mm SVG = 0.18px screen. Need ~5x multiplier.
+  const ssFactor = Math.max(1, vbW / 900);
+  const ss = (base: number) => Math.round(base * ssFactor * 10) / 10; // scaled stroke
+
   // Modules
   for (const mod of modules) {
     const mx = padL + (mod.position?.x || 0);
@@ -497,67 +502,67 @@ function renderWallSvg(
     const mt = modType(mod);
 
     // Module body
-    svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="${fill}" stroke="#444" stroke-width="1.5"/>`;
+    svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="${fill}" stroke="#333" stroke-width="${ss(2)}"/>`;
+
+    // 18mm side panels (visible thickness like in Promob)
+    svg += `<line x1="${mx}" y1="${my}" x2="${mx}" y2="${my + mod.height}" stroke="#555" stroke-width="${ss(1.5)}"/>`;
+    svg += `<line x1="${mx + mod.width}" y1="${my}" x2="${mx + mod.width}" y2="${my + mod.height}" stroke="#555" stroke-width="${ss(1.5)}"/>`;
 
     // Interior details based on module type
     const modId = (mod.moduleId || "").toLowerCase();
     const modNotes = (mod.notes || []).join(" ").toLowerCase();
-    const insetX = mx + 4;
-    const insetW = mod.width - 8;
+    const insetX = mx + 18; // 18mm offset for side panel thickness
+    const insetW = mod.width - 36;
 
     if (mt === "upper") {
       // Maleiro / luggage — open space with silhouette of suitcases
-      svg += `<rect x="${insetX}" y="${my + 4}" width="${insetW}" height="${mod.height - 8}" fill="none" stroke="#888" stroke-width="0.8" stroke-dasharray="4,2"/>`;
-      // Suitcase silhouettes
-      const suitW = Math.min(insetW * 0.35, 80);
+      svg += `<rect x="${insetX}" y="${my + 4}" width="${insetW}" height="${mod.height - 8}" fill="none" stroke="#444" stroke-width="${ss(1)}" stroke-dasharray="${ss(6)},${ss(3)}"/>`;
+      const suitW = Math.min(insetW * 0.35, 120);
       const suitH = mod.height * 0.6;
-      svg += `<rect x="${insetX + 8}" y="${my + mod.height - suitH - 6}" width="${suitW}" height="${suitH}" fill="none" stroke="#777" stroke-width="1" rx="3"/>`;
-      svg += `<line x1="${insetX + 8 + suitW * 0.3}" y1="${my + mod.height - suitH - 6}" x2="${insetX + 8 + suitW * 0.7}" y2="${my + mod.height - suitH - 6}" stroke="#777" stroke-width="1.5"/>`;
-      if (insetW > 200) {
-        svg += `<rect x="${insetX + suitW + 20}" y="${my + mod.height - suitH * 0.7 - 6}" width="${suitW * 0.8}" height="${suitH * 0.7}" fill="none" stroke="#999" stroke-width="0.8" rx="2"/>`;
+      svg += `<rect x="${insetX + 15}" y="${my + mod.height - suitH - 10}" width="${suitW}" height="${suitH}" fill="none" stroke="#333" stroke-width="${ss(1.5)}" rx="5"/>`;
+      svg += `<line x1="${insetX + 15 + suitW * 0.3}" y1="${my + mod.height - suitH - 10}" x2="${insetX + 15 + suitW * 0.7}" y2="${my + mod.height - suitH - 10}" stroke="#333" stroke-width="${ss(2)}"/>`;
+      if (insetW > 300) {
+        svg += `<rect x="${insetX + suitW + 35}" y="${my + mod.height - suitH * 0.7 - 10}" width="${suitW * 0.8}" height="${suitH * 0.7}" fill="none" stroke="#555" stroke-width="${ss(1)}" rx="4"/>`;
       }
-      svg += `<text x="${mx + mod.width / 2}" y="${my + 14}" text-anchor="middle" font-size="9" font-weight="bold" fill="#555" font-family="Arial,sans-serif">MALEIRO</text>`;
+      svg += `<text x="${mx + mod.width / 2}" y="${my + 25}" text-anchor="middle" font-size="${ss(12)}" font-weight="bold" fill="#333" font-family="Arial,sans-serif">MALEIRO</text>`;
     } else if (modId.includes("cabideiro")) {
       // Hanging bar — oval bar with supports + garment silhouettes
       const subtipo = modNotes.includes("long") ? "long" : modNotes.includes("short") ? "short" : "mixed";
       if (subtipo === "mixed" || subtipo === "long") {
         const barY = my + mod.height * 0.08;
         // Bar supports (brackets)
-        svg += `<rect x="${insetX + 5}" y="${barY - 6}" width="12" height="12" fill="none" stroke="#555" stroke-width="1"/>`;
-        svg += `<rect x="${insetX + insetW - 17}" y="${barY - 6}" width="12" height="12" fill="none" stroke="#555" stroke-width="1"/>`;
-        // Oval bar
-        svg += `<line x1="${insetX + 17}" y1="${barY}" x2="${insetX + insetW - 17}" y2="${barY}" stroke="#444" stroke-width="3" stroke-linecap="round"/>`;
+        svg += `<rect x="${insetX + 8}" y="${barY - 10}" width="${ss(18)}" height="${ss(18)}" fill="none" stroke="#333" stroke-width="${ss(1.5)}"/>`;
+        svg += `<rect x="${insetX + insetW - 8 - ss(18)}" y="${barY - 10}" width="${ss(18)}" height="${ss(18)}" fill="none" stroke="#333" stroke-width="${ss(1.5)}"/>`;
+        // Oval bar (thick, black)
+        svg += `<line x1="${insetX + 30}" y1="${barY}" x2="${insetX + insetW - 30}" y2="${barY}" stroke="#222" stroke-width="${ss(5)}" stroke-linecap="round"/>`;
         // Hanging garments (V-shape hangers + body)
-        for (let gx = insetX + 30; gx < insetX + insetW - 25; gx += 22) {
+        const spacing = Math.max(ss(30), 35);
+        for (let gx = insetX + 50; gx < insetX + insetW - 40; gx += spacing) {
           const gh = mod.height * (subtipo === "long" ? 0.65 : 0.45);
           // Hanger triangle
-          svg += `<polyline points="${gx - 6},${barY + 3} ${gx},${barY - 3} ${gx + 6},${barY + 3}" fill="none" stroke="#666" stroke-width="1"/>`;
+          svg += `<polyline points="${gx - 10},${barY + 5} ${gx},${barY - 5} ${gx + 10},${barY + 5}" fill="none" stroke="#333" stroke-width="${ss(1.5)}"/>`;
           // Garment body
-          svg += `<line x1="${gx}" y1="${barY + 3}" x2="${gx}" y2="${barY + gh}" stroke="#888" stroke-width="1"/>`;
-          svg += `<line x1="${gx - 7}" y1="${barY + gh}" x2="${gx + 7}" y2="${barY + gh}" stroke="#888" stroke-width="1"/>`;
-          // Shoulder width
-          svg += `<line x1="${gx - 6}" y1="${barY + 3}" x2="${gx - 6}" y2="${barY + gh * 0.15}" stroke="#888" stroke-width="0.5"/>`;
-          svg += `<line x1="${gx + 6}" y1="${barY + 3}" x2="${gx + 6}" y2="${barY + gh * 0.15}" stroke="#888" stroke-width="0.5"/>`;
+          svg += `<line x1="${gx}" y1="${barY + 5}" x2="${gx}" y2="${barY + gh}" stroke="#555" stroke-width="${ss(1.5)}"/>`;
+          svg += `<line x1="${gx - 12}" y1="${barY + gh}" x2="${gx + 12}" y2="${barY + gh}" stroke="#555" stroke-width="${ss(1.5)}"/>`;
         }
-        // Bar height dimension
-        svg += `<text x="${insetX + 5}" y="${barY + 18}" font-size="8" font-weight="bold" fill="${DIM_RED}" font-family="Arial,sans-serif">${Math.round(mod.height * 0.08)}mm</text>`;
+        svg += `<text x="${insetX + 8}" y="${barY + 30}" font-size="${ss(10)}" font-weight="bold" fill="${DIM_RED}" font-family="Arial,sans-serif">${Math.round(mod.height * 0.08)}mm</text>`;
       }
       if (subtipo === "mixed") {
         const divX = mx + mod.width * 0.55;
-        svg += `<line x1="${divX}" y1="${my + 3}" x2="${divX}" y2="${my + mod.height - 3}" stroke="#555" stroke-width="1.5"/>`;
+        svg += `<line x1="${divX}" y1="${my + 5}" x2="${divX}" y2="${my + mod.height - 5}" stroke="#333" stroke-width="${ss(2)}"/>`;
       }
     } else if (modId.includes("prateleira")) {
-      // Shelves — thick horizontal lines with bracket supports
+      // Shelves — thick horizontal lines (black, Promob style)
       const shelfCount = 6;
       const spacing = mod.height / (shelfCount + 1);
       for (let s = 1; s <= shelfCount; s++) {
         const sy = my + s * spacing;
-        svg += `<line x1="${insetX}" y1="${sy}" x2="${insetX + insetW}" y2="${sy}" stroke="#555" stroke-width="2"/>`;
-        // Bracket support marks (small triangles at edges)
-        svg += `<circle cx="${insetX + 3}" cy="${sy}" r="1.5" fill="#666"/>`;
-        svg += `<circle cx="${insetX + insetW - 3}" cy="${sy}" r="1.5" fill="#666"/>`;
+        svg += `<line x1="${insetX}" y1="${sy}" x2="${insetX + insetW}" y2="${sy}" stroke="#333" stroke-width="${ss(3)}"/>`;
+        // Pin supports at edges
+        svg += `<circle cx="${insetX + 5}" cy="${sy + ss(4)}" r="${ss(2)}" fill="#555"/>`;
+        svg += `<circle cx="${insetX + insetW - 5}" cy="${sy + ss(4)}" r="${ss(2)}" fill="#555"/>`;
       }
-      svg += `<text x="${insetX + 5}" y="${my + spacing / 2 + 3}" font-size="8" font-weight="bold" fill="${DIM_RED}" font-family="Arial,sans-serif">${Math.round(spacing)}mm</text>`;
+      svg += `<text x="${insetX + 8}" y="${my + spacing / 2 + 5}" font-size="${ss(10)}" font-weight="bold" fill="${DIM_RED}" font-family="Arial,sans-serif">${Math.round(spacing)}mm</text>`;
     } else if (modId.includes("sapateira")) {
       // Shoe rack — inclined shelves (15°) with shoe outlines
       const isBoots = modNotes.includes("boot") || modId.includes("bota");
@@ -565,94 +570,86 @@ function renderWallSvg(
       const spacing = mod.height / (shelfCount + 1);
       for (let s = 1; s <= shelfCount; s++) {
         const sy = my + s * spacing;
-        const tilt = 12;
-        svg += `<line x1="${insetX}" y1="${sy + tilt}" x2="${insetX + insetW}" y2="${sy}" stroke="#555" stroke-width="1.5"/>`;
+        const tilt = ss(15);
+        svg += `<line x1="${insetX}" y1="${sy + tilt}" x2="${insetX + insetW}" y2="${sy}" stroke="#333" stroke-width="${ss(2.5)}"/>`;
         // Shoe outlines on shelf
         if (s <= shelfCount - 1) {
-          for (let sx = insetX + 10; sx < insetX + insetW - 20; sx += 28) {
+          for (let sx = insetX + 15; sx < insetX + insetW - 25; sx += ss(40)) {
             const shoeH = isBoots ? spacing * 0.5 : spacing * 0.3;
-            svg += `<ellipse cx="${sx + 10}" cy="${sy - shoeH / 2}" rx="10" ry="${shoeH / 2}" fill="none" stroke="#999" stroke-width="0.6"/>`;
+            svg += `<ellipse cx="${sx + 15}" cy="${sy - shoeH / 2}" rx="${ss(14)}" ry="${shoeH / 2}" fill="none" stroke="#666" stroke-width="${ss(1)}"/>`;
           }
         }
       }
-      svg += `<text x="${insetX + 5}" y="${my + 14}" font-size="8" font-weight="bold" fill="${DIM_RED}" font-family="Arial,sans-serif">${isBoots ? "BOTAS" : "SAPATOS"}</text>`;
+      svg += `<text x="${insetX + 8}" y="${my + 25}" font-size="${ss(11)}" font-weight="bold" fill="${DIM_RED}" font-family="Arial,sans-serif">${isBoots ? "BOTAS" : "SAPATOS"}</text>`;
     } else if (modId.includes("vitrine")) {
       // Glass shelves — dashed lines (glass) + LED strips + bag outlines
       const shelfCount = 5;
       const spacing = mod.height / (shelfCount + 1);
       for (let s = 1; s <= shelfCount; s++) {
         const sy = my + s * spacing;
-        // Glass shelf (dashed, thicker)
-        svg += `<line x1="${insetX}" y1="${sy}" x2="${insetX + insetW}" y2="${sy}" stroke="#3399BB" stroke-width="1.5" stroke-dasharray="8,4"/>`;
-        // LED strip above shelf (yellow glow)
-        svg += `<line x1="${insetX + 3}" y1="${sy - 3}" x2="${insetX + insetW - 3}" y2="${sy - 3}" stroke="#FFD700" stroke-width="2" opacity="0.6"/>`;
-        // Bag silhouette on shelf
+        // Glass shelf (dashed, THICK blue)
+        svg += `<line x1="${insetX}" y1="${sy}" x2="${insetX + insetW}" y2="${sy}" stroke="#2288AA" stroke-width="${ss(3)}" stroke-dasharray="${ss(12)},${ss(6)}"/>`;
+        // LED strip (yellow, thick)
+        svg += `<line x1="${insetX + 5}" y1="${sy - ss(5)}" x2="${insetX + insetW - 5}" y2="${sy - ss(5)}" stroke="#FFD700" stroke-width="${ss(3)}" opacity="0.7"/>`;
+        // Bag silhouette
         if (s <= shelfCount - 1) {
-          const bagW = Math.min(insetW * 0.3, 40);
-          const bagH = spacing * 0.55;
+          const bagW = Math.min(insetW * 0.3, 80);
+          const bagH = spacing * 0.5;
           const bagX = insetX + insetW / 2 - bagW / 2;
-          svg += `<rect x="${bagX}" y="${sy - bagH - 2}" width="${bagW}" height="${bagH}" fill="none" stroke="#AAA" stroke-width="0.8" rx="3"/>`;
-          // Bag handle
-          svg += `<path d="M${bagX + bagW * 0.3} ${sy - bagH - 2} Q${bagX + bagW / 2} ${sy - bagH - 8} ${bagX + bagW * 0.7} ${sy - bagH - 2}" fill="none" stroke="#AAA" stroke-width="0.6"/>`;
+          svg += `<rect x="${bagX}" y="${sy - bagH - 4}" width="${bagW}" height="${bagH}" fill="none" stroke="#666" stroke-width="${ss(1.2)}" rx="4"/>`;
+          svg += `<path d="M${bagX + bagW * 0.3} ${sy - bagH - 4} Q${bagX + bagW / 2} ${sy - bagH - ss(12)} ${bagX + bagW * 0.7} ${sy - bagH - 4}" fill="none" stroke="#666" stroke-width="${ss(1)}"/>`;
         }
       }
-      svg += `<text x="${mx + mod.width / 2}" y="${my + 15}" text-anchor="middle" font-size="9" font-weight="bold" fill="#3399BB" font-family="Arial,sans-serif">VIDRO + LED</text>`;
+      svg += `<text x="${mx + mod.width / 2}" y="${my + 25}" text-anchor="middle" font-size="${ss(12)}" font-weight="bold" fill="#2288AA" font-family="Arial,sans-serif">VIDRO + LED</text>`;
     } else if (modId.includes("gaveteiro") || modId.includes("ilha")) {
-      // Drawers — stacked with visible handles and spacing
+      // Drawers — stacked with visible handles (Promob style: thick black outlines)
       const drawerCount = Math.max(3, Math.min(6, Math.floor(mod.height / 150)));
-      const margin = 8;
-      const totalGap = (drawerCount - 1) * 4;
+      const margin = 12;
+      const totalGap = (drawerCount - 1) * 6;
       const drawerH = (mod.height - margin * 2 - totalGap) / drawerCount;
       for (let d = 0; d < drawerCount; d++) {
-        const dy = my + margin + d * (drawerH + 4);
-        svg += `<rect x="${insetX}" y="${dy}" width="${insetW}" height="${drawerH}" fill="none" stroke="#555" stroke-width="1.2" rx="1"/>`;
-        // Handle (horizontal bar)
-        const handleW = Math.min(insetW * 0.25, 30);
-        svg += `<line x1="${mx + mod.width / 2 - handleW}" y1="${dy + drawerH / 2}" x2="${mx + mod.width / 2 + handleW}" y2="${dy + drawerH / 2}" stroke="#444" stroke-width="2" stroke-linecap="round"/>`;
+        const dy = my + margin + d * (drawerH + 6);
+        svg += `<rect x="${insetX}" y="${dy}" width="${insetW}" height="${drawerH}" fill="none" stroke="#333" stroke-width="${ss(2)}" rx="2"/>`;
+        // Handle (horizontal bar, thick)
+        const handleW = Math.min(insetW * 0.25, 50);
+        svg += `<line x1="${mx + mod.width / 2 - handleW}" y1="${dy + drawerH / 2}" x2="${mx + mod.width / 2 + handleW}" y2="${dy + drawerH / 2}" stroke="#222" stroke-width="${ss(3)}" stroke-linecap="round"/>`;
       }
     } else if (modId.includes("bancada") || modId.includes("vanity")) {
-      // Vanity — mirror with X pattern, countertop, drawers
+      // Vanity — mirror with X, countertop, drawers
       const mirrorH = mod.height * 0.35;
       const mirrorY = my + mod.height * 0.1;
-      // Mirror frame
-      svg += `<rect x="${insetX + 5}" y="${mirrorY}" width="${insetW - 10}" height="${mirrorH}" fill="#E8F4F8" stroke="#3399BB" stroke-width="1.5"/>`;
-      // Mirror X diagonal (standard mirror symbol)
-      svg += `<line x1="${insetX + 5}" y1="${mirrorY}" x2="${insetX + insetW - 5}" y2="${mirrorY + mirrorH}" stroke="#99CCDD" stroke-width="0.8"/>`;
-      svg += `<line x1="${insetX + insetW - 5}" y1="${mirrorY}" x2="${insetX + 5}" y2="${mirrorY + mirrorH}" stroke="#99CCDD" stroke-width="0.8"/>`;
-      svg += `<text x="${mx + mod.width / 2}" y="${mirrorY + mirrorH / 2 + 3}" text-anchor="middle" font-size="9" font-weight="bold" fill="#3399BB" font-family="Arial,sans-serif">ESPELHO</text>`;
-      // Countertop (thick line)
+      svg += `<rect x="${insetX + 8}" y="${mirrorY}" width="${insetW - 16}" height="${mirrorH}" fill="#E8F4F8" stroke="#2288AA" stroke-width="${ss(2.5)}"/>`;
+      svg += `<line x1="${insetX + 8}" y1="${mirrorY}" x2="${insetX + insetW - 8}" y2="${mirrorY + mirrorH}" stroke="#77AABB" stroke-width="${ss(1.5)}"/>`;
+      svg += `<line x1="${insetX + insetW - 8}" y1="${mirrorY}" x2="${insetX + 8}" y2="${mirrorY + mirrorH}" stroke="#77AABB" stroke-width="${ss(1.5)}"/>`;
+      svg += `<text x="${mx + mod.width / 2}" y="${mirrorY + mirrorH / 2 + 5}" text-anchor="middle" font-size="${ss(12)}" font-weight="bold" fill="#2288AA" font-family="Arial,sans-serif">ESPELHO</text>`;
       const counterY = mirrorY + mirrorH + mod.height * 0.05;
-      svg += `<line x1="${mx}" y1="${counterY}" x2="${mx + mod.width}" y2="${counterY}" stroke="#333" stroke-width="3"/>`;
-      svg += `<text x="${mx + mod.width / 2}" y="${counterY - 4}" text-anchor="middle" font-size="7" fill="#666" font-family="Arial,sans-serif">BANCADA 850mm</text>`;
-      // Drawers below
-      const drawSpace = my + mod.height - counterY - 10;
+      svg += `<line x1="${mx}" y1="${counterY}" x2="${mx + mod.width}" y2="${counterY}" stroke="#222" stroke-width="${ss(5)}"/>`;
+      svg += `<text x="${mx + mod.width / 2}" y="${counterY - ss(6)}" text-anchor="middle" font-size="${ss(9)}" fill="#444" font-family="Arial,sans-serif">BANCADA 850mm</text>`;
+      const drawSpace = my + mod.height - counterY - 15;
       const numDraw = 3;
       const dh = drawSpace / numDraw;
       for (let d = 0; d < numDraw; d++) {
-        const dy = counterY + 5 + d * dh;
-        svg += `<rect x="${insetX}" y="${dy}" width="${insetW}" height="${dh - 4}" fill="none" stroke="#555" stroke-width="1" rx="1"/>`;
-        svg += `<line x1="${mx + mod.width / 2 - 10}" y1="${dy + dh / 2 - 2}" x2="${mx + mod.width / 2 + 10}" y2="${dy + dh / 2 - 2}" stroke="#444" stroke-width="1.5" stroke-linecap="round"/>`;
+        const dy = counterY + 8 + d * dh;
+        svg += `<rect x="${insetX}" y="${dy}" width="${insetW}" height="${dh - 6}" fill="none" stroke="#333" stroke-width="${ss(1.8)}" rx="2"/>`;
+        svg += `<line x1="${mx + mod.width / 2 - 15}" y1="${dy + dh / 2 - 3}" x2="${mx + mod.width / 2 + 15}" y2="${dy + dh / 2 - 3}" stroke="#222" stroke-width="${ss(2.5)}" stroke-linecap="round"/>`;
       }
     } else if (modId.includes("armas")) {
-      // Gun safe — mirror door (diagonal hatch) + internal shelves + LED + sensor
-      // Mirror door front (diagonal hatching)
-      svg += `<rect x="${insetX + 2}" y="${my + 4}" width="${insetW - 4}" height="${mod.height - 8}" fill="#E8F0F0" stroke="#3399BB" stroke-width="1"/>`;
-      for (let hy = my + 4; hy < my + mod.height - 4; hy += 14) {
-        svg += `<line x1="${insetX + 2}" y1="${hy}" x2="${insetX + insetW - 2}" y2="${hy + 14}" stroke="#AACCDD" stroke-width="0.6"/>`;
+      // Gun safe — mirror door (diagonal hatch) thick strokes
+      svg += `<rect x="${insetX + 3}" y="${my + 6}" width="${insetW - 6}" height="${mod.height - 12}" fill="#E8F0F0" stroke="#2288AA" stroke-width="${ss(2)}"/>`;
+      for (let hy = my + 6; hy < my + mod.height - 6; hy += ss(20)) {
+        svg += `<line x1="${insetX + 3}" y1="${hy}" x2="${insetX + insetW - 3}" y2="${hy + ss(20)}" stroke="#99BBCC" stroke-width="${ss(1)}"/>`;
       }
-      // Mirror X symbol
-      svg += `<line x1="${insetX + 5}" y1="${my + 8}" x2="${insetX + insetW - 5}" y2="${my + mod.height - 8}" stroke="#88AACC" stroke-width="0.8"/>`;
-      svg += `<line x1="${insetX + insetW - 5}" y1="${my + 8}" x2="${insetX + 5}" y2="${my + mod.height - 8}" stroke="#88AACC" stroke-width="0.8"/>`;
-      svg += `<text x="${mx + mod.width / 2}" y="${my + mod.height / 2}" text-anchor="middle" font-size="9" font-weight="bold" fill="#3399BB" font-family="Arial,sans-serif">PORTA ESPELHO</text>`;
-      svg += `<text x="${mx + mod.width / 2}" y="${my + mod.height / 2 + 14}" text-anchor="middle" font-size="7" fill="#666" font-family="Arial,sans-serif">LED + SENSOR</text>`;
-      // Handle (circle)
-      svg += `<circle cx="${insetX + insetW - 10}" cy="${my + mod.height / 2}" r="4" fill="none" stroke="#444" stroke-width="1.5"/>`;
+      svg += `<line x1="${insetX + 8}" y1="${my + 12}" x2="${insetX + insetW - 8}" y2="${my + mod.height - 12}" stroke="#77AACC" stroke-width="${ss(1.5)}"/>`;
+      svg += `<line x1="${insetX + insetW - 8}" y1="${my + 12}" x2="${insetX + 8}" y2="${my + mod.height - 12}" stroke="#77AACC" stroke-width="${ss(1.5)}"/>`;
+      svg += `<text x="${mx + mod.width / 2}" y="${my + mod.height / 2}" text-anchor="middle" font-size="${ss(12)}" font-weight="bold" fill="#2288AA" font-family="Arial,sans-serif">PORTA ESPELHO</text>`;
+      svg += `<text x="${mx + mod.width / 2}" y="${my + mod.height / 2 + ss(18)}" text-anchor="middle" font-size="${ss(9)}" fill="#444" font-family="Arial,sans-serif">LED + SENSOR</text>`;
+      svg += `<circle cx="${insetX + insetW - 15}" cy="${my + mod.height / 2}" r="${ss(6)}" fill="none" stroke="#333" stroke-width="${ss(2)}"/>`;
     } else if (mod.height > 600) {
       // Generic fallback — shelf divisions
       const divisions = Math.floor(mod.height / 400);
       for (let d = 1; d < divisions; d++) {
         const dy = my + (mod.height / divisions) * d;
-        svg += `<line x1="${insetX}" y1="${dy}" x2="${insetX + insetW}" y2="${dy}" stroke="#777" stroke-width="1.2"/>`;
+        svg += `<line x1="${insetX}" y1="${dy}" x2="${insetX + insetW}" y2="${dy}" stroke="#444" stroke-width="${ss(2)}"/>`;
       }
     }
 
@@ -676,12 +673,24 @@ function renderWallSvg(
       }
     }
 
-    // Module name — small label at bottom of module (does not overlap interior details)
-    const fontSize = Math.max(7, Math.min(11, mod.width / 14));
-    svg += `<text x="${mx + mod.width / 2}" y="${my + mod.height - 4}" text-anchor="middle" font-size="${fontSize}" font-weight="bold" fill="#333" font-family="Arial,sans-serif" opacity="0.7">${esc(mod.name)}</text>`;
+    // Module name — label at bottom of module
+    const fontSize = ss(Math.max(9, Math.min(14, mod.width / 12)));
+    svg += `<text x="${mx + mod.width / 2}" y="${my + mod.height - ss(6)}" text-anchor="middle" font-size="${fontSize}" font-weight="bold" fill="#222" font-family="Arial,sans-serif">${esc(mod.name)}</text>`;
 
-    // Module identification + dimensions below module (single line)
-    svg += `<text x="${mx + mod.width / 2}" y="${padT + wallH + 8}" text-anchor="middle" font-size="7" fill="#555" font-family="Arial,sans-serif">${mod.width}x${mod.height}x${mod.depth}</text>`;
+    // Descriptive label below module (function description)
+    const modDesc = modId.includes("cabideiro") ? "Cabideiro vestidos longos" :
+      modId.includes("sapateira") && modNotes.includes("boot") ? "Sapateira botas cano alto" :
+      modId.includes("sapateira") ? "Sapateira sapatos" :
+      modId.includes("vitrine") ? "Vitrine bolsas c/ LED" :
+      modId.includes("armas") ? "Armário armas c/ espelho" :
+      modId.includes("bancada") ? "Bancada makeup c/ espelho" :
+      modId.includes("gaveteiro") || modId.includes("ilha") ? "Gaveteiro ilha central" :
+      modId.includes("maleiro") ? "Maleiro / area malas" : "";
+    if (modDesc) {
+      svg += `<text x="${mx + mod.width / 2}" y="${padT + wallH + ss(10)}" text-anchor="middle" font-size="${ss(9)}" fill="#555" font-family="Arial,sans-serif" font-style="italic">${modDesc}</text>`;
+    }
+    // Dimensions below
+    svg += `<text x="${mx + mod.width / 2}" y="${padT + wallH + ss(22)}" text-anchor="middle" font-size="${ss(8)}" fill="#666" font-family="Arial,sans-serif">${mod.width}x${mod.height}x${mod.depth}</text>`;
 
     // Level 1 COTAS (CABINETS): individual module widths
     const dimY1 = padT + wallH + 15;
