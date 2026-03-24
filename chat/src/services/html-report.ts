@@ -107,6 +107,13 @@ function svgDefs(prefix: string = ""): string {
     <pattern id="${prefix}wasteHatch" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
       <line x1="0" y1="0" x2="0" y2="10" stroke="#e0d0d0" stroke-width="0.7"/>
     </pattern>
+    <pattern id="${prefix}wallHatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#888" stroke-width="0.6"/>
+    </pattern>
+    <pattern id="${prefix}wallHatchX" patternUnits="userSpaceOnUse" width="6" height="6">
+      <line x1="0" y1="0" x2="6" y2="6" stroke="#888" stroke-width="0.5"/>
+      <line x1="6" y1="0" x2="0" y2="6" stroke="#888" stroke-width="0.5"/>
+    </pattern>
   </defs>`;
 }
 
@@ -137,6 +144,58 @@ function dimLine(
     lines += `<text x="${x - 4}" y="${(y1 + y2) / 2}" text-anchor="middle" font-size="${fontSize}" fill="${DIM_RED}" font-weight="bold" class="dim-label" transform="rotate(-90 ${x - 4} ${(y1 + y2) / 2})">${label}</text>`;
   }
   return lines;
+}
+
+/** Internal vertical cotas for module interiors — shows each shelf/bar/drawer height */
+function internalVCotas(
+  mx: number, my: number, modW: number, modH: number,
+  heights: number[], // array of y-offsets from module top (in mm)
+  prefix: string, ss: (n: number) => number,
+): string {
+  if (heights.length === 0) return "";
+  let svg = "";
+  const cx = mx + modW + ss(12); // right side of module
+  // Sort heights ascending
+  const sorted = [...heights].sort((a, b) => a - b);
+  // Add top (0) and bottom (modH) as anchors
+  const anchors = [0, ...sorted, modH];
+  for (let i = 0; i < anchors.length - 1; i++) {
+    const y1 = my + anchors[i];
+    const y2 = my + anchors[i + 1];
+    const span = anchors[i + 1] - anchors[i];
+    if (span < 30) continue; // skip tiny gaps
+    // Small tick marks
+    svg += `<line x1="${mx + modW + ss(4)}" y1="${y1}" x2="${cx + ss(4)}" y2="${y1}" stroke="${DIM_RED}" stroke-width="0.4"/>`;
+    svg += `<line x1="${mx + modW + ss(4)}" y1="${y2}" x2="${cx + ss(4)}" y2="${y2}" stroke="${DIM_RED}" stroke-width="0.4"/>`;
+    // Vertical line
+    svg += `<line x1="${cx}" y1="${y1 + 2}" x2="${cx}" y2="${y2 - 2}" stroke="${DIM_RED}" stroke-width="0.5"/>`;
+    // Label
+    const labelY = (y1 + y2) / 2;
+    svg += `<text x="${cx + ss(4)}" y="${labelY + 3}" font-size="${ss(7)}" fill="${DIM_RED}" font-weight="bold" font-family="Arial,sans-serif">${Math.round(span)}</text>`;
+  }
+  return svg;
+}
+
+/** Material callout leader: line from point to annotation box */
+function materialCallout(
+  x1: number, y1: number, // origin point on drawing
+  x2: number, y2: number, // annotation box position
+  label: string,
+  prefix: string,
+  ss: (n: number) => number,
+): string {
+  let svg = "";
+  // Small circle at origin
+  svg += `<circle cx="${x1}" cy="${y1}" r="${ss(2)}" fill="${DIM_RED}" stroke="none"/>`;
+  // Leader line (thin, with elbow)
+  const elbowX = x2;
+  const elbowY = y1;
+  svg += `<polyline points="${x1},${y1} ${elbowX},${elbowY} ${x2},${y2}" fill="none" stroke="#555" stroke-width="${ss(0.6)}"/>`;
+  // Annotation text
+  svg += `<text x="${x2 + ss(3)}" y="${y2 + ss(3)}" font-size="${ss(7)}" fill="#444" font-family="Arial,sans-serif" font-style="italic">${label}</text>`;
+  // Underline
+  svg += `<line x1="${x2}" y1="${y2 + ss(5)}" x2="${x2 + label.length * ss(4)}" y2="${y2 + ss(5)}" stroke="#555" stroke-width="${ss(0.4)}"/>`;
+  return svg;
 }
 
 /* ============================================================
@@ -516,9 +575,14 @@ function renderWallSvg(
     // Module body
     svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="${fill}" stroke="#333" stroke-width="${ss(2)}"/>`;
 
-    // 18mm side panels (visible thickness like in Promob)
-    svg += `<line x1="${mx}" y1="${my}" x2="${mx}" y2="${my + mod.height}" stroke="#555" stroke-width="${ss(1.5)}"/>`;
-    svg += `<line x1="${mx + mod.width}" y1="${my}" x2="${mx + mod.width}" y2="${my + mod.height}" stroke="#555" stroke-width="${ss(1.5)}"/>`;
+    // 18mm side panels with ABNT hatch fill (solid material cross-section)
+    svg += `<rect x="${mx}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#555" stroke-width="${ss(0.8)}"/>`;
+    svg += `<rect x="${mx + mod.width - 18}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#555" stroke-width="${ss(0.8)}"/>`;
+    // Top/bottom panels 18mm
+    svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="18" fill="url(#${prefix}_wallHatch)" stroke="#555" stroke-width="${ss(0.5)}" opacity="0.6"/>`;
+    svg += `<rect x="${mx}" y="${my + mod.height - 18}" width="${mod.width}" height="18" fill="url(#${prefix}_wallHatch)" stroke="#555" stroke-width="${ss(0.5)}" opacity="0.6"/>`;
+    // Depth label below module name
+    svg += `<text x="${mx + mod.width / 2}" y="${padT + wallH + ss(34)}" text-anchor="middle" font-size="${ss(7)}" fill="#888" font-family="Arial,sans-serif" font-style="italic">Prof. ${mod.depth}mm</text>`;
 
     // Interior details based on module type
     const modId = (mod.moduleId || "").toLowerCase();
@@ -707,6 +771,53 @@ function renderWallSvg(
       }
     }
 
+    // === INTERNAL VERTICAL COTAS (per-module shelf/bar/drawer heights) ===
+    {
+      const intHeights: number[] = [];
+      if (modId.includes("cabideiro")) {
+        intHeights.push(Math.round(mod.height * 0.08)); // bar height
+      } else if (modId.includes("prateleira")) {
+        const sc = 6; const sp = mod.height / (sc + 1);
+        for (let s = 1; s <= sc; s++) intHeights.push(Math.round(s * sp));
+      } else if (modId.includes("sapateira")) {
+        const isB = modNotes.includes("boot") || modId.includes("bota");
+        const sc = isB ? 5 : 6; const sp = mod.height / (sc + 1);
+        for (let s = 1; s <= sc; s++) intHeights.push(Math.round(s * sp));
+      } else if (modId.includes("vitrine")) {
+        const sc = 5; const sp = mod.height / (sc + 1);
+        for (let s = 1; s <= sc; s++) intHeights.push(Math.round(s * sp));
+      } else if (modId.includes("gaveteiro") || modId.includes("ilha")) {
+        const dc = Math.max(3, Math.min(6, Math.floor(mod.height / 150)));
+        const dh = mod.height / dc;
+        for (let d = 1; d < dc; d++) intHeights.push(Math.round(d * dh));
+      } else if (modId.includes("bancada") || modId.includes("vanity")) {
+        intHeights.push(Math.round(mod.height * 0.1)); // mirror top
+        intHeights.push(Math.round(mod.height * 0.45)); // mirror bottom
+        intHeights.push(Math.round(mod.height * 0.50)); // counter
+      } else if (modId.includes("armas")) {
+        const sc = 5; const sp = (mod.height * 0.7) / sc;
+        for (let s = 1; s <= sc; s++) intHeights.push(Math.round(15 + s * sp));
+        intHeights.push(Math.round(mod.height * 0.75)); // cases start
+      }
+      if (intHeights.length > 0) {
+        svg += internalVCotas(mx, my, mod.width, mod.height, intHeights, `${prefix}_`, ss);
+      }
+    }
+
+    // === MATERIAL CALLOUT LEADER (first module of each type) ===
+    {
+      const matName = mod.cutList?.[0]?.material || "MDP 18mm";
+      const calloutX = mx + mod.width + ss(30);
+      const calloutY = my + mod.height * 0.3;
+      if (modId.includes("vitrine")) {
+        svg += materialCallout(insetX + insetW / 2, my + mod.height * 0.3, calloutX, calloutY - ss(20), "Vidro temp. 8mm + LED", `${prefix}_`, ss);
+      } else if (modId.includes("armas")) {
+        svg += materialCallout(mx + mod.width / 2, my + ss(20), calloutX, calloutY - ss(20), "Espelho + sensor porta", `${prefix}_`, ss);
+      } else if (modId.includes("bancada")) {
+        svg += materialCallout(mx + mod.width / 2, my + mod.height * 0.5, calloutX, calloutY, "Bancada " + matName, `${prefix}_`, ss);
+      }
+    }
+
     // Module name — label at bottom of module
     const fontSize = ss(Math.max(9, Math.min(14, mod.width / 12)));
     svg += `<text x="${mx + mod.width / 2}" y="${my + mod.height - ss(6)}" text-anchor="middle" font-size="${fontSize}" font-weight="bold" fill="#222" font-family="Arial,sans-serif">${esc(mod.name)}</text>`;
@@ -821,9 +932,12 @@ function renderWallInteriorSvg(
 
     // Module outline (solid = open, no doors)
     svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="#FAFAFA" stroke="#666" stroke-width="1.5"/>`;
-    // 18mm side panels
-    svg += `<line x1="${mx + 18}" y1="${my}" x2="${mx + 18}" y2="${my + mod.height}" stroke="#aaa" stroke-width="0.8" stroke-dasharray="4,3"/>`;
-    svg += `<line x1="${mx + mod.width - 18}" y1="${my}" x2="${mx + mod.width - 18}" y2="${my + mod.height}" stroke="#aaa" stroke-width="0.8" stroke-dasharray="4,3"/>`;
+    // 18mm side panels with ABNT hatch
+    svg += `<rect x="${mx}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#999" stroke-width="0.5"/>`;
+    svg += `<rect x="${mx + mod.width - 18}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#999" stroke-width="0.5"/>`;
+    // Top/bottom panels
+    svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="18" fill="url(#${prefix}_wallHatch)" stroke="#999" stroke-width="0.3" opacity="0.5"/>`;
+    svg += `<rect x="${mx}" y="${my + mod.height - 18}" width="${mod.width}" height="18" fill="url(#${prefix}_wallHatch)" stroke="#999" stroke-width="0.3" opacity="0.5"/>`;
 
     if (mt === "upper") {
       // Maleiro interior — open space with divider + suitcase outlines
@@ -976,6 +1090,44 @@ function renderWallInteriorSvg(
       }
       svg += `<text x="${mx + mod.width / 2}" y="${my + 14}" text-anchor="middle" font-size="8" font-weight="bold" fill="#555" font-family="Arial,sans-serif">PRATELEIRAS</text>`;
     }
+
+    // Internal vertical cotas (SEM portas — full detail)
+    {
+      const intH: number[] = [];
+      const ssI = (n: number) => n; // no scaling in interior view
+      if (modId.includes("cabideiro")) {
+        intH.push(Math.round(mod.height * 0.06));
+      } else if (modId.includes("sapateira")) {
+        const isB = modNotes.includes("boot") || modId.includes("bota");
+        const sc = isB ? 5 : 6; const sp = mod.height / (sc + 1);
+        for (let s = 1; s <= sc; s++) intH.push(Math.round(s * sp));
+      } else if (modId.includes("vitrine")) {
+        const sc = 5; const sp = mod.height / (sc + 1);
+        for (let s = 1; s <= sc; s++) intH.push(Math.round(s * sp));
+      } else if (modId.includes("gaveteiro") || modId.includes("ilha")) {
+        const dc = Math.max(3, Math.min(7, Math.floor(mod.height / 180)));
+        const dh = (mod.height - 16) / dc;
+        for (let d = 1; d < dc; d++) intH.push(Math.round(8 + d * dh));
+      } else if (modId.includes("bancada") || modId.includes("vanity")) {
+        intH.push(Math.round(mod.height * 0.12));
+        intH.push(Math.round(mod.height * 0.42));
+        intH.push(Math.round(mod.height * 0.48));
+      } else if (modId.includes("armas")) {
+        const sc = 5; const sp = (mod.height * 0.7) / sc;
+        for (let s = 1; s <= sc; s++) intH.push(Math.round(15 + s * sp));
+        intH.push(Math.round(mod.height * 0.75));
+      } else if (modId.includes("prateleira") || mod.height > 600) {
+        const sc = Math.max(3, Math.min(8, Math.floor(mod.height / 350)));
+        const sp = mod.height / (sc + 1);
+        for (let s = 1; s <= sc; s++) intH.push(Math.round(s * sp));
+      }
+      if (intH.length > 0) {
+        svg += internalVCotas(mx, my, mod.width, mod.height, intH, `${prefix}_`, ssI);
+      }
+    }
+
+    // Depth label
+    svg += `<text x="${mx + mod.width / 2}" y="${padT + wallH + 40}" text-anchor="middle" font-size="7" fill="#888" font-family="Arial,sans-serif" font-style="italic">Prof. ${mod.depth}mm</text>`;
 
     // Module label
     const fontSize = Math.max(8, Math.min(12, mod.width / 12));
@@ -1336,6 +1488,165 @@ function renderMakeupGunSvg(briefing: ParsedBriefing, modules: BlueprintModule[]
 
   // Material labels
   svg += `<text x="${gsOx + gsAreaW / 2}" y="${gsOy + gsAreaH - 5}" text-anchor="middle" font-size="7" fill="#888" font-family="Arial,sans-serif">Porta: Espelho | Corpo: MDP 18mm | Prateleiras: MDP 15mm + LED</text>`;
+
+  svg += `</svg>`;
+  return svg;
+}
+
+/* ============================================================
+   SVG: Section Views (Corte A-A', B-B')
+   ============================================================ */
+function renderSectionViewsSvg(briefing: ParsedBriefing, results: EngineResults): string {
+  const bp = results.blueprint;
+  const walls = briefing.space?.walls || [];
+  let roomW = 0, roomD = 0;
+  if (walls.length >= 2) {
+    roomW = Math.max(...walls.map(w => w.length_m)) * 1000;
+    const sorted = walls.map(w => w.length_m * 1000).sort((a, b) => b - a);
+    roomD = sorted[1] || sorted[0] || 4000;
+  }
+  if (roomW === 0) roomW = bp.mainWall.totalWidth || 5000;
+  if (roomD === 0) roomD = roomW * 0.8;
+  const ceilingH = (briefing.space?.ceiling_height_m || 2.8) * 1000;
+  const modDepth = 600; // standard module depth
+
+  const vW = 900, vH = 550;
+  let svg = `<svg viewBox="0 0 ${vW} ${vH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;height:auto;display:block;margin:0 auto;background:#fff;">`;
+  svg += svgDefs("sec_");
+
+  // Section A-A': Horizontal cut through room looking toward north wall (depth profile)
+  const secAx = 30, secAy = 30;
+  const secAw = 400, secAh = 220;
+  const scA = Math.min((secAw - 60) / roomD, (secAh - 60) / ceilingH);
+  const rD = roomD * scA;
+  const rH = ceilingH * scA;
+  const rx = secAx + 30;
+  const ry = secAy + secAh - rH - 20;
+
+  svg += `<text x="${secAx + secAw / 2}" y="${secAy}" text-anchor="middle" font-size="12" font-weight="bold" fill="${STROKE}" font-family="Arial,sans-serif">CORTE A-A' — Vista Transversal</text>`;
+
+  // Room outline
+  svg += `<rect x="${rx}" y="${ry}" width="${rD}" height="${rH}" fill="#FEFEFE" stroke="${STROKE}" stroke-width="1.5"/>`;
+  // Floor
+  svg += `<line x1="${rx - 10}" y1="${ry + rH}" x2="${rx + rD + 10}" y2="${ry + rH}" stroke="${STROKE}" stroke-width="3"/>`;
+  for (let hx = rx - 10; hx < rx + rD + 10; hx += 10) {
+    svg += `<line x1="${hx}" y1="${ry + rH}" x2="${hx - 5}" y2="${ry + rH + 5}" stroke="${STROKE}" stroke-width="0.4"/>`;
+  }
+  // Ceiling
+  svg += `<line x1="${rx - 10}" y1="${ry}" x2="${rx + rD + 10}" y2="${ry}" stroke="#999" stroke-width="1" stroke-dasharray="8,4"/>`;
+
+  // Left wall modules (back, north wall modules seen from side)
+  const mDepthPx = modDepth * scA;
+  svg += `<rect x="${rx}" y="${ry}" width="${mDepthPx}" height="${rH}" fill="#E8E0D0" stroke="${STROKE}" stroke-width="1"/>`;
+  svg += `<rect x="${rx}" y="${ry}" width="${mDepthPx}" height="${rH}" fill="url(#sec_wallHatch)" opacity="0.3"/>`;
+  svg += `<text x="${rx + mDepthPx / 2}" y="${ry + rH / 2}" text-anchor="middle" font-size="8" fill="#555" font-family="Arial,sans-serif" transform="rotate(-90, ${rx + mDepthPx / 2}, ${ry + rH / 2})">MODULOS PAREDE N</text>`;
+
+  // Right wall modules (if side wall exists)
+  if (bp.sideWall && bp.sideWall.modules.length > 0) {
+    svg += `<rect x="${rx + rD - mDepthPx}" y="${ry}" width="${mDepthPx}" height="${rH}" fill="#E0E8E0" stroke="${STROKE}" stroke-width="1"/>`;
+    svg += `<text x="${rx + rD - mDepthPx / 2}" y="${ry + rH / 2}" text-anchor="middle" font-size="8" fill="#555" font-family="Arial,sans-serif" transform="rotate(-90, ${rx + rD - mDepthPx / 2}, ${ry + rH / 2})">PAREDE LATERAL</text>`;
+  }
+
+  // Island (if present, shown in center)
+  const islandZone = (briefing.zones || []).find(z => z.name.toLowerCase().includes("ilha"));
+  if (islandZone) {
+    const iD = (islandZone.dimensions?.depth_m || 0.6) * 1000 * scA;
+    const iH = 900 * scA;
+    const iX = rx + rD / 2 - iD / 2;
+    const iY = ry + rH - iH;
+    svg += `<rect x="${iX}" y="${iY}" width="${iD}" height="${iH}" fill="#F5F2ED" stroke="${STROKE}" stroke-width="1"/>`;
+    svg += `<text x="${iX + iD / 2}" y="${iY + iH / 2 + 3}" text-anchor="middle" font-size="7" fill="#555" font-family="Arial,sans-serif">ILHA</text>`;
+  }
+
+  // Circulation arrows
+  const circY = ry + rH - 15;
+  svg += `<line x1="${rx + mDepthPx + 10}" y1="${circY}" x2="${rx + rD - mDepthPx - 10}" y2="${circY}" stroke="${GOLD}" stroke-width="1.5" marker-end="url(#sec_arrowBlkE)" stroke-dasharray="4,2"/>`;
+  svg += `<text x="${rx + rD / 2}" y="${circY - 5}" text-anchor="middle" font-size="7" fill="${GOLD}" font-family="Arial,sans-serif">CIRCULACAO</text>`;
+
+  // Dimensions
+  svg += dimLine(rx, ry + rH + 12, rx + rD, ry + rH + 12, `${roomD} mm`, 9, "sec_");
+  svg += dimLine(rx - 15, ry, rx - 15, ry + rH, `${ceilingH} mm`, 9, "sec_");
+  svg += dimLine(rx, ry + rH + 25, rx + mDepthPx, ry + rH + 25, `${modDepth}`, 7, "sec_");
+
+  // Tolerance note
+  svg += `<text x="${rx}" y="${ry - 8}" font-size="7" fill="#888" font-family="Arial,sans-serif">Desconto parede: 5mm | Folga piso (rodape): 100mm</text>`;
+
+  // Section B-B': Longitudinal cut (side view through main wall)
+  const secBx = 470, secBy = 30;
+  const secBw = 400, secBh = 220;
+  const scB = Math.min((secBw - 60) / roomW, (secBh - 60) / ceilingH);
+  const rW2 = roomW * scB;
+  const rH2 = ceilingH * scB;
+  const rx2 = secBx + 30;
+  const ry2 = secBy + secBh - rH2 - 20;
+
+  svg += `<text x="${secBx + secBw / 2}" y="${secBy}" text-anchor="middle" font-size="12" font-weight="bold" fill="${STROKE}" font-family="Arial,sans-serif">CORTE B-B' — Vista Longitudinal</text>`;
+
+  // Room outline
+  svg += `<rect x="${rx2}" y="${ry2}" width="${rW2}" height="${rH2}" fill="#FEFEFE" stroke="${STROKE}" stroke-width="1.5"/>`;
+  svg += `<line x1="${rx2 - 10}" y1="${ry2 + rH2}" x2="${rx2 + rW2 + 10}" y2="${ry2 + rH2}" stroke="${STROKE}" stroke-width="3"/>`;
+  for (let hx = rx2 - 10; hx < rx2 + rW2 + 10; hx += 10) {
+    svg += `<line x1="${hx}" y1="${ry2 + rH2}" x2="${hx - 5}" y2="${ry2 + rH2 + 5}" stroke="${STROKE}" stroke-width="0.4"/>`;
+  }
+
+  // Module silhouettes from side
+  const mainMods = bp.mainWall.modules;
+  for (const mod of mainMods) {
+    const mxB = rx2 + (mod.position?.x || 0) * scB;
+    const mwB = mod.width * scB;
+    const mhB = mod.height * scB;
+    const myB = ry2 + rH2 - (mod.position?.y || 0) * scB - mhB;
+    svg += `<rect x="${mxB}" y="${myB}" width="${mwB}" height="${mhB}" fill="#E8E0D0" stroke="${STROKE}" stroke-width="0.8" opacity="0.7"/>`;
+  }
+
+  // Dimensions
+  svg += dimLine(rx2, ry2 + rH2 + 12, rx2 + rW2, ry2 + rH2 + 12, `${roomW} mm`, 9, "sec_");
+  svg += dimLine(rx2 - 15, ry2, rx2 - 15, ry2 + rH2, `${ceilingH} mm`, 9, "sec_");
+
+  // Detail C: Rodape detail
+  const d3x = 30, d3y = 310;
+  svg += `<text x="${d3x}" y="${d3y}" font-size="11" font-weight="bold" fill="#333" font-family="Arial,sans-serif">DET. RODAPE — Folga Piso</text>`;
+  // Floor
+  svg += `<line x1="${d3x}" y1="${d3y + 90}" x2="${d3x + 200}" y2="${d3y + 90}" stroke="${STROKE}" stroke-width="2"/>`;
+  for (let hx = d3x; hx < d3x + 200; hx += 8) {
+    svg += `<line x1="${hx}" y1="${d3y + 90}" x2="${hx - 4}" y2="${d3y + 94}" stroke="${STROKE}" stroke-width="0.4"/>`;
+  }
+  // Module bottom
+  svg += `<rect x="${d3x + 10}" y="${d3y + 10}" width="130" height="70" fill="#E8E0D0" stroke="${STROKE}" stroke-width="1.5"/>`;
+  svg += `<rect x="${d3x + 10}" y="${d3y + 10}" width="130" height="70" fill="url(#sec_hatchPattern)" opacity="0.15"/>`;
+  // Rodape gap
+  svg += dimLine(d3x + 150, d3y + 80, d3x + 150, d3y + 90, "100mm", 7, "sec_");
+  svg += `<text x="${d3x + 75}" y="${d3y + 86}" text-anchor="middle" font-size="7" fill="#888" font-family="Arial,sans-serif">Rodape 100mm</text>`;
+  // Wall desconto
+  svg += `<line x1="${d3x + 5}" y1="${d3y + 10}" x2="${d3x + 5}" y2="${d3y + 90}" stroke="${STROKE}" stroke-width="2"/>`;
+  svg += dimLine(d3x + 5, d3y + 100, d3x + 10, d3y + 100, "5mm", 6, "sec_");
+  svg += `<text x="${d3x + 30}" y="${d3y + 108}" font-size="6" fill="#888" font-family="Arial,sans-serif">Desconto parede</text>`;
+
+  // Detail D: Door clearance
+  const d4x = 280, d4y = 310;
+  svg += `<text x="${d4x}" y="${d4y}" font-size="11" font-weight="bold" fill="#333" font-family="Arial,sans-serif">DET. FOLGA PORTA — Dobradica</text>`;
+  // Side panel
+  svg += `<rect x="${d4x}" y="${d4y + 10}" width="18" height="120" fill="url(#sec_wallHatch)" stroke="#333" stroke-width="1.5"/>`;
+  // Door (slightly ajar)
+  svg += `<line x1="${d4x + 18}" y1="${d4y + 10}" x2="${d4x + 100}" y2="${d4y + 18}" stroke="#333" stroke-width="1.5"/>`;
+  svg += `<line x1="${d4x + 18}" y1="${d4y + 130}" x2="${d4x + 100}" y2="${d4y + 138}" stroke="#333" stroke-width="1.5"/>`;
+  svg += `<rect x="${d4x + 100}" y="${d4y + 18}" width="18" height="120" fill="#C8B8A0" stroke="#333" stroke-width="1" transform="rotate(5, ${d4x + 109}, ${d4y + 78})"/>`;
+  // Gap dimensions
+  svg += `<text x="${d4x + 22}" y="${d4y + 75}" font-size="7" fill="${DIM_RED}" font-family="Arial,sans-serif">3mm gap</text>`;
+  // Overlay (door overlap 18mm)
+  svg += dimLine(d4x + 130, d4y + 18, d4x + 130, d4y + 138, "Porta", 7, "sec_");
+  svg += `<text x="${d4x}" y="${d4y + 150}" font-size="7" fill="#888" font-family="Arial,sans-serif">Sobreposicao porta: 18mm sobre lateral</text>`;
+
+  // Detail E: Module-to-module gap
+  const d5x = 550, d5y = 310;
+  svg += `<text x="${d5x}" y="${d5y}" font-size="11" font-weight="bold" fill="#333" font-family="Arial,sans-serif">DET. FOLGA ENTRE MODULOS</text>`;
+  svg += `<rect x="${d5x}" y="${d5y + 10}" width="60" height="100" fill="url(#sec_wallHatch)" stroke="#333" stroke-width="1"/>`;
+  svg += `<rect x="${d5x + 63}" y="${d5y + 10}" width="60" height="100" fill="url(#sec_wallHatch)" stroke="#333" stroke-width="1"/>`;
+  svg += dimLine(d5x + 60, d5y + 120, d5x + 63, d5y + 120, "3mm", 7, "sec_");
+  svg += `<text x="${d5x + 61}" y="${d5y + 60}" text-anchor="middle" font-size="8" fill="${DIM_RED}" font-family="Arial,sans-serif" transform="rotate(-90, ${d5x + 61}, ${d5y + 60})">3mm</text>`;
+  svg += `<text x="${d5x}" y="${d5y + 135}" font-size="7" fill="#888" font-family="Arial,sans-serif">Folga entre modulos adjacentes: 2-3mm</text>`;
+
+  svg += `<text x="${vW / 2}" y="${vH - 5}" text-anchor="middle" font-size="8" fill="#888" font-family="Arial,sans-serif">Cortes de secao — Escala esquematica — Medidas em mm</text>`;
 
   svg += `</svg>`;
   return svg;
@@ -1891,6 +2202,7 @@ export function generateHtmlReport(briefing: ParsedBriefing, results: EngineResu
   dynamicCount += 1; // Plano de Corte
   dynamicCount += 1; // Ferragens
   dynamicCount += 1; // Detalhes Construtivos
+  dynamicCount += 1; // Cortes de Secao
   dynamicCount += 1; // Vista Isometrica 3D
   // If no walls, add extra prancha for additional zones
   if (walls.length === 0) dynamicCount++; // placeholder wall prancha
@@ -1913,6 +2225,7 @@ export function generateHtmlReport(briefing: ParsedBriefing, results: EngineResu
   pranchaIndex.push({ num: pNum++, title: "PLANO DE CORTE (NESTING)" });
   pranchaIndex.push({ num: pNum++, title: "FERRAGENS" });
   pranchaIndex.push({ num: pNum++, title: "DETALHES CONSTRUTIVOS" });
+  pranchaIndex.push({ num: pNum++, title: "CORTES DE SECAO" });
   pranchaIndex.push({ num: pNum++, title: "VISTA ISOMETRICA 3D" });
 
   // Prancha number tracker
@@ -2318,7 +2631,7 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
     <tr>
       <th>#</th><th>Peca</th><th>Modulo</th><th>Zona</th><th>Qtd</th>
       <th>Largura mm</th><th>Altura mm</th><th>Esp. mm</th>
-      <th>Material</th><th>Fita de Borda</th><th>Veio</th><th>Cor</th>
+      <th>Material</th><th>Fita Borda (faces)</th><th>Veio</th><th>Cor</th>
     </tr>
     ${(() => {
       let tbl = "";
@@ -2326,10 +2639,30 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
       for (const [zone, cuts] of Object.entries(cutsByZone)) {
         tbl += `<tr class="zone-header"><td colspan="12">${esc(zone)}</td></tr>`;
         for (const c of cuts) {
+          // Determine edge banding per face based on piece type
+          const pLow = c.piece.toLowerCase();
+          let edgeFaces = c.edge || "-";
+          if (edgeFaces !== "-" && edgeFaces !== "none") {
+            if (pLow.includes("lateral") || pLow.includes("side")) {
+              edgeFaces = "F,S,I (3 faces)"; // frente, superior, inferior
+            } else if (pLow.includes("prateleira") || pLow.includes("shelf")) {
+              edgeFaces = "F (1 face frontal)";
+            } else if (pLow.includes("fundo") || pLow.includes("back")) {
+              edgeFaces = "— (sem fita)";
+            } else if (pLow.includes("porta") || pLow.includes("door") || pLow.includes("frente") || pLow.includes("front")) {
+              edgeFaces = "4 faces (perimetro)";
+            } else if (pLow.includes("tampo") || pLow.includes("top")) {
+              edgeFaces = "4 faces (perimetro)";
+            } else if (pLow.includes("divisor") || pLow.includes("divider")) {
+              edgeFaces = "F (1 face visivel)";
+            } else {
+              edgeFaces = "F,S (2 faces visiveis)";
+            }
+          }
           tbl += `<tr>
             <td>${idx++}</td><td>${esc(c.piece)}</td><td>${esc(c.module)}</td><td>${esc(c.zone)}</td>
             <td>${c.qty}</td><td>${c.w}</td><td>${c.h}</td><td>${c.thickness}</td>
-            <td>${esc(c.material)}</td><td>${esc(c.edge)}</td><td>${c.grain}</td>
+            <td>${esc(c.material)}</td><td>${esc(edgeFaces)}</td><td>${c.grain}</td>
             <td><span style="display:inline-block;width:14px;height:14px;background:${c.colorHex || "#ccc"};border:1px solid #999;vertical-align:middle;border-radius:2px"></span> ${esc(c.colorHex || "-")}</td>
           </tr>`;
         }
@@ -2506,6 +2839,22 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
   </table>`;
   })()}
 
+  <!-- Tolerance & Fit Notes -->
+  <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:#333">Tolerancias e Descontos de Montagem</h3>
+  <table>
+    <tr><th>Item</th><th>Valor</th><th>Observacao</th></tr>
+    <tr><td>Desconto parede (lado encostado)</td><td>5 mm</td><td>Aplicar em cada lateral encostada na alvenaria</td></tr>
+    <tr><td>Folga entre modulos adjacentes</td><td>2–3 mm</td><td>Permite ajuste e dilatacao termica</td></tr>
+    <tr><td>Rodape (folga piso-movel)</td><td>70–100 mm</td><td>Padrao 100mm — ajustar conforme rodape existente</td></tr>
+    <tr><td>Sobreposicao porta sobre lateral</td><td>18 mm</td><td>Dobradica 35mm copo — sobreposicao total</td></tr>
+    <tr><td>Folga porta-porta (duas portas)</td><td>3 mm</td><td>Entre frontal de portas adjacentes</td></tr>
+    <tr><td>Desconto corrediça (porta correr)</td><td>12–15 mm</td><td>Por trilho — conforme modelo do trilho</td></tr>
+    <tr><td>Clearance gaveta (puxar + corpo)</td><td>Prof. gaveta + 200 mm</td><td>Espaco livre frontal para abertura total</td></tr>
+    <tr><td>Clearance ilha (todos os lados)</td><td>Min. 600 mm</td><td>Circulacao minima ao redor da ilha central</td></tr>
+    <tr><td>Prateleira vao maximo sem suporte</td><td>900 mm</td><td>Acima disso necessita suporte central</td></tr>
+    <tr><td>Fita de borda</td><td>ABS/PVC</td><td>Todas as faces visiveis — largura = espessura da chapa</td></tr>
+  </table>
+
   <!-- Summary -->
   <div style="margin-top:20px;padding:16px;background:#f5f5f5;border-radius:6px;border-left:4px solid ${GOLD}">
     <p style="font-size:13px;font-weight:700;margin-bottom:6px">Resumo Final</p>
@@ -2518,6 +2867,21 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
   </div>
 
   ${pF(pDC)}
+</div>
+
+<!-- ================================================================ -->
+<!-- PRANCHA — CORTES DE SECAO                                      -->
+<!-- ================================================================ -->
+`;
+  const pSEC = nextPrancha();
+  html += `
+<div class="prancha" id="prancha-${String(pSEC).padStart(2, "0")}">
+  ${pH(pSEC, "CORTES DE SECAO", "A2 Landscape")}
+  <p style="font-size:11px;color:#666;margin-bottom:8px">Vistas transversal (A-A') e longitudinal (B-B') com profundidades, circulacao, detalhes de rodape, folga de portas e entre modulos.</p>
+  <div class="svg-wrap">
+    ${renderSectionViewsSvg(briefing, results)}
+  </div>
+  ${pF(pSEC, "Esquematica")}
 </div>
 
 <!-- ================================================================ -->
