@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMA ID - Desenhos Tecnicos - Closet Sabrina Parkland</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #f5f5f0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1a1a1a; }
+
+.header {
+  background: #fff; border-bottom: 3px solid #1a1a1a;
+  padding: 30px 40px; display: flex; align-items: center; gap: 30px;
+}
+.logo { font-size: 32px; font-weight: 800; letter-spacing: 2px; }
+.logo span { color: #c0392b; }
+.header-info { flex: 1; }
+.header-info h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.header-info p { font-size: 13px; color: #666; }
+.header-meta { text-align: right; font-size: 12px; color: #888; line-height: 1.8; }
+.header-meta strong { color: #1a1a1a; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 30px 20px 60px; }
+
+.summary {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px; margin-bottom: 40px;
+}
+.stat-card {
+  background: #fff; border: 1px solid #ddd; border-radius: 6px;
+  padding: 16px 20px; text-align: center;
+}
+.stat-card .value { font-size: 28px; font-weight: 700; color: #c0392b; }
+.stat-card .label { font-size: 12px; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.sheets-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.sheet-card {
+  background: #fff; border: 1px solid #ccc; border-radius: 6px;
+  overflow: hidden; transition: box-shadow 0.2s, transform 0.15s;
+  text-decoration: none; color: inherit; display: block;
+}
+.sheet-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.12); transform: translateY(-2px); }
+
+.sheet-preview {
+  height: 180px; background: #fafaf8; border-bottom: 1px solid #eee;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.sheet-preview .sheet-icon {
+  width: 240px; height: 160px; border: 2px solid #1a1a1a; background: #fff;
+  position: relative; padding: 12px;
+}
+.sheet-preview .sheet-icon::after {
+  content: ''; position: absolute; inset: 4px;
+  border: 1px solid #ccc;
+}
+.sheet-number {
+  position: absolute; top: 10px; left: 10px;
+  background: #c0392b; color: #fff; font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 3px;
+}
+.sheet-type {
+  position: absolute; top: 10px; right: 10px;
+  background: #eee; color: #555; font-size: 10px; font-weight: 600;
+  padding: 3px 8px; border-radius: 3px; text-transform: uppercase;
+}
+
+/* Mini preview drawings inside cards */
+.mini-floor .sheet-icon { }
+.mini-floor .room { position: absolute; inset: 20px 30px; border: 2px solid #333; }
+.mini-floor .island { position: absolute; width: 30px; height: 16px; border: 1px solid #333; background: #f0e8d0; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.mini-floor .zone1 { position: absolute; right: 6px; top: 6px; bottom: 6px; width: 20%; background: rgba(232,213,224,0.4); border-left: 1px solid #999; }
+.mini-floor .zone2 { position: absolute; left: 6px; top: 6px; bottom: 6px; width: 15%; background: rgba(213,224,232,0.4); border-right: 1px solid #999; }
+
+.mini-elev .lines { position: absolute; inset: 20px 30px; }
+.mini-elev .bar { position: absolute; width: 60%; height: 1px; background: #666; }
+.mini-elev .shelf { position: absolute; width: 30%; height: 1px; background: #333; left: 65%; }
+
+.mini-table .tbl { position: absolute; inset: 24px 34px; display: flex; flex-direction: column; gap: 3px; }
+.mini-table .tbl-row { height: 4px; background: #e8e8e8; border-radius: 1px; }
+.mini-table .tbl-row:nth-child(odd) { background: #d8d8d8; }
+.mini-table .tbl-header { height: 6px; background: #c0392b; border-radius: 1px; opacity: 0.6; }
+
+.mini-nest .blocks { position: absolute; inset: 20px 30px; }
+.mini-nest .block { position: absolute; border: 1px solid #333; background: #f5ead0; }
+
+.sheet-info { padding: 16px 20px; }
+.sheet-info h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.sheet-info p { font-size: 12px; color: #666; line-height: 1.5; }
+.sheet-info .meta { margin-top: 10px; display: flex; gap: 16px; font-size: 11px; color: #999; }
+.sheet-info .meta span { display: flex; align-items: center; gap: 4px; }
+
+.footer {
+  text-align: center; padding: 30px; font-size: 12px; color: #999;
+  border-top: 1px solid #ddd; margin-top: 40px;
+}
+
+@media print {
+  body { background: #fff; }
+  .sheet-card:hover { box-shadow: none; transform: none; }
+  .sheets-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .header { flex-direction: column; text-align: center; padding: 20px; }
+  .header-meta { text-align: center; }
+  .sheets-grid { grid-template-columns: 1fr; }
+  .summary { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">SOMA <span>ID</span></div>
+  <div class="header-info">
+    <h1>Desenhos Tecnicos de Producao</h1>
+    <p>Closet Sabrina Parkland &mdash; Parkland, FL</p>
+  </div>
+  <div class="header-meta">
+    <strong>Cliente:</strong> Sabrina<br>
+    <strong>Designer:</strong> Alana (B.Home Concept)<br>
+    <strong>Data:</strong> 03/22/2026<br>
+    <strong>Folhas:</strong> 8
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="summary">
+    <div class="stat-card">
+      <div class="value">8</div>
+      <div class="label">Folhas Tecnicas</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">149</div>
+      <div class="label">Pecas Cortadas</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">15</div>
+      <div class="label">Chapas Material</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">$3,157</div>
+      <div class="label">Custo Material (USD)</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">18.67</div>
+      <div class="label">Area Total (m2)</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">5</div>
+      <div class="label">Zonas</div>
+    </div>
+  </div>
+
+  <div class="sheets-grid">
+
+    <a class="sheet-card" href="folha_01_planta_baixa.html">
+      <div class="sheet-preview mini-floor">
+        <div class="sheet-icon">
+          <div class="room"></div>
+          <div class="island"></div>
+          <div class="zone1"></div>
+          <div class="zone2"></div>
+        </div>
+        <span class="sheet-number">01</span>
+        <span class="sheet-type">Planta</span>
+      </div>
+      <div class="sheet-info">
+        <h3>Planta Baixa Cotada</h3>
+        <p>Vista superior do closet com cotas externas e internas, posicao da ilha, passagens criticas e arco da porta. Escala 1:25.</p>
+        <div class="meta">
+          <span>A2 Landscape</span>
+          <span>1:25</span>
+          <span>5 zonas</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="sheet-card" href="folha_02_elevacao_closet_her.html">
+      <div class="sheet-preview mini-elev">
+        <div class="sheet-icon">
+          <div class="lines">
+            <div class="bar" style="top:20%"></div>
+            <div class="bar" style="top:45%; width:40%"></div>
+            <div class="bar" style="top:70%; width:40%"></div>
+            <div class="shelf" style="top:15%"></div>
+            <div class="shelf" style="top:30%"></div>
+            <div class="shelf" style="top:45%"></div>
+            <div class="shelf" style="top:60%"></div>
+            <div class="shelf" style="top:75%"></div>
+          </div>
+        </div>
+        <span class="sheet-number">02</span>
+        <span class="sheet-type">Elevacao</span>
+      </div>
+      <div class="sheet-info">
+        <h3>Elevacao Closet Her</h3>
+        <p>Parede leste completa: barras cabide, prateleiras, sapateira 30+6, vitrines bolsas com LED, area malas. Escala 1:20.</p>
+        <div class="meta">
+          <span>A2 Landscape</span>
+          <span>1:20</span>
+          <span>7 secoes</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="sheet-card" href="folha_03_elevacao_ilha.html">
+      <div class="sheet-preview mini-elev">
+        <div class="sheet-icon">
+          <div class="lines">
+            <div style="position:absolute;width:40%;height:40%;border:2px solid #333;top:10%;left:5%;background:#f5ead0"></div>
+            <div style="position:absolute;width:40%;height:40%;border:2px solid #333;top:10%;right:5%;background:#eee"></div>
+            <div style="position:absolute;width:40%;height:40%;border:2px solid #333;bottom:10%;left:5%;background:#f0f0f0"></div>
+            <div style="position:absolute;width:40%;height:40%;border:2px solid #333;bottom:10%;right:5%;background:#f0f0f0"></div>
+          </div>
+        </div>
+        <span class="sheet-number">03</span>
+        <span class="sheet-type">4 Vistas</span>
+      </div>
+      <div class="sheet-info">
+        <h3>Ilha Central - 4 Vistas</h3>
+        <p>Frontal, posterior, laterais. Gavetas categorizadas, tampo vidro, divisores veludo, corredicias soft-close. Escala 1:10.</p>
+        <div class="meta">
+          <span>A2 Landscape</span>
+          <span>1:10</span>
+          <span>5 gavetas</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="sheet-card" href="folha_04_elevacao_makeup_armas.html">
+      <div class="sheet-preview mini-elev">
+        <div class="sheet-icon">
+          <div class="lines">
+            <div style="position:absolute;width:45%;height:50%;border:1px solid #333;bottom:15%;left:5%;background:#f0e8f0"></div>
+            <div style="position:absolute;width:12%;height:35%;border:1px solid #888;bottom:55%;left:18%;background:#e8e8f0"></div>
+            <div style="position:absolute;width:40%;height:80%;border:2px solid #333;top:8%;right:5%;background:#ddd"></div>
+          </div>
+        </div>
+        <span class="sheet-number">04</span>
+        <span class="sheet-type">Elevacao</span>
+      </div>
+      <div class="sheet-info">
+        <h3>Makeup + Area Armas</h3>
+        <p>Bancada makeup com espelho e LED. Armario armas: porta espelho fechada/aberta, prateleiras LED, sensor. Escala 1:20.</p>
+        <div class="meta">
+          <span>A2 Landscape</span>
+          <span>1:20</span>
+          <span>2 zonas</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="sheet-card" href="folha_05_elevacao_closet_his.html">
+      <div class="sheet-preview mini-elev">
+        <div class="sheet-icon">
+          <div class="lines">
+            <div style="position:absolute;width:20%;height:80%;border:1px solid #333;top:8%;left:5%;"></div>
+            <div style="position:absolute;width:20%;height:80%;border:1px solid #333;top:8%;left:28%;"></div>
+            <div style="position:absolute;width:25%;height:80%;border:1px solid #333;top:8%;left:51%;"></div>
+            <div style="position:absolute;width:22%;height:80%;border:1px solid #333;top:8%;right:3%;"></div>
+            <div class="bar" style="top:25%;left:53%;width:22%"></div>
+          </div>
+        </div>
+        <span class="sheet-number">05</span>
+        <span class="sheet-type">Elevacao</span>
+      </div>
+      <div class="sheet-info">
+        <h3>Elevacao Closet His</h3>
+        <p>4 modulos parede oeste: 2x prateleiras (800mm), cabide (1200mm), sapateira inclinada (1230mm). Escala 1:20.</p>
+        <div class="meta">
+          <span>A2 Landscape</span>
+          <span>1:20</span>
+          <span>4 modulos</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="sheet-card" href="folha_06_ferragens.html">
+      <div class="sheet-preview mini-table">
+        <div class="sheet-icon">
+          <div class="tbl">
+            <div class="tbl-header"></div>
+            <div class="tbl-row"></div>
+            <div class="tbl-row"></div>
+            <div class="tbl-row"></div>
+            <div class="tbl-header"></div>
+            <div class="tbl-row"></div>
+            <div class="tbl-row"></div>
+            <div class="tbl-row"></div>
+            <div class="tbl-header"></div>
+            <div class="tbl-row"></div>
+            <div class="tbl-row"></div>
+          </div>
+        </div>
+        <span class="sheet-number">06</span>
+        <span class="sheet-type">Ferragens</span>
+      </div>
+      <div class="sheet-info">
+        <h3>Detalhamento de Ferragens</h3>
+        <p>Desenhos tecnicos + tabela completa: barras, corredicias, dobradicas, puxadores, sensor, LED. 13 itens com precos.</p>
+        <div class="meta">
+          <span>A2 Landscape</span>
+          <span>13 itens</span>
+          <span>$725.41</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="sheet-card" href="folha_07_nesting.html">
+      <div class="sheet-preview mini-nest">
+        <div class="sheet-icon">
+          <div class="blocks">
+            <div class="block" style="width:60%;height:35%;top:5%;left:5%"></div>
+            <div class="block" style="width:30%;height:35%;top:5%;right:5%"></div>
+            <div class="block" style="width:45%;height:25%;top:45%;left:5%"></div>
+            <div class="block" style="width:45%;height:25%;top:45%;right:5%"></div>
+            <div class="block" style="width:35%;height:20%;bottom:5%;left:5%"></div>
+            <div class="block" style="width:25%;height:20%;bottom:5%;left:45%"></div>
+            <div class="block" style="width:22%;height:20%;bottom:5%;right:5%"></div>
+          </div>
+        </div>
+        <span class="sheet-number">07</span>
+        <span class="sheet-type">Nesting</span>
+      </div>
+      <div class="sheet-info">
+        <h3>Plano de Corte (Nesting)</h3>
+        <p>Layout de corte otimizado: 11 chapas Lana, 2 Lord, 2 MDF. Pecas codificadas, aproveitamento ~78% (ATENCAO: abaixo da meta de 85%). Escala variavel.</p>
+        <div class="meta">
+          <span>A2 Landscape</span>
+          <span>15 chapas</span>
+          <span>149 pecas</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="sheet-card" href="folha_08_bom.html">
+      <div class="sheet-preview mini-table">
+        <div class="sheet-icon">
+          <div class="tbl">
+            <div class="tbl-header"></div>
+            <div class="tbl-row" style="width:95%"></div>
+            <div class="tbl-row" style="width:95%"></div>
+            <div class="tbl-row" style="width:95%"></div>
+            <div class="tbl-header"></div>
+            <div class="tbl-row" style="width:95%"></div>
+            <div class="tbl-row" style="width:95%"></div>
+            <div class="tbl-header"></div>
+            <div class="tbl-row" style="width:95%"></div>
+            <div class="tbl-row" style="width:95%"></div>
+            <div class="tbl-row" style="width:95%"></div>
+            <div class="tbl-header" style="background:#333"></div>
+          </div>
+        </div>
+        <span class="sheet-number">08</span>
+        <span class="sheet-type">BOM</span>
+      </div>
+      <div class="sheet-info">
+        <h3>Lista de Materiais (BOM)</h3>
+        <p>21 itens em 6 grupos: chapas, vidros, ferragens fixacao/movimento, acabamentos, LED/eletrica. Total $3,157.21 USD.</p>
+        <div class="meta">
+          <span>A3 Portrait</span>
+          <span>21 itens</span>
+          <span>~716 kg</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  Gerado automaticamente por SOMA ID AI Engine | somaid.12brain.org | 03/22/2026
+</div>
+
+</body>
+</html>

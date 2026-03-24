@@ -163,11 +163,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onGuestAccess }) => {
         <div className="mt-8 pt-4 border-t border-slate-800/50 text-center">
             <button
               onClick={onGuestAccess}
-              className="w-full py-2 bg-yellow-600/10 border border-yellow-600/30 text-yellow-500 text-[10px] font-bold uppercase tracking-widest rounded hover:bg-yellow-600/20 transition-all"
+              className="w-full py-4 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest rounded-lg hover:bg-cyan-400 transition-all active:scale-95 shadow-[0_0_30px_rgba(6,182,212,0.3)]"
               data-testid="auth-guest-button"
             >
-              ⚡ {t('auth_quick_sandbox')}
+              Entrar na Demo
             </button>
+            <p className="text-[9px] text-slate-600 mt-2 font-mono uppercase tracking-widest">Acesso completo sem cadastro</p>
         </div>
       </div>
       

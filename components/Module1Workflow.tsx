@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Project, QuoteItem } from '../types';
 import { SalesService } from '../services/salesService';
 import { PdfService } from '../services/pdfService';
+import { DxfService } from '../services/dxfService';
+import { EngineeringService } from '../services/engineeringService';
 import { Blueprint2D } from './Blueprint2D';
 
 interface Props {
@@ -12,11 +14,27 @@ interface Props {
 
 export const Module1Workflow: React.FC<Props> = ({ project, onUpdate }) => {
   const [localQuote, setLocalQuote] = useState<QuoteItem[]>(project.quoteData?.items || []);
+  const [showApprovalGate, setShowApprovalGate] = useState(false);
+  const [approvalConfirmed, setApprovalConfirmed] = useState(false);
+  const [approvalNotes, setApprovalNotes] = useState('');
+
+  const confirmApproval = () => {
+    const somaId = SalesService.generateSomaId(project);
+    onUpdate({
+      somaId,
+      m1Status: 'PRE_APROVADO',
+      approvalTimestamp: new Date().toISOString(),
+      approvalNotes: approvalNotes || undefined,
+    });
+    setShowApprovalGate(false);
+    setApprovalConfirmed(false);
+    setApprovalNotes('');
+  };
 
   const nextStep = () => {
     if (project.m1Status === 'ENCANTAMENTO') {
-      const somaId = SalesService.generateSomaId(project);
-      onUpdate({ somaId, m1Status: 'PRE_APROVADO' });
+      setShowApprovalGate(true);
+      return;
     } else if (project.m1Status === 'PRE_APROVADO') {
       onUpdate({ 
         technicalBriefingText: project.insightsIA?.technicalBriefing || "Initial engineering briefing generated based on visual constraints...",
@@ -50,6 +68,26 @@ export const Module1Workflow: React.FC<Props> = ({ project, onUpdate }) => {
 
   const handleDownloadQuote = () => PdfService.generateQuotePDF(project);
   const handleDownloadContract = () => PdfService.generateContractPDF(project);
+
+  const handleExportDxf = async () => {
+    if (!project.technicalData) return;
+    try {
+      const nesting = await EngineeringService.processNesting(project.technicalData);
+      const dxf = new DxfService();
+      const dxfContent = dxf.generateNestingDxf(nesting);
+      const blob = new Blob([dxfContent], { type: 'application/dxf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${project.somaId || 'SOMA-ID'}_NESTING.dxf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('DXF export error:', err);
+    }
+  };
 
   return (
     <div className="space-y-8 animate-fade-in pb-10">
@@ -99,7 +137,7 @@ export const Module1Workflow: React.FC<Props> = ({ project, onUpdate }) => {
                     <span className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></span> Planta Baixa de Venda
                 </p>
                 <div className="flex-grow flex items-center justify-center">
-                   {project.technicalData && <Blueprint2D data={project.technicalData} wallWidth={project.wallWidth} />}
+                   <Blueprint2D data={project.technicalData} wallWidth={project.wallWidth} wallHeight={project.wallHeight || 2700} />
                 </div>
               </div>
             </div>
@@ -107,6 +145,56 @@ export const Module1Workflow: React.FC<Props> = ({ project, onUpdate }) => {
             <button onClick={nextStep} className="mt-14 px-20 py-6 bg-cyan-500 hover:bg-cyan-400 text-black font-black uppercase tracking-[0.3em] text-sm rounded-2xl shadow-[0_25px_50px_rgba(6,182,212,0.4)] transition-all active:scale-95">
               Aprovar Conceito →
             </button>
+
+            {/* Approval Gate Modal */}
+            {showApprovalGate && (
+              <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-6" onClick={() => setShowApprovalGate(false)}>
+                <div className="bg-[#0F172A] border border-slate-700 rounded-2xl p-8 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
+                  <h3 className="text-xl font-black text-white uppercase tracking-tight mb-2">Confirmar Aprovação do Cliente</h3>
+                  <p className="text-slate-400 text-sm mb-6">O cliente visualizou e aprovou este conceito visual?</p>
+
+                  <label className="flex items-center gap-3 mb-6 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={approvalConfirmed}
+                      onChange={e => setApprovalConfirmed(e.target.checked)}
+                      className="w-5 h-5 rounded border-slate-600 bg-slate-900 text-cyan-500 focus:ring-cyan-500 cursor-pointer"
+                    />
+                    <span className="text-white text-sm font-bold group-hover:text-cyan-400 transition">Cliente aprovou presencialmente</span>
+                  </label>
+
+                  <div className="mb-6">
+                    <label className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1 block">Observações (opcional)</label>
+                    <textarea
+                      value={approvalNotes}
+                      onChange={e => setApprovalNotes(e.target.value)}
+                      placeholder="Ex: cliente pediu para escurecer um tom..."
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white text-sm outline-none focus:border-cyan-500 resize-none h-20"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={confirmApproval}
+                      disabled={!approvalConfirmed}
+                      className={`flex-1 py-3 font-black uppercase text-xs tracking-widest rounded-xl transition-all ${
+                        approvalConfirmed
+                          ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_10px_25px_rgba(22,163,74,0.3)]'
+                          : 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                      }`}
+                    >
+                      Confirmar Aprovação
+                    </button>
+                    <button
+                      onClick={() => setShowApprovalGate(false)}
+                      className="px-6 py-3 text-slate-500 hover:text-white text-xs font-bold uppercase tracking-widest transition"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -114,6 +202,14 @@ export const Module1Workflow: React.FC<Props> = ({ project, onUpdate }) => {
         {(project.m1Status === 'PRE_APROVADO' || project.m1Status === 'BRIEFING_GERADO') && (
           <div className="flex-grow p-12 flex flex-col items-center justify-center animate-fade-in max-w-4xl mx-auto w-full">
              <div className="w-24 h-24 bg-green-500/10 text-green-500 rounded-[2rem] flex items-center justify-center mb-8 text-4xl border border-green-500/20 rotate-12">✓</div>
+             {(project as any).approvalTimestamp && (
+               <div className="mb-4 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full flex items-center gap-2">
+                 <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                 <span className="text-green-400 text-[10px] font-bold uppercase tracking-widest">
+                   Aprovado pelo cliente — {new Date((project as any).approvalTimestamp).toLocaleString('pt-BR')}
+                 </span>
+               </div>
+             )}
              <h2 className="text-4xl font-black text-white mb-2 uppercase tracking-tighter">Identidade do Projeto</h2>
              <div className="bg-slate-950 border border-cyan-500/30 px-12 py-6 rounded-3xl mb-12 shadow-[0_0_40px_rgba(6,182,212,0.15)] text-center">
                 <p className="text-[11px] text-slate-500 font-mono uppercase tracking-[0.3em] mb-2">Protocolo Soma-ID</p>
@@ -249,11 +345,16 @@ export const Module1Workflow: React.FC<Props> = ({ project, onUpdate }) => {
              <p className="text-slate-500 font-medium text-lg max-w-xl mx-auto mb-14 leading-relaxed">
                Contrato assinado e orçamento aprovado. O projeto agora é movido para o pipeline de <span className="text-purple-400 font-bold">Produção (Módulo 2)</span> para detalhamento de fábrica.
              </p>
-             <div className="flex gap-6">
+             <div className="flex gap-6 flex-wrap justify-center">
                 <button onClick={async () => {
                     await PdfService.generateQuotePDF(project);
                     await PdfService.generateContractPDF(project);
                 }} className="px-10 py-5 bg-white/5 border border-white/10 text-white font-bold uppercase text-[11px] tracking-widest rounded-2xl hover:bg-white/10 transition">Gerar PDF do Dossier</button>
+                {project.technicalData && (
+                  <button onClick={handleExportDxf} className="px-10 py-5 bg-purple-600/20 border border-purple-500/30 text-purple-300 font-bold uppercase text-[11px] tracking-widest rounded-2xl hover:bg-purple-600/30 transition flex items-center gap-2">
+                    Exportar DXF
+                  </button>
+                )}
                 <button onClick={() => window.location.reload()} className="px-10 py-5 bg-cyan-500 text-black font-black uppercase text-[11px] tracking-widest rounded-2xl hover:bg-cyan-400 transition shadow-2xl">Novo Atendimento</button>
              </div>
           </div>

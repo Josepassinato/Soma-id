@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMA ID - Folha 02 - Elevação Closet Her</title>
+<style>
+  @page { size: A2 landscape; margin: 0; }
+  body {
+    margin: 0; padding: 20px;
+    background: #f0f0f0;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .sheet {
+    background: #fff;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    display: inline-block;
+  }
+  svg { display: block; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .sheet { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5940 4200" width="1188" height="840"
+     style="font-family: Arial, Helvetica, sans-serif;">
+
+<!-- ============================================================ -->
+<!-- DEFINITIONS                                                    -->
+<!-- ============================================================ -->
+<defs>
+  <!-- Dimension arrowhead -->
+  <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#000"/>
+  </marker>
+  <marker id="arrowR" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+    <polygon points="8,0 0,3 8,6" fill="#000"/>
+  </marker>
+  <!-- Dot marker for leader lines -->
+  <marker id="dot" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+    <circle cx="3" cy="3" r="2.5" fill="#000"/>
+  </marker>
+  <!-- MDP hatch pattern -->
+  <pattern id="hatchMDP" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="12" stroke="#999" stroke-width="0.5"/>
+  </pattern>
+  <!-- Glass hatch -->
+  <pattern id="hatchGlass" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#6BB8E8" stroke-width="0.3"/>
+  </pattern>
+  <!-- LED symbol -->
+  <pattern id="ledZigzag" patternUnits="userSpaceOnUse" width="20" height="6">
+    <polyline points="0,3 5,0 10,6 15,0 20,3" fill="none" stroke="#E8A800" stroke-width="1"/>
+  </pattern>
+</defs>
+
+<!-- ============================================================ -->
+<!-- BACKGROUND & BORDER                                            -->
+<!-- ============================================================ -->
+<rect width="5940" height="4200" fill="#FFFFFF"/>
+<rect x="20" y="20" width="5900" height="4160" fill="none" stroke="#000" stroke-width="3"/>
+<rect x="30" y="30" width="5880" height="4140" fill="none" stroke="#000" stroke-width="1"/>
+
+<!-- ============================================================ -->
+<!-- TITLE BLOCK (bottom-right)                                     -->
+<!-- ============================================================ -->
+<g id="titleBlock">
+  <rect x="4300" y="3700" width="1580" height="440" fill="none" stroke="#000" stroke-width="2"/>
+  <!-- Internal dividers -->
+  <line x1="4300" y1="3770" x2="5880" y2="3770" stroke="#000" stroke-width="1"/>
+  <line x1="4300" y1="3830" x2="5880" y2="3830" stroke="#000" stroke-width="1"/>
+  <line x1="4300" y1="3890" x2="5880" y2="3890" stroke="#000" stroke-width="1"/>
+  <line x1="4300" y1="3950" x2="5880" y2="3950" stroke="#000" stroke-width="1"/>
+  <line x1="4300" y1="4010" x2="5880" y2="4010" stroke="#000" stroke-width="1"/>
+  <line x1="4300" y1="4070" x2="5880" y2="4070" stroke="#000" stroke-width="1"/>
+
+  <text x="5090" y="3752" text-anchor="middle" font-size="48" font-weight="bold" fill="#000">SOMA ID</text>
+  <text x="5090" y="3810" text-anchor="middle" font-size="32" fill="#000">Closet Sabrina Parkland</text>
+  <text x="5090" y="3870" text-anchor="middle" font-size="30" font-weight="bold" fill="#000">ELEVACAO CLOSET HER - PAREDE LESTE</text>
+  <text x="5090" y="3930" text-anchor="middle" font-size="28" fill="#000">Escala: 1:20</text>
+  <text x="5090" y="3990" text-anchor="middle" font-size="28" fill="#000">Data: 03/22/2026</text>
+  <text x="5090" y="4050" text-anchor="middle" font-size="28" fill="#000">Folha: 2/8</text>
+  <text x="5090" y="4115" text-anchor="middle" font-size="24" fill="#000">Projetista: SOMA ID AI Engine</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- DRAWING TITLE                                                  -->
+<!-- ============================================================ -->
+<text x="2600" y="150" text-anchor="middle" font-size="56" font-weight="bold" fill="#000">
+  ELEVACAO FRONTAL - CLOSET HER
+</text>
+<text x="2600" y="200" text-anchor="middle" font-size="30" fill="#555">
+  Parede Leste - Vista Frontal - Escala 1:20
+</text>
+
+<!-- ============================================================ -->
+<!-- COORDINATE SYSTEM                                              -->
+<!-- Scale: 1:20, but on SVG we use 1mm = ~1 unit at viewBox       -->
+<!-- Drawing area: origin at (350, 3400) = floor level left edge    -->
+<!-- Y grows upward in real, but SVG Y goes down.                   -->
+<!-- Convention: floor at SVG y=3400, ceiling at y=3400-3000/k      -->
+<!-- Using scale factor k where 1mm real = 0.8 SVG units            -->
+<!-- Total wall: 9520mm real => 9520*0.8 = 7616 too wide             -->
+<!-- Let's use scale: 1mm = 0.55 SVG units to fit drawing area      -->
+<!-- Wall 9640mm wide => 5302 SVG. Height 3000mm => 1650 SVG        -->
+<!-- Drawing origin: left=300, floor_y=3350                         -->
+<!-- ============================================================ -->
+
+<!--
+  LAYOUT PLAN (left to right, total ~9640mm wall):
+  1. Steamer Niche: 300mm
+  2. Long Hanging: 1500mm
+  3. Double Hanging: 2000mm
+  4. Shelves: 800mm
+  5. Shoe Rack: 1500mm (regular)
+  6. Boot Rack: 1050mm (boots above regular)
+  7. Vitrines: 1050mm
+  8. Luggage overhead spans sections 2-3 (2000mm wide at top)
+
+  Rearranged for better composition:
+  Steamer(300) + LongHang(1500) + DoubleHang(2000) + Shelves(800) + Shoes(1500) + Vitrines(1050) + Boots area integrated
+  Total: 300+1500+2000+800+1500+1050 = 7150mm
+  With 18mm dividers between sections (5 dividers): 7150+90 = 7240mm
+
+  Scale: 1mm real = 0.6 SVG units
+  Origin: x_origin=350, floor_y=3350
+-->
+
+<g id="elevation" transform="translate(0,0)">
+
+<!-- Floor reference line -->
+<line x1="250" y1="3350" x2="5050" y2="3350" stroke="#000" stroke-width="2" stroke-dasharray="20,5,5,5"/>
+<text x="200" y="3365" text-anchor="end" font-size="22" fill="#000">0</text>
+
+<!-- Ceiling line at 3000mm => y = 3350 - 3000*0.6 = 3350-1800 = 1550 -->
+<line x1="250" y1="1550" x2="5050" y2="1550" stroke="#000" stroke-width="1" stroke-dasharray="15,5"/>
+<text x="200" y="1565" text-anchor="end" font-size="22" fill="#000">3000</text>
+
+<!-- Furniture top at 2400mm => y = 3350 - 2400*0.6 = 3350-1440 = 1910 -->
+
+<!-- ============================================================ -->
+<!-- Scale factor: s=0.6  Origin: ox=350, oy=3350 (floor)          -->
+<!-- Real x => SVG: ox + x*s    Real y(from floor) => SVG: oy - y*s -->
+<!-- ============================================================ -->
+
+<!--
+  SECTION POSITIONS (x in mm from left edge):
+  A: Steamer Niche: 0 to 300
+  B: Long Hanging: 318 to 1818 (300+18 divider)
+  C: Double Hanging: 1836 to 3836 (1818+18)
+  D: Shelves: 3854 to 4654 (3836+18)
+  E: Shoe Rack: 4672 to 6172 (4654+18)
+  F: Vitrines (bags): 6190 to 7240 (6172+18, width 1050)
+
+  But this totals 7240mm which at 0.6 scale = 4344 SVG units.
+  With origin at 350, right edge at 4694. Fits in viewBox.
+-->
+
+<!-- Helper: s=0.6, ox=350, oy=3350 -->
+<!-- Macro: x(mm) = 350 + mm*0.6,  y(mm) = 3350 - mm*0.6 -->
+
+<!-- ============================================================ -->
+<!-- SECTION A: STEAMER NICHE (0-300mm wide, 0-1800mm tall)        -->
+<!-- ============================================================ -->
+<g id="steamerNiche">
+  <!-- Outer box: 300w x 1800h -->
+  <!-- left=350, right=350+180=530, bottom=3350, top=3350-1080=2270 -->
+  <rect x="350" y="2270" width="180" height="1080" fill="url(#hatchMDP)" stroke="#000" stroke-width="2"/>
+
+  <!-- Side panels 18mm thick -->
+  <rect x="350" y="2270" width="10.8" height="1080" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <rect x="519.2" y="2270" width="10.8" height="1080" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Top panel -->
+  <rect x="350" y="2270" width="180" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Back panel thin -->
+  <rect x="355" y="2275" width="170" height="1070" fill="none" stroke="#666" stroke-width="0.5" stroke-dasharray="4,4"/>
+
+  <!-- Label -->
+  <text x="440" y="2800" text-anchor="middle" font-size="18" fill="#000" transform="rotate(-90,440,2800)">STEAMER</text>
+  <text x="440" y="2750" text-anchor="middle" font-size="14" fill="#555" transform="rotate(-90,440,2750)">300x400x1800</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- SECTION B: LONG HANGING (318-1818mm, bar at 1700mm)           -->
+<!-- ============================================================ -->
+<g id="longHanging">
+  <!-- x: 350+318*0.6=540.8 to 350+1818*0.6=1440.8 -->
+  <!-- Divider at 318mm: x=540.8, 18mm wide=10.8 -->
+  <rect x="540.8" y="1910" width="10.8" height="1440" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Top panel at 2400mm -->
+  <rect x="540.8" y="1910" width="900" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Right divider at 1818mm -->
+  <rect x="1440.8" y="1910" width="10.8" height="1440" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Hanging bar at 1700mm height: y = 3350-1700*0.6 = 3350-1020 = 2330 -->
+  <!-- Bar shown as circle (section view) 25mm dia = 15 SVG -->
+  <!-- Bar position: center of section -->
+  <line x1="565" y1="2330" x2="1430" y2="2330" stroke="#888" stroke-width="1" stroke-dasharray="8,4"/>
+  <circle cx="565" cy="2330" r="7.5" fill="none" stroke="#000" stroke-width="1.5"/>
+  <circle cx="1430" cy="2330" r="7.5" fill="none" stroke="#000" stroke-width="1.5"/>
+  <!-- Bar center line -->
+  <circle cx="565" cy="2330" r="1.5" fill="#000"/>
+  <circle cx="1430" cy="2330" r="1.5" fill="#000"/>
+
+  <!-- Hanger silhouettes (decorative indication) -->
+  <g stroke="#bbb" stroke-width="0.8" fill="none">
+    <path d="M700,2330 L700,2315 C700,2295 720,2280 740,2295 L740,2330"/>
+    <path d="M850,2330 L850,2315 C850,2295 870,2280 890,2295 L890,2330"/>
+    <path d="M1000,2330 L1000,2315 C1000,2295 1020,2280 1040,2295 L1040,2330"/>
+    <path d="M1150,2330 L1150,2315 C1150,2295 1170,2280 1190,2295 L1190,2330"/>
+  </g>
+  <!-- Long garment lines -->
+  <g stroke="#ccc" stroke-width="0.5">
+    <line x1="720" y1="2340" x2="710" y2="3340"/>
+    <line x1="740" y1="2340" x2="750" y2="3340"/>
+    <line x1="870" y1="2340" x2="860" y2="3340"/>
+    <line x1="890" y1="2340" x2="900" y2="3340"/>
+    <line x1="1020" y1="2340" x2="1010" y2="3340"/>
+    <line x1="1040" y1="2340" x2="1050" y2="3340"/>
+  </g>
+
+  <!-- Label -->
+  <text x="998" y="2200" text-anchor="middle" font-size="22" fill="#000">CABIDEIRO LONGO</text>
+  <text x="998" y="2225" text-anchor="middle" font-size="16" fill="#555">Barra cromada o/25mm</text>
+  <text x="998" y="2250" text-anchor="middle" font-size="16" fill="#555">Vestidos / Casacos</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- LUGGAGE AREA (top of Long+Double Hanging sections)            -->
+<!-- Shelf at 2000mm, width 2000mm, over sections B+C partially    -->
+<!-- ============================================================ -->
+<g id="luggageArea">
+  <!-- 2000mm height => y = 3350-2000*0.6 = 3350-1200 = 2150 -->
+  <!-- Positioned above long hanging start: x from 540.8 -->
+  <!-- 2000mm wide = 1200 SVG -->
+  <!-- Shelf -->
+  <rect x="551.6" y="2150" width="1200" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Divider in middle: at 1000mm from start -->
+  <rect x="1145" y="1920.8" width="10.8" height="229.2" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Suitcase outlines -->
+  <g fill="none" stroke="#999" stroke-width="0.8" stroke-dasharray="5,3">
+    <!-- Large suitcase 1 -->
+    <rect x="570" y="1930" width="240" height="215" rx="5"/>
+    <!-- Large suitcase 2 -->
+    <rect x="830" y="1930" width="240" height="215" rx="5"/>
+    <!-- Small suitcase 1 -->
+    <rect x="1165" y="1950" width="150" height="195" rx="5"/>
+    <!-- Small suitcase 2 -->
+    <rect x="1340" y="1950" width="150" height="195" rx="5"/>
+  </g>
+
+  <text x="1151" y="2020" text-anchor="middle" font-size="18" fill="#666">MALAS / LUGGAGE</text>
+  <text x="1151" y="2040" text-anchor="middle" font-size="14" fill="#888">2 grandes + 2 pequenas</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- SECTION C: DOUBLE HANGING (1836-3836mm)                       -->
+<!-- x: 350+1836*0.6=1451.6 to 350+3836*0.6=2651.6               -->
+<!-- ============================================================ -->
+<g id="doubleHanging">
+  <!-- Left divider already placed at 1440.8+10.8=1451.6 -->
+
+  <!-- Top panel -->
+  <rect x="1451.6" y="1910" width="1200" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Right divider at 3836mm -->
+  <rect x="2651.6" y="1910" width="10.8" height="1440" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Upper bar at 1700mm: y=2330 -->
+  <line x1="1470" y1="2330" x2="2640" y2="2330" stroke="#888" stroke-width="1" stroke-dasharray="8,4"/>
+  <circle cx="1470" cy="2330" r="7.5" fill="none" stroke="#000" stroke-width="1.5"/>
+  <circle cx="2640" cy="2330" r="7.5" fill="none" stroke="#000" stroke-width="1.5"/>
+  <circle cx="1470" cy="2330" r="1.5" fill="#000"/>
+  <circle cx="2640" cy="2330" r="1.5" fill="#000"/>
+
+  <!-- Lower bar at 900mm: y = 3350-900*0.6 = 3350-540 = 2810 -->
+  <line x1="1470" y1="2810" x2="2640" y2="2810" stroke="#888" stroke-width="1" stroke-dasharray="8,4"/>
+  <circle cx="1470" cy="2810" r="7.5" fill="none" stroke="#000" stroke-width="1.5"/>
+  <circle cx="2640" cy="2810" r="7.5" fill="none" stroke="#000" stroke-width="1.5"/>
+  <circle cx="1470" cy="2810" r="1.5" fill="#000"/>
+  <circle cx="2640" cy="2810" r="1.5" fill="#000"/>
+
+  <!-- Hanger silhouettes upper -->
+  <g stroke="#bbb" stroke-width="0.8" fill="none">
+    <path d="M1600,2330 L1600,2315 C1600,2295 1620,2280 1640,2295 L1640,2330"/>
+    <path d="M1800,2330 L1800,2315 C1800,2295 1820,2280 1840,2295 L1840,2330"/>
+    <path d="M2000,2330 L2000,2315 C2000,2295 2020,2280 2040,2295 L2040,2330"/>
+    <path d="M2200,2330 L2200,2315 C2200,2295 2220,2280 2240,2295 L2240,2330"/>
+    <path d="M2400,2330 L2400,2315 C2400,2295 2420,2280 2440,2295 L2440,2330"/>
+  </g>
+  <!-- Short garment lines (upper - shirts) -->
+  <g stroke="#ccc" stroke-width="0.5">
+    <line x1="1620" y1="2340" x2="1615" y2="2790"/>
+    <line x1="1640" y1="2340" x2="1645" y2="2790"/>
+    <line x1="1820" y1="2340" x2="1815" y2="2790"/>
+    <line x1="1840" y1="2340" x2="1845" y2="2790"/>
+    <line x1="2020" y1="2340" x2="2015" y2="2790"/>
+    <line x1="2040" y1="2340" x2="2045" y2="2790"/>
+    <line x1="2220" y1="2340" x2="2215" y2="2790"/>
+    <line x1="2240" y1="2340" x2="2245" y2="2790"/>
+  </g>
+
+  <!-- Hanger silhouettes lower -->
+  <g stroke="#bbb" stroke-width="0.8" fill="none">
+    <path d="M1600,2810 L1600,2795 C1600,2775 1620,2760 1640,2775 L1640,2810"/>
+    <path d="M1800,2810 L1800,2795 C1800,2775 1820,2760 1840,2775 L1840,2810"/>
+    <path d="M2000,2810 L2000,2795 C2000,2775 2020,2760 2040,2775 L2040,2810"/>
+    <path d="M2200,2810 L2200,2795 C2200,2775 2220,2760 2240,2775 L2240,2810"/>
+    <path d="M2400,2810 L2400,2795 C2400,2775 2420,2760 2440,2775 L2440,2810"/>
+  </g>
+  <!-- Trouser lines (lower) -->
+  <g stroke="#ccc" stroke-width="0.5">
+    <line x1="1620" y1="2820" x2="1618" y2="3340"/>
+    <line x1="1640" y1="2820" x2="1642" y2="3340"/>
+    <line x1="1820" y1="2820" x2="1818" y2="3340"/>
+    <line x1="1840" y1="2820" x2="1842" y2="3340"/>
+    <line x1="2020" y1="2820" x2="2018" y2="3340"/>
+    <line x1="2040" y1="2820" x2="2042" y2="3340"/>
+  </g>
+
+  <!-- Labels -->
+  <text x="2055" y="2200" text-anchor="middle" font-size="22" fill="#000">CABIDEIRO DUPLO</text>
+  <text x="2055" y="2480" text-anchor="middle" font-size="16" fill="#555">Superior: Camisas / Blusas</text>
+  <text x="2055" y="3000" text-anchor="middle" font-size="16" fill="#555">Inferior: Calcas / Saias</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- SECTION D: SHELVES (3854-4654mm, 800mm wide)                  -->
+<!-- x: 350+3854*0.6=2662.4 to 350+4654*0.6=3142.4               -->
+<!-- 7 shelves, spacing ~300mm, 6 niches 400x350x400              -->
+<!-- ============================================================ -->
+<g id="shelves">
+  <!-- Left divider at 2662.4 already (right side of double hanging) -->
+
+  <!-- Top panel -->
+  <rect x="2662.4" y="1910" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Right divider -->
+  <rect x="3142.4" y="1910" width="10.8" height="1440" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- 7 shelves from floor up, spacing ~300mm -->
+  <!-- Shelf positions (mm from floor): 300, 600, 900, 1200, 1500, 1800, 2100 -->
+  <!-- Plus bottom at 0 and top at 2400 -->
+
+  <!-- Bottom shelf (floor level, base) -->
+  <rect x="2662.4" y="3339.2" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Shelf 1: 300mm => y=3350-180=3170 -->
+  <rect x="2662.4" y="3170" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Shelf 2: 600mm => y=3350-360=2990 -->
+  <rect x="2662.4" y="2990" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Shelf 3: 900mm => y=3350-540=2810 -->
+  <rect x="2662.4" y="2810" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Shelf 4: 1200mm => y=3350-720=2630 -->
+  <rect x="2662.4" y="2630" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Shelf 5: 1500mm => y=3350-900=2450 -->
+  <rect x="2662.4" y="2450" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Shelf 6: 1800mm => y=3350-1080=2270 -->
+  <rect x="2662.4" y="2270" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Shelf 7: 2100mm => y=3350-1260=2090 -->
+  <rect x="2662.4" y="2090" width="480" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- Center vertical divider for niches (splits 800 into 2x400 = 2x240 SVG) -->
+  <rect x="2898" y="2090" width="10.8" height="1260" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+
+  <!-- Folded clothes indication (stacks in niches) -->
+  <g fill="none" stroke="#ccc" stroke-width="0.5">
+    <!-- Stack hints in a few niches -->
+    <rect x="2680" y="3200" width="200" height="30" rx="2"/>
+    <rect x="2680" y="3225" width="200" height="30" rx="2"/>
+    <rect x="2920" y="3200" width="200" height="30" rx="2"/>
+    <rect x="2920" y="3038" width="200" height="30" rx="2"/>
+    <rect x="2680" y="3038" width="200" height="30" rx="2"/>
+    <rect x="2680" y="3063" width="200" height="30" rx="2"/>
+    <rect x="2920" y="2876" width="200" height="30" rx="2"/>
+    <rect x="2680" y="2876" width="200" height="30" rx="2"/>
+  </g>
+
+  <!-- Label -->
+  <text x="2902" y="1990" text-anchor="middle" font-size="20" fill="#000">PRATELEIRAS</text>
+  <text x="2902" y="2012" text-anchor="middle" font-size="14" fill="#555">7 prat. 800x400x18 MDP</text>
+  <text x="2902" y="2032" text-anchor="middle" font-size="14" fill="#555">6 nichos p/ roupas dobradas</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- SECTION E: SHOE RACK (4672-6172mm, 1500mm wide)               -->
+<!-- x: 350+4672*0.6=3153.2 to 350+6172*0.6=4053.2               -->
+<!-- Regular: 5 rows x 6 pairs, 150mm per row = 750mm total       -->
+<!-- Boots: 2 rows x 3 pairs above, 400mm per row = 800mm         -->
+<!-- Boots width: 1050mm                                            -->
+<!-- ============================================================ -->
+<g id="shoeRack">
+  <!-- Right divider -->
+  <rect x="4053.2" y="1910" width="10.8" height="1440" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+  <!-- Top panel -->
+  <rect x="3153.2" y="1910" width="900" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1"/>
+
+  <!-- REGULAR SHOES: bottom 750mm (5 rows x 150mm) -->
+  <!-- Row 1: floor to 150mm => y: 3350 to 3350-90=3260 -->
+  <rect x="3153.2" y="3260" width="900" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+  <!-- Row 2: 150 to 300mm -->
+  <rect x="3153.2" y="3170" width="900" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+  <!-- Row 3: 300 to 450mm -->
+  <rect x="3153.2" y="3080" width="900" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+  <!-- Row 4: 450 to 600mm -->
+  <rect x="3153.2" y="2990" width="900" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+  <!-- Row 5: 600 to 750mm -->
+  <rect x="3153.2" y="2900" width="900" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+
+  <!-- Shoe pair outlines (decorative) -->
+  <g fill="none" stroke="#bbb" stroke-width="0.5">
+    <!-- Row 1 shoes -->
+    <ellipse cx="3220" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3280" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3370" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3430" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3520" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3580" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3670" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3730" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3820" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3880" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="3950" cy="3305" rx="25" ry="12"/>
+    <ellipse cx="4010" cy="3305" rx="25" ry="12"/>
+  </g>
+
+  <!-- BOOTS: above shoes, 2 rows x 400mm = 800mm (from 750 to 1550mm) -->
+  <!-- Boots use only 1050mm width = 630 SVG, centered or left-aligned -->
+  <!-- Boot row 1: 750-1150mm => y: 2900 to 2900-240=2660 -->
+  <rect x="3153.2" y="2660" width="630" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+  <!-- Boot row 2: 1150-1550mm => y: 2660 to 2660-240=2420 -->
+  <rect x="3153.2" y="2420" width="630" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+
+  <!-- Vertical divider separating boots from upper area on right side -->
+  <rect x="3783.2" y="2420" width="10.8" height="480" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+
+  <!-- Boot silhouettes -->
+  <g fill="none" stroke="#bbb" stroke-width="0.5">
+    <!-- Boot row 1 -->
+    <rect x="3175" y="2680" width="60" height="210" rx="5"/>
+    <rect x="3255" y="2680" width="60" height="210" rx="5"/>
+    <rect x="3375" y="2680" width="60" height="210" rx="5"/>
+    <rect x="3455" y="2680" width="60" height="210" rx="5"/>
+    <rect x="3575" y="2680" width="60" height="210" rx="5"/>
+    <rect x="3655" y="2680" width="60" height="210" rx="5"/>
+    <!-- Boot row 2 -->
+    <rect x="3175" y="2440" width="60" height="210" rx="5"/>
+    <rect x="3255" y="2440" width="60" height="210" rx="5"/>
+    <rect x="3375" y="2440" width="60" height="210" rx="5"/>
+  </g>
+
+  <!-- Upper open area (right of boots, for accessories or extra space) -->
+  <text x="3918" y="2550" text-anchor="middle" font-size="14" fill="#888">ACESSORIOS</text>
+
+  <!-- Labels -->
+  <text x="3603" y="3380" text-anchor="middle" font-size="20" fill="#000">SAPATEIRA - 30 pares</text>
+  <text x="3468" y="2410" text-anchor="middle" font-size="18" fill="#000">BOTAS - 6 pares</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- SECTION F: VITRINES / BAGS DISPLAY (6190-7240mm, 1050mm wide) -->
+<!-- x: 350+6190*0.6=4064 to 350+7240*0.6=4694                   -->
+<!-- 3 columns x 5 shelves, glass shelves, LED strips             -->
+<!-- Column width: 350mm = 210 SVG each                            -->
+<!-- Total height: 2000mm from floor = 1200 SVG                   -->
+<!-- ============================================================ -->
+<g id="vitrines">
+  <!-- Outer frame -->
+  <!-- Left panel: x=4064, 18mm=10.8 SVG -->
+  <rect x="4064" y="2150" width="10.8" height="1200" fill="#D4C5A9" stroke="#000" stroke-width="1.5"/>
+  <!-- Right panel -->
+  <rect x="4683.2" y="2150" width="10.8" height="1200" fill="#D4C5A9" stroke="#000" stroke-width="1.5"/>
+  <!-- Top panel -->
+  <rect x="4064" y="2150" width="630" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1.5"/>
+  <!-- Bottom panel (at floor) -->
+  <rect x="4064" y="3339.2" width="630" height="10.8" fill="#D4C5A9" stroke="#000" stroke-width="1.5"/>
+
+  <!-- Column dividers (2 dividers creating 3 columns) -->
+  <!-- Col 1: 4074.8 to 4074.8+210=4284.8 -->
+  <!-- Divider 1: 4284.8 -->
+  <rect x="4284.8" y="2150" width="10.8" height="1200" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+  <!-- Col 2: 4295.6 to 4295.6+210=4505.6 -->
+  <!-- Divider 2: 4505.6 -->
+  <rect x="4505.6" y="2150" width="10.8" height="1200" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+  <!-- Col 3: 4516.4 to 4516.4+210=4683.2 (minus panel) -->
+
+  <!-- 5 shelves per column, spacing = 2000/5 = 400mm = 240 SVG -->
+  <!-- Glass shelves: thinner, blue tint -->
+  <!-- Shelf positions from floor: 400, 800, 1200, 1600mm -->
+  <!-- y: 3350-240=3110, 3350-480=2870, 3350-720=2630, 3350-960=2390 -->
+
+  <!-- Glass shelf row 1: 400mm -->
+  <rect x="4074.8" y="3107" width="210" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <rect x="4295.6" y="3107" width="210" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <rect x="4516.4" y="3107" width="167" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+
+  <!-- Glass shelf row 2: 800mm -->
+  <rect x="4074.8" y="2867" width="210" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <rect x="4295.6" y="2867" width="210" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <rect x="4516.4" y="2867" width="167" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+
+  <!-- Glass shelf row 3: 1200mm -->
+  <rect x="4074.8" y="2627" width="210" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <rect x="4295.6" y="2627" width="210" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <rect x="4516.4" y="2627" width="167" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+
+  <!-- Glass shelf row 4: 1600mm -->
+  <rect x="4074.8" y="2387" width="210" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <rect x="4295.6" y="2387" width="210" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <rect x="4516.4" y="2387" width="167" height="4" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+
+  <!-- LED strips (zigzag indicators under each shelf) -->
+  <g>
+    <!-- LED under shelf row 1 -->
+    <line x1="4080" y1="3114" x2="4280" y2="3114" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4300" y1="3114" x2="4500" y2="3114" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4520" y1="3114" x2="4678" y2="3114" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+
+    <!-- LED under shelf row 2 -->
+    <line x1="4080" y1="2874" x2="4280" y2="2874" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4300" y1="2874" x2="4500" y2="2874" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4520" y1="2874" x2="4678" y2="2874" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+
+    <!-- LED under shelf row 3 -->
+    <line x1="4080" y1="2634" x2="4280" y2="2634" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4300" y1="2634" x2="4500" y2="2634" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4520" y1="2634" x2="4678" y2="2634" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+
+    <!-- LED under shelf row 4 -->
+    <line x1="4080" y1="2394" x2="4280" y2="2394" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4300" y1="2394" x2="4500" y2="2394" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4520" y1="2394" x2="4678" y2="2394" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+
+    <!-- LED under top panel -->
+    <line x1="4080" y1="2163" x2="4280" y2="2163" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4300" y1="2163" x2="4500" y2="2163" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="4520" y1="2163" x2="4678" y2="2163" stroke="#E8A800" stroke-width="2" stroke-dasharray="3,2"/>
+  </g>
+
+  <!-- Bag silhouettes (decorative) -->
+  <g fill="none" stroke="#bbb" stroke-width="0.6">
+    <!-- Some bag outlines -->
+    <rect x="4105" y="3140" width="60" height="50" rx="5"/>
+    <path d="M4125,3140 C4125,3125 4145,3125 4145,3140"/>
+
+    <rect x="4330" y="2900" width="55" height="50" rx="5"/>
+    <path d="M4347,2900 C4347,2885 4367,2885 4367,2900"/>
+
+    <rect x="4545" y="2660" width="50" height="45" rx="5"/>
+    <path d="M4560,2660 C4560,2645 4580,2645 4580,2660"/>
+
+    <rect x="4105" y="2660" width="60" height="55" rx="5"/>
+    <path d="M4125,2660 C4125,2640 4150,2640 4150,2660"/>
+
+    <rect x="4330" y="2420" width="55" height="50" rx="5"/>
+    <path d="M4347,2420 C4347,2405 4367,2405 4367,2420"/>
+
+    <rect x="4545" y="2185" width="50" height="50" rx="5"/>
+    <path d="M4560,2185 C4560,2170 4580,2170 4580,2185"/>
+  </g>
+
+  <!-- Label -->
+  <text x="4379" y="2120" text-anchor="middle" font-size="22" font-weight="bold" fill="#000">VITRINES - BOLSAS</text>
+  <text x="4379" y="2142" text-anchor="middle" font-size="14" fill="#555">3 col. x 5 prat. vidro temp. 6mm</text>
+  <text x="4379" y="2095" text-anchor="middle" font-size="14" fill="#E8A800">LED 3000K cada prateleira</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- DIMENSION LINES                                                -->
+<!-- ============================================================ -->
+<g id="dimensions" fill="#000" stroke="#000">
+
+  <!-- ==================== VERTICAL DIMENSIONS (right side) ==================== -->
+
+  <!-- Total height: floor to furniture top 2400mm -->
+  <!-- Right side dimension line at x=4800 -->
+  <line x1="4780" y1="3350" x2="4780" y2="1910" stroke-width="1" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="4760" y1="3350" x2="4800" y2="3350" stroke-width="0.5"/>
+  <line x1="4760" y1="1910" x2="4800" y2="1910" stroke-width="0.5"/>
+  <text x="4810" y="2640" font-size="22" fill="#000" transform="rotate(-90,4810,2640)">2400</text>
+
+  <!-- Floor to ceiling 3000mm -->
+  <line x1="4900" y1="3350" x2="4900" y2="1550" stroke-width="1" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="4880" y1="3350" x2="4920" y2="3350" stroke-width="0.5"/>
+  <line x1="4880" y1="1550" x2="4920" y2="1550" stroke-width="0.5"/>
+  <text x="4930" y="2470" font-size="22" fill="#000" transform="rotate(-90,4930,2470)">3000 (piso a teto)</text>
+
+  <!-- Bar height 1700mm (left side dim) -->
+  <line x1="310" y1="3350" x2="310" y2="2330" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="290" y1="3350" x2="330" y2="3350" stroke-width="0.5"/>
+  <line x1="290" y1="2330" x2="330" y2="2330" stroke-width="0.5"/>
+  <text x="280" y="2850" font-size="20" fill="#000" transform="rotate(-90,280,2850)">1700</text>
+
+  <!-- Lower bar height 900mm -->
+  <line x1="260" y1="3350" x2="260" y2="2810" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="240" y1="2810" x2="280" y2="2810" stroke-width="0.5"/>
+  <text x="230" y="3090" font-size="20" fill="#000" transform="rotate(-90,230,3090)">900</text>
+
+  <!-- Luggage shelf height 2000mm -->
+  <line x1="210" y1="3350" x2="210" y2="2150" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="190" y1="2150" x2="230" y2="2150" stroke-width="0.5"/>
+  <text x="185" y="2760" font-size="18" fill="#000" transform="rotate(-90,185,2760)">2000</text>
+
+  <!-- Steamer height 1800mm -->
+  <line x1="345" y1="3350" x2="345" y2="2270" stroke-width="0.8" stroke-dasharray="4,2"/>
+  <text x="360" y="3370" font-size="16" fill="#000">0</text>
+  <text x="360" y="2285" font-size="16" fill="#000">1800</text>
+
+  <!-- Vitrine height 2000mm -->
+  <!-- y floor=3350, y top=3350-2000*0.6=2150 -->
+  <line x1="4730" y1="3350" x2="4730" y2="2150" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="4710" y1="2150" x2="4750" y2="2150" stroke-width="0.5"/>
+  <text x="4745" y="2760" font-size="18" fill="#000" transform="rotate(-90,4745,2760)">2000</text>
+
+  <!-- ==================== HORIZONTAL DIMENSIONS (bottom) ==================== -->
+
+  <!-- Overall width dimension at y=3450 -->
+  <!-- Steamer to end of vitrines: 0 to 7240mm (unfolded) -->
+  <!-- SVG: 350 to 4694 -->
+  <line x1="350" y1="3450" x2="4694" y2="3450" stroke-width="1" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="350" y1="3430" x2="350" y2="3470" stroke-width="0.5"/>
+  <line x1="4694" y1="3430" x2="4694" y2="3470" stroke-width="0.5"/>
+  <text x="2522" y="3490" text-anchor="middle" font-size="24" fill="#000">7240 (desdobrado)</text>
+
+  <!-- Section widths at y=3520 -->
+  <!-- Steamer: 300mm -->
+  <line x1="350" y1="3520" x2="530" y2="3520" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="350" y1="3500" x2="350" y2="3540" stroke-width="0.5"/>
+  <line x1="530" y1="3500" x2="530" y2="3540" stroke-width="0.5"/>
+  <text x="440" y="3550" text-anchor="middle" font-size="18" fill="#000">300</text>
+
+  <!-- Long Hanging: 1500mm => 350+318*0.6=540.8+10.8=551.6 to 551.6+900=1451.6-10.8=1440.8 -->
+  <line x1="551.6" y1="3520" x2="1440.8" y2="3520" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="551.6" y1="3500" x2="551.6" y2="3540" stroke-width="0.5"/>
+  <line x1="1440.8" y1="3500" x2="1440.8" y2="3540" stroke-width="0.5"/>
+  <text x="996" y="3550" text-anchor="middle" font-size="18" fill="#000">1500</text>
+
+  <!-- Double Hanging: 2000mm -->
+  <line x1="1462.4" y1="3520" x2="2651.6" y2="3520" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="1462.4" y1="3500" x2="1462.4" y2="3540" stroke-width="0.5"/>
+  <line x1="2651.6" y1="3500" x2="2651.6" y2="3540" stroke-width="0.5"/>
+  <text x="2057" y="3550" text-anchor="middle" font-size="18" fill="#000">2000</text>
+
+  <!-- Shelves: 800mm -->
+  <line x1="2673.2" y1="3520" x2="3142.4" y2="3520" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="2673.2" y1="3500" x2="2673.2" y2="3540" stroke-width="0.5"/>
+  <line x1="3142.4" y1="3500" x2="3142.4" y2="3540" stroke-width="0.5"/>
+  <text x="2907" y="3550" text-anchor="middle" font-size="18" fill="#000">800</text>
+
+  <!-- Shoe Rack: 1500mm -->
+  <line x1="3164" y1="3520" x2="4053.2" y2="3520" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="3164" y1="3500" x2="3164" y2="3540" stroke-width="0.5"/>
+  <line x1="4053.2" y1="3500" x2="4053.2" y2="3540" stroke-width="0.5"/>
+  <text x="3608" y="3550" text-anchor="middle" font-size="18" fill="#000">1500</text>
+
+  <!-- Vitrines: 1050mm -->
+  <line x1="4064" y1="3520" x2="4694" y2="3520" stroke-width="0.8" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <line x1="4064" y1="3500" x2="4064" y2="3540" stroke-width="0.5"/>
+  <line x1="4694" y1="3500" x2="4694" y2="3540" stroke-width="0.5"/>
+  <text x="4379" y="3550" text-anchor="middle" font-size="18" fill="#000">1050</text>
+
+  <!-- Shoe shelf height dimensions on the right side of shoe section -->
+  <!-- 150mm per row = 90 SVG -->
+  <line x1="4068" y1="3350" x2="4068" y2="3260" stroke-width="0.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <text x="4078" y="3315" font-size="14" fill="#000">150</text>
+
+  <!-- Boot row 400mm -->
+  <line x1="3798" y1="2900" x2="3798" y2="2660" stroke-width="0.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <text x="3808" y="2790" font-size="14" fill="#000">400</text>
+
+  <!-- Shelf spacing 300mm -->
+  <line x1="3158" y1="3340" x2="3158" y2="3170" stroke-width="0.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <text x="3120" y="3260" font-size="14" fill="#000" transform="rotate(-90,3120,3260)">300</text>
+
+  <!-- Vitrine column width 350mm = 210 SVG -->
+  <line x1="4074.8" y1="3380" x2="4284.8" y2="3380" stroke-width="0.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <text x="4180" y="3400" text-anchor="middle" font-size="14" fill="#000">350</text>
+
+  <line x1="4295.6" y1="3380" x2="4505.6" y2="3380" stroke-width="0.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <text x="4400" y="3400" text-anchor="middle" font-size="14" fill="#000">350</text>
+
+  <line x1="4516.4" y1="3380" x2="4683.2" y2="3380" stroke-width="0.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <text x="4600" y="3400" text-anchor="middle" font-size="14" fill="#000">350</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- MATERIAL CALLOUTS WITH LEADER LINES                           -->
+<!-- ============================================================ -->
+<g id="callouts" fill="#000" stroke="#000">
+
+  <!-- MDP Lana callout -->
+  <circle cx="600" cy="1920" r="3" fill="#000"/>
+  <line x1="600" y1="1920" x2="700" y2="1830" stroke-width="0.8"/>
+  <line x1="700" y1="1830" x2="900" y2="1830" stroke-width="0.8"/>
+  <text x="910" y="1825" font-size="18" fill="#000">MDP 18mm cor Lana</text>
+  <rect x="910" y="1835" width="40" height="15" fill="#D4C5A9" stroke="#000" stroke-width="0.5"/>
+
+  <!-- Chrome bar callout -->
+  <circle cx="565" cy="2315" r="3" fill="#000"/>
+  <line x1="565" y1="2315" x2="620" y2="2260" stroke-width="0.8"/>
+  <line x1="620" y1="2260" x2="800" y2="2260" stroke-width="0.8"/>
+  <text x="810" y="2255" font-size="18" fill="#000">Barra cromada o/25mm</text>
+
+  <!-- Glass shelf callout -->
+  <circle cx="4180" cy="2867" r="3" fill="#000"/>
+  <line x1="4180" y1="2867" x2="4250" y2="2810" stroke-width="0.8"/>
+  <line x1="4250" y1="2810" x2="4450" y2="2810" stroke-width="0.8"/>
+  <text x="4460" y="2805" font-size="18" fill="#000">Vidro temp. 6mm</text>
+
+  <!-- LED callout -->
+  <circle cx="4300" cy="2634" r="3" fill="#E8A800"/>
+  <line x1="4300" y1="2634" x2="4350" y2="2580" stroke="#E8A800" stroke-width="0.8"/>
+  <line x1="4350" y1="2580" x2="4550" y2="2580" stroke="#E8A800" stroke-width="0.8"/>
+  <text x="4560" y="2575" font-size="18" fill="#E8A800">Fita LED 3000K</text>
+  <!-- LED zigzag symbol -->
+  <polyline points="4560,2585 4570,2578 4580,2592 4590,2578 4600,2592 4610,2585" fill="none" stroke="#E8A800" stroke-width="1.2"/>
+
+  <!-- Shoe shelf callout -->
+  <circle cx="3400" cy="3260" r="3" fill="#000"/>
+  <line x1="3400" y1="3260" x2="3400" y2="3230" stroke-width="0.8"/>
+  <line x1="3400" y1="3230" x2="3550" y2="3230" stroke-width="0.8"/>
+  <text x="3560" y="3225" font-size="16" fill="#000">Prat. 1500x300x18 MDP</text>
+
+  <!-- Boot shelf depth callout -->
+  <circle cx="3300" cy="2660" r="3" fill="#000"/>
+  <line x1="3300" y1="2660" x2="3300" y2="2630" stroke-width="0.8"/>
+  <line x1="3300" y1="2630" x2="3450" y2="2630" stroke-width="0.8"/>
+  <text x="3460" y="2625" font-size="16" fill="#000">1050x350x18 MDP</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- SECTION LABELS (at top of each section)                       -->
+<!-- ============================================================ -->
+<g id="sectionLabels">
+  <text x="440" y="1880" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">A</text>
+  <text x="996" y="1880" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">B</text>
+  <text x="2057" y="1880" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">C</text>
+  <text x="2907" y="1880" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">D</text>
+  <text x="3608" y="1880" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">E</text>
+  <text x="4379" y="1880" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">F</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- MATERIALS LEGEND (bottom-left)                                -->
+<!-- ============================================================ -->
+<g id="legend" transform="translate(100,3650)">
+  <text x="0" y="0" font-size="24" font-weight="bold" fill="#000">LEGENDA DE MATERIAIS</text>
+  <line x1="0" y1="10" x2="350" y2="10" stroke="#000" stroke-width="1"/>
+
+  <!-- MDP -->
+  <rect x="0" y="25" width="30" height="15" fill="#D4C5A9" stroke="#000" stroke-width="0.8"/>
+  <text x="40" y="38" font-size="18" fill="#000">MDP 18mm cor Lana (corpo)</text>
+
+  <!-- Glass -->
+  <rect x="0" y="55" width="30" height="15" fill="#A8D8EA" stroke="#4A90B8" stroke-width="0.8"/>
+  <text x="40" y="68" font-size="18" fill="#000">Vidro temperado 6mm</text>
+
+  <!-- Chrome -->
+  <circle cx="15" cy="98" r="7" fill="none" stroke="#000" stroke-width="1.5"/>
+  <circle cx="15" cy="98" r="1.5" fill="#000"/>
+  <text x="40" y="103" font-size="18" fill="#000">Barra cromada o/25mm</text>
+
+  <!-- LED -->
+  <polyline points="0,128 8,118 16,138 24,118 30,128" fill="none" stroke="#E8A800" stroke-width="1.5"/>
+  <text x="40" y="133" font-size="18" fill="#E8A800">Fita LED 3000K warm white</text>
+
+  <!-- Hatch -->
+  <rect x="0" y="145" width="30" height="15" fill="url(#hatchMDP)" stroke="#000" stroke-width="0.8"/>
+  <text x="40" y="158" font-size="18" fill="#000">Secao MDP (hachura)</text>
+
+  <!-- Dashed = hidden/back panel -->
+  <line x1="0" y1="178" x2="30" y2="178" stroke="#666" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="40" y="183" font-size="18" fill="#000">Painel traseiro / linha oculta</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- DEPTH INDICATION (small axonometric hint, top-right)          -->
+<!-- ============================================================ -->
+<g id="depthNote" transform="translate(4300,300)">
+  <text x="0" y="0" font-size="20" font-weight="bold" fill="#000">PROFUNDIDADE</text>
+  <text x="0" y="25" font-size="18" fill="#000">600mm da parede</text>
+  <!-- Small side view sketch -->
+  <rect x="0" y="40" width="60" height="120" fill="none" stroke="#000" stroke-width="1"/>
+  <line x1="0" y1="40" x2="-30" y2="25" stroke="#000" stroke-width="0.8"/>
+  <line x1="60" y1="40" x2="30" y2="25" stroke="#000" stroke-width="0.8"/>
+  <line x1="-30" y1="25" x2="30" y2="25" stroke="#000" stroke-width="0.8"/>
+  <line x1="-30" y1="25" x2="-30" y2="145" stroke="#000" stroke-width="0.8"/>
+  <line x1="-30" y1="145" x2="0" y2="160" stroke="#000" stroke-width="0.8"/>
+  <!-- Depth dimension -->
+  <line x1="0" y1="170" x2="60" y2="170" stroke="#000" stroke-width="0.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+  <text x="30" y="188" text-anchor="middle" font-size="16" fill="#000">600</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- NOTES                                                          -->
+<!-- ============================================================ -->
+<g id="notes" transform="translate(800,3650)">
+  <text x="0" y="0" font-size="24" font-weight="bold" fill="#000">NOTAS</text>
+  <line x1="0" y1="10" x2="300" y2="10" stroke="#000" stroke-width="1"/>
+  <text x="0" y="35" font-size="16" fill="#000">1. Todas as medidas em milimetros (mm)</text>
+  <text x="0" y="58" font-size="16" fill="#000">2. Ferragens: dobradicas 35mm, corrediceas telescopicas</text>
+  <text x="0" y="81" font-size="16" fill="#000">3. Acabamento: borda ABS 1mm nas faces visiveis</text>
+  <text x="0" y="104" font-size="16" fill="#000">4. Vitrines: display aberto (sem portas de vidro)</text>
+  <text x="0" y="127" font-size="16" fill="#000">5. Fixacao na parede: cantoneiras de aco a cada 600mm</text>
+  <text x="0" y="150" font-size="16" fill="#000">6. LED: transformador 12V embutido no topo do modulo</text>
+  <text x="0" y="173" font-size="16" fill="#000">7. Barras cromadas: suportes flangeados nas laterais</text>
+  <text x="0" y="196" font-size="16" fill="#000">8. Elevacao desdobrada — modulos distribuidos em L (parede leste 3640mm + retorno)</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- FLOOR LINE LABEL                                               -->
+<!-- ============================================================ -->
+<text x="250" y="3395" font-size="18" fill="#000">N.P.A. (Nivel Piso Acabado)</text>
+
+</g><!-- end elevation -->
+
+</svg>
+</div>
+</body>
+</html>

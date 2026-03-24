@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMA ID - Bill of Materials - Sabrina Parkland</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
+  .header h1 { font-size: 24px; font-weight: 300; letter-spacing: 2px; }
+  .header h2 { font-size: 16px; font-weight: 400; opacity: 0.8; margin-top: 5px; }
+  .header .meta { display: flex; gap: 30px; margin-top: 15px; font-size: 13px; opacity: 0.7; }
+  .section { background: white; padding: 25px; margin-bottom: 2px; }
+  .section:last-child { border-radius: 0 0 12px 12px; margin-bottom: 20px; }
+  .section h3 { font-size: 16px; color: #1a1a2e; border-bottom: 2px solid #e8e8e8; padding-bottom: 8px; margin-bottom: 15px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f8f9fa; text-align: left; padding: 10px 12px; font-weight: 600; color: #555; border-bottom: 2px solid #dee2e6; }
+  td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+  tr:hover { background: #f8f9ff; }
+  .qty { text-align: center; font-weight: 600; }
+  .price { text-align: right; font-family: 'Courier New', monospace; }
+  .subtotal { font-weight: 700; color: #1a1a2e; }
+  .category-header { background: #eef2ff; font-weight: 600; color: #1a1a2e; }
+  .category-header td { padding: 12px; font-size: 14px; border-bottom: 2px solid #c7d2fe; }
+  .totals-row { background: #1a1a2e; color: white; }
+  .totals-row td { padding: 14px 12px; font-weight: 700; font-size: 15px; }
+  .grand-total { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #4ade80; }
+  .grand-total td { padding: 16px 12px; font-size: 18px; font-weight: 800; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-lana { background: #f5f0e8; color: #8b7355; }
+  .badge-lord { background: #e8eaf0; color: #555; }
+  .badge-glass { background: #e0f2fe; color: #0369a1; }
+  .badge-mirror { background: #fce7f3; color: #be185d; }
+  .badge-led { background: #fef3c7; color: #92400e; }
+  .badge-hw { background: #f0fdf4; color: #166534; }
+  .notes { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; margin-top: 15px; font-size: 12px; }
+  .notes li { margin-bottom: 5px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+  .stat-card { background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .stat-card .value { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+  .stat-card .label { font-size: 12px; color: #888; margin-top: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>SOMA ID</h1>
+    <h2>Bill of Materials &mdash; Projeto Sabrina Parkland</h2>
+    <div class="meta">
+      <span>Cliente: B.Home Concept (Silmara)</span>
+      <span>Designer: Alana</span>
+      <span>Data: 22/03/2026</span>
+      <span>Local: Parkland, FL</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="stats">
+      <div class="stat-card">
+        <div class="value">15</div>
+        <div class="label">Chapas MDP/MDF</div>
+      </div>
+      <div class="stat-card">
+        <div class="value">149</div>
+        <div class="label">Pecas cortadas</div>
+      </div>
+      <div class="stat-card">
+        <div class="value">10.2 m&sup2;</div>
+        <div class="label">Vidro + Espelho</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" style="color:#16a34a">$3,157</div>
+        <div class="label">Total Materiais (USD)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Chapas e Paineis</h3>
+    <table>
+      <thead>
+        <tr><th>Material</th><th>Descricao</th><th class="qty">Chapas</th><th class="qty">Pecas</th><th>Dimensao Chapa</th><th class="price">Unit (USD)</th><th class="price">Total (USD)</th></tr>
+      </thead>
+      <tbody>
+        <tr class="category-header"><td colspan="7">CHAPAS MDP/MDF</td></tr>
+        <tr><td><span class="badge badge-lana">Lana</span> MDP 18mm</td><td>Corpo, laterais, prateleiras, divisores</td><td class="qty">11</td><td class="qty">127</td><td>2750 x 1850mm</td><td class="price">$85.00</td><td class="price subtotal">$935.00</td></tr>
+        <tr><td><span class="badge badge-lord">Lord</span> MDP 18mm</td><td>Frentes gavetas, bancada makeup</td><td class="qty">2</td><td class="qty">14</td><td>2750 x 1850mm</td><td class="price">$92.00</td><td class="price subtotal">$184.00</td></tr>
+        <tr><td>MDF 6mm</td><td>Paineis de fundo (todos modulos)</td><td class="qty">2</td><td class="qty">8</td><td>2750 x 1850mm</td><td class="price">$35.00</td><td class="price subtotal">$70.00</td></tr>
+        <tr class="totals-row"><td colspan="6">Subtotal Chapas</td><td class="price">$1,189.00</td></tr>
+
+        <tr class="category-header"><td colspan="7">VIDROS E ESPELHOS</td></tr>
+        <tr><td><span class="badge badge-glass">Vidro</span> Temperado 6mm</td><td>Prateleiras vitrines (15) + tampo ilha (1)</td><td class="qty">-</td><td class="qty">16</td><td>6.27 m&sup2; total</td><td class="price">$45.00/m&sup2;</td><td class="price subtotal">$282.15</td></tr>
+        <tr><td><span class="badge badge-mirror">Espelho</span> 4mm</td><td>Porta area armas (1324x2364) + makeup (800x1000)</td><td class="qty">-</td><td class="qty">2</td><td>3.93 m&sup2; total</td><td class="price">$55.00/m&sup2;</td><td class="price subtotal">$216.15</td></tr>
+        <tr class="totals-row"><td colspan="6">Subtotal Vidros/Espelhos</td><td class="price">$498.30</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Iluminacao LED</h3>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Descricao</th><th class="qty">Qtd</th><th>Comprimento</th><th class="price">Unit (USD)</th><th class="price">Total (USD)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="badge badge-led">LED</span> Fita 3000K</td><td>Vitrines bolsas (15 prateleiras)</td><td class="qty">15</td><td>15.75m</td><td class="price">$4.50/m</td><td class="price">$70.88</td></tr>
+        <tr><td><span class="badge badge-led">LED</span> Fita 3000K</td><td>Area armas (6 prateleiras)</td><td class="qty">6</td><td>7.94m</td><td class="price">$4.50/m</td><td class="price">$35.73</td></tr>
+        <tr><td><span class="badge badge-led">LED</span> Fita 4000K</td><td>Espelho makeup (laterais)</td><td class="qty">2</td><td>1.60m</td><td class="price">$4.50/m</td><td class="price">$7.20</td></tr>
+        <tr><td>Sensor magnetico</td><td>Acendimento automatico porta armas</td><td class="qty">1</td><td>-</td><td class="price">$12.00</td><td class="price">$12.00</td></tr>
+        <tr><td>Driver 12V 60W</td><td>Fonte LED area armas</td><td class="qty">1</td><td>-</td><td class="price">$25.00</td><td class="price">$25.00</td></tr>
+        <tr><td>Driver 12V 100W</td><td>Fonte LED vitrines</td><td class="qty">1</td><td>-</td><td class="price">$35.00</td><td class="price">$35.00</td></tr>
+        <tr class="totals-row"><td colspan="5">Subtotal Iluminacao</td><td class="price">$185.81</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Ferragens e Hardware</h3>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Descricao</th><th class="qty">Qtd</th><th class="price">Unit (USD)</th><th class="price">Total (USD)</th></tr>
+      </thead>
+      <tbody>
+        <tr class="category-header"><td colspan="5"><span class="badge badge-hw">FERRAGENS</span> BARRAS E SUPORTES</td></tr>
+        <tr><td>Barra cabide cromada 25mm</td><td>Closet Her + Closet His</td><td class="qty">6.7m</td><td class="price">$8.00/m</td><td class="price">$53.60</td></tr>
+        <tr><td>Flanges fixacao barra</td><td>Suportes laterais</td><td class="qty">10</td><td class="price">$3.50</td><td class="price">$35.00</td></tr>
+        <tr class="category-header"><td colspan="5"><span class="badge badge-hw">FERRAGENS</span> CORREDICAS</td></tr>
+        <tr><td>Corredica telescopica 500mm soft-close</td><td>Gavetas ilha central (5 pares)</td><td class="qty">5 pares</td><td class="price">$18.00</td><td class="price">$90.00</td></tr>
+        <tr><td>Corredica telescopica 450mm soft-close</td><td>Gavetas makeup (2 pares)</td><td class="qty">2 pares</td><td class="price">$16.00</td><td class="price">$32.00</td></tr>
+        <tr class="category-header"><td colspan="5"><span class="badge badge-hw">FERRAGENS</span> DOBRADICAS E PUXADORES</td></tr>
+        <tr><td>Dobradica conceito 110&deg; soft-close</td><td>Porta espelho area armas</td><td class="qty">4</td><td class="price">$12.00</td><td class="price">$48.00</td></tr>
+        <tr><td>Puxadores embutidos</td><td>Gavetas ilha + makeup</td><td class="qty">7</td><td class="price">$8.00</td><td class="price">$56.00</td></tr>
+        <tr class="category-header"><td colspan="5"><span class="badge badge-hw">FERRAGENS</span> ESTRUTURA</td></tr>
+        <tr><td>Pes regulaveis 100mm</td><td>Base modulos de piso</td><td class="qty">24</td><td class="price">$2.50</td><td class="price">$60.00</td></tr>
+        <tr><td>Kit fixacao (minifix + cavilhas)</td><td>Montagem estrutural</td><td class="qty">3 kits</td><td class="price">$45.00</td><td class="price">$135.00</td></tr>
+        <tr class="totals-row"><td colspan="4">Subtotal Ferragens</td><td class="price">$509.60</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Acabamentos e Consumiveis</h3>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Descricao</th><th class="qty">Qtd</th><th class="price">Unit (USD)</th><th class="price">Total (USD)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Fita de borda Lana 22mm</td><td>Bordas visiveis corpo</td><td class="qty">180m</td><td class="price">$0.45/m</td><td class="price">$81.00</td></tr>
+        <tr><td>Fita de borda Lord 22mm</td><td>Bordas visiveis frentes</td><td class="qty">25m</td><td class="price">$0.50/m</td><td class="price">$12.50</td></tr>
+        <tr><td>Veludo cinza</td><td>Divisores tampo ilha</td><td class="qty">0.66 m&sup2;</td><td class="price">$25.00/m&sup2;</td><td class="price">$16.50</td></tr>
+        <tr class="totals-row"><td colspan="4">Subtotal Acabamentos</td><td class="price">$110.00</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <table>
+      <tbody>
+        <tr class="totals-row"><td colspan="4" style="font-size:14px">Chapas MDP/MDF</td><td class="price" style="font-size:14px">$1,189.00</td></tr>
+        <tr class="totals-row"><td colspan="4" style="font-size:14px">Vidros e Espelhos</td><td class="price" style="font-size:14px">$498.30</td></tr>
+        <tr class="totals-row"><td colspan="4" style="font-size:14px">Iluminacao LED</td><td class="price" style="font-size:14px">$185.81</td></tr>
+        <tr class="totals-row"><td colspan="4" style="font-size:14px">Ferragens e Hardware</td><td class="price" style="font-size:14px">$509.60</td></tr>
+        <tr class="totals-row"><td colspan="4" style="font-size:14px">Acabamentos e Consumiveis</td><td class="price" style="font-size:14px">$110.00</td></tr>
+        <tr class="grand-total"><td colspan="4">TOTAL GERAL MATERIAIS</td><td class="price">$2,492.71</td></tr>
+      </tbody>
+    </table>
+    <div class="notes">
+      <strong>Notas:</strong>
+      <ul>
+        <li>Precos baseados em valores tipicos de South Florida wholesale (Home Depot Pro, 84 Lumber)</li>
+        <li>NAO inclui: mao de obra, transporte, instalacao, acabamento final</li>
+        <li>Vidro temperado cortado sob medida — pode variar +/-15% dependendo do fornecedor</li>
+        <li>Espelho porta armas (1324x2364mm) — peca grande, verificar disponibilidade com fornecedor</li>
+        <li>Precos de LED e sensores baseados em Amazon/Home Depot retail — bulk pricing pode reduzir 20-30%</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

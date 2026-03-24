@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SOMA ID - Closet Sabrina Parkland - 3D</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; color: #fff; }
+
+#header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  height: 56px;
+}
+#header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
+#header h1 span { color: #e94560; font-weight: 700; }
+#header .subtitle { font-size: 11px; opacity: 0.7; }
+
+#footer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(22, 33, 62, 0.9); padding: 8px 20px;
+  text-align: center; font-size: 11px; opacity: 0.6;
+}
+
+#controls {
+  position: fixed; top: 66px; right: 12px; z-index: 100;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.ctrl-btn {
+  background: rgba(15, 52, 96, 0.85); border: 1px solid rgba(233, 69, 96, 0.3);
+  color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  font-size: 12px; transition: all 0.2s; backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+.ctrl-btn:hover, .ctrl-btn.active { background: #e94560; border-color: #e94560; transform: scale(1.05); }
+
+#sidebar {
+  position: fixed; top: 56px; left: 0; bottom: 30px; width: 260px; z-index: 90;
+  background: rgba(22, 33, 62, 0.92); backdrop-filter: blur(10px);
+  overflow-y: auto; padding: 12px; transition: transform 0.3s;
+  border-right: 1px solid rgba(233, 69, 96, 0.2);
+}
+#sidebar.hidden { transform: translateX(-260px); }
+#sidebar h3 { font-size: 13px; color: #e94560; margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 1px; }
+#sidebar h3:first-child { margin-top: 0; }
+.part-item {
+  padding: 6px 10px; font-size: 11px; border-radius: 6px; cursor: pointer;
+  transition: background 0.15s; display: flex; justify-content: space-between; align-items: center;
+  margin: 2px 0;
+}
+.part-item:hover { background: rgba(233, 69, 96, 0.2); }
+.part-item .dims { opacity: 0.5; font-size: 10px; }
+.zone-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0; }
+
+#tooltip {
+  position: fixed; z-index: 200; pointer-events: none;
+  background: rgba(15, 52, 96, 0.95); border: 1px solid #e94560;
+  border-radius: 8px; padding: 10px 14px; font-size: 12px;
+  display: none; max-width: 250px; backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+#tooltip .tt-name { font-weight: 700; color: #e94560; margin-bottom: 4px; }
+#tooltip .tt-dims { opacity: 0.8; }
+#tooltip .tt-mat { opacity: 0.6; font-size: 11px; margin-top: 2px; }
+
+#toggle-sidebar {
+  position: fixed; top: 66px; left: 12px; z-index: 100;
+}
+
+#canvas-container { width: 100vw; height: 100vh; }
+
+#loading {
+  position: fixed; inset: 0; z-index: 300; background: #1a1a2e;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+}
+#loading .spinner { width: 40px; height: 40px; border: 3px solid #16213e; border-top-color: #e94560; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading p { margin-top: 16px; font-size: 14px; opacity: 0.7; }
+
+@media (max-width: 768px) {
+  #sidebar { width: 220px; }
+  #sidebar.hidden { transform: translateX(-220px); }
+  #header h1 { font-size: 13px; }
+  .ctrl-btn { padding: 6px 10px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div><p>Carregando modelo 3D...</p></div>
+
+<div id="header">
+  <div>
+    <h1><span>SOMA ID</span> — Closet Sabrina Parkland — Modelo 3D Interativo</h1>
+    <div class="subtitle">Parkland, FL | 5.13m x 3.64m | H=3.00m | 99 pecas</div>
+  </div>
+</div>
+
+<div id="toggle-sidebar">
+  <button class="ctrl-btn" onclick="toggleSidebar()">&#9776; Pecas</button>
+</div>
+
+<div id="sidebar">
+</div>
+
+<div id="controls">
+  <button class="ctrl-btn active" onclick="setView('iso')">Isometrica</button>
+  <button class="ctrl-btn" onclick="setView('top')">Planta</button>
+  <button class="ctrl-btn" onclick="setView('front')">Frente</button>
+  <button class="ctrl-btn" onclick="setView('left')">Esquerda</button>
+  <button class="ctrl-btn" onclick="setView('right')">Direita</button>
+  <hr style="border-color: rgba(255,255,255,0.1); margin: 4px 0;">
+  <button class="ctrl-btn" id="explode-btn" onclick="toggleExplode()">Explodir</button>
+</div>
+
+<div id="tooltip">
+  <div class="tt-name"></div>
+  <div class="tt-dims"></div>
+  <div class="tt-mat"></div>
+</div>
+
+<div id="canvas-container"></div>
+
+<div id="footer">Gerado automaticamente por SOMA ID | somaid.12brain.org</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─── SCENE SETUP ────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1a2e);
+scene.fog = new THREE.Fog(0x1a1a2e, 15000, 25000);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 50000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(2565, 1500, 1820);
+controls.minDistance = 1000;
+controls.maxDistance = 20000;
+
+// ─── LIGHTING ───────────────────────────────────────────
+const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambient);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+dirLight.position.set(5000, 8000, 6000);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.set(2048, 2048);
+dirLight.shadow.camera.left = -5000;
+dirLight.shadow.camera.right = 5000;
+dirLight.shadow.camera.top = 5000;
+dirLight.shadow.camera.bottom = -5000;
+scene.add(dirLight);
+
+const fillLight = new THREE.DirectionalLight(0x8090ff, 0.3);
+fillLight.position.set(-3000, 4000, -2000);
+scene.add(fillLight);
+
+const pointLight = new THREE.PointLight(0xffd4a0, 0.4, 8000);
+pointLight.position.set(2565, 1500, 1820);
+scene.add(pointLight);
+
+// ─── MATERIALS ──────────────────────────────────────────
+const materials = {
+  wall: new THREE.MeshStandardMaterial({
+    color: 0xf0ede8, roughness: 0.9, metalness: 0,
+    transparent: true, opacity: 0.25, side: THREE.DoubleSide
+  }),
+  lana: new THREE.MeshStandardMaterial({ color: 0xD4C5A9, roughness: 0.6, metalness: 0.05 }),
+  lord: new THREE.MeshStandardMaterial({ color: 0x4A4A4A, roughness: 0.5, metalness: 0.1 }),
+  glass: new THREE.MeshPhysicalMaterial({
+    color: 0xd4eaf7, roughness: 0.1, metalness: 0,
+    transparent: true, opacity: 0.3, transmission: 0.6,
+    thickness: 6, ior: 1.5
+  }),
+  mirror: new THREE.MeshStandardMaterial({
+    color: 0xe8e8f0, roughness: 0.05, metalness: 1.0,
+    envMapIntensity: 1.0
+  }),
+  chrome: new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.15, metalness: 0.9 }),
+  floor: new THREE.MeshStandardMaterial({ color: 0x8b7355, roughness: 0.8, metalness: 0 }),
+};
+
+const zoneColors = {
+  closet_her: 0xE8D5E0,
+  ilha_central: 0xF5E6C8,
+  makeup_area: 0xE0D5E8,
+  area_armas: 0xA0A0A0,
+  closet_his: 0xD5E0E8,
+  room: 0xf0ede8,
+};
+
+// ─── ROOM DIMENSIONS ────────────────────────────────────
+const ROOM_W = 5130, ROOM_D = 3640, ROOM_H = 3000;
+const WALL_T = 150, MDP_T = 18, GLASS_T = 6, MIRROR_T = 4;
+
+const partRegistry = [];
+const zoneGroups = {};
+const allMeshes = [];
+
+function addPart(name, zone, materialKey, geometry, position, rotation) {
+  const mat = materials[materialKey] ? materials[materialKey].clone() : materials.lana.clone();
+  const mesh = new THREE.Mesh(geometry, mat);
+  mesh.position.set(position[0], position[2], position[1]);
+  if (rotation) {
+    if (rotation[0]) mesh.rotation.x = rotation[0];
+    if (rotation[1]) mesh.rotation.y = rotation[1];
+    if (rotation[2]) mesh.rotation.z = rotation[2];
+  }
+  mesh.castShadow = materialKey !== 'wall' && materialKey !== 'glass';
+  mesh.receiveShadow = true;
+
+  mesh.userData = { name, zone, material: materialKey, originalPosition: mesh.position.clone() };
+
+  if (!zoneGroups[zone]) {
+    zoneGroups[zone] = new THREE.Group();
+    zoneGroups[zone].userData.zone = zone;
+    scene.add(zoneGroups[zone]);
+  }
+  zoneGroups[zone].add(mesh);
+  allMeshes.push(mesh);
+
+  const bb = new THREE.Box3().setFromObject(mesh);
+  const size = new THREE.Vector3();
+  bb.getSize(size);
+
+  partRegistry.push({
+    name, zone, material: materialKey, mesh,
+    dims: Math.round(size.x) + 'x' + Math.round(size.z) + 'x' + Math.round(size.y) + 'mm',
+  });
+}
+
+// ─── BUILD GEOMETRY ─────────────────────────────────────
+
+// Floor
+const floorGeo = new THREE.BoxGeometry(ROOM_W + 300, 20, ROOM_D + 300);
+const floorMesh = new THREE.Mesh(floorGeo, materials.floor);
+floorMesh.position.set(ROOM_W / 2, -10, ROOM_D / 2);
+floorMesh.receiveShadow = true;
+scene.add(floorMesh);
+
+const grid = new THREE.GridHelper(8000, 40, 0x444444, 0x333333);
+grid.position.y = 1;
+scene.add(grid);
+
+function boxGeo(w, h, d) { return new THREE.BoxGeometry(w, h, d); }
+
+// ── WALLS ──
+const doorW = 900;
+const sideW = (ROOM_W - doorW) / 2;
+addPart('Parede Norte', 'room', 'wall', boxGeo(ROOM_W, ROOM_H, WALL_T), [ROOM_W/2, ROOM_D + WALL_T/2, ROOM_H/2]);
+addPart('Parede Sul (E)', 'room', 'wall', boxGeo(sideW, ROOM_H, WALL_T), [sideW/2, -WALL_T/2, ROOM_H/2]);
+addPart('Parede Sul (D)', 'room', 'wall', boxGeo(sideW, ROOM_H, WALL_T), [ROOM_W - sideW/2, -WALL_T/2, ROOM_H/2]);
+addPart('Verga Porta', 'room', 'wall', boxGeo(doorW, ROOM_H-2100, WALL_T), [ROOM_W/2, -WALL_T/2, 2100 + (ROOM_H-2100)/2]);
+addPart('Parede Leste', 'room', 'wall', boxGeo(WALL_T, ROOM_H, ROOM_D), [ROOM_W + WALL_T/2, ROOM_D/2, ROOM_H/2]);
+addPart('Parede Oeste', 'room', 'wall', boxGeo(WALL_T, ROOM_H, ROOM_D), [-WALL_T/2, ROOM_D/2, ROOM_H/2]);
+
+// ── CLOSET HER (along east wall + north section) ──
+const HER_X = ROOM_W - 600;
+const HER_Y = ROOM_D * 0.15;
+
+// Vertical structure panels
+addPart('Lateral Her E', 'closet_her', 'lana', boxGeo(MDP_T, 2400, 600), [HER_X + MDP_T/2, HER_Y, 1200]);
+addPart('Lateral Her D', 'closet_her', 'lana', boxGeo(MDP_T, 2400, 600), [ROOM_W - MDP_T/2, HER_Y, 1200]);
+
+// Top panel
+addPart('Topo Closet Her', 'closet_her', 'lana', boxGeo(ROOM_W - HER_X, MDP_T, 600), [HER_X + (ROOM_W - HER_X)/2, HER_Y, 2400]);
+
+// Hanging bars
+const barGeo = new THREE.CylinderGeometry(12.5, 12.5, 1500, 16);
+addPart('Barra Vestidos', 'closet_her', 'chrome', barGeo, [HER_X + 300, HER_Y + 200, 1700], [0, 0, Math.PI/2]);
+
+const barGeo2 = new THREE.CylinderGeometry(12.5, 12.5, 1800, 16);
+addPart('Barra Camisas (superior)', 'closet_her', 'chrome', barGeo2, [HER_X + 300, HER_Y + 1600, 1700], [0, 0, Math.PI/2]);
+addPart('Barra Calcas (inferior)', 'closet_her', 'chrome', barGeo2, [HER_X + 300, HER_Y + 1600, 900], [0, 0, Math.PI/2]);
+
+// Shelves Her
+for (let i = 0; i < 8; i++) {
+  addPart('Prateleira Her ' + (i+1), 'closet_her', 'lana',
+    boxGeo(800, MDP_T, 400), [HER_X + 400, HER_Y, 300 + i * 270]);
+}
+
+// Niches
+for (let i = 0; i < 6; i++) {
+  // niche dividers (horizontal)
+  addPart('Divisor Nicho ' + (i+1), 'closet_her', 'lana',
+    boxGeo(400, MDP_T, 400), [HER_X + 200, HER_Y + 500, 300 + i * 360]);
+}
+
+// Shoe rack
+for (let i = 0; i < 5; i++) {
+  addPart('Sapateira ' + (i+1) + ' (sapatos)', 'closet_her', 'lana',
+    boxGeo(1500, MDP_T, 300), [800, HER_Y + 100, 100 + i * 150]);
+}
+for (let i = 0; i < 2; i++) {
+  addPart('Sapateira ' + (i+1) + ' (botas)', 'closet_her', 'lana',
+    boxGeo(1050, MDP_T, 350), [600, HER_Y + 100, 850 + i * 400]);
+}
+
+// Vitrines (bags)
+for (let col = 0; col < 3; col++) {
+  addPart('Vitrine Lateral ' + (col+1), 'closet_her', 'lana',
+    boxGeo(MDP_T, 2000, 350), [HER_X + 400, HER_Y + 500 + col * 370, 1400]);
+  for (let row = 0; row < 5; row++) {
+    addPart('Vidro Vitrine ' + (col+1) + '-' + (row+1), 'closet_her', 'glass',
+      boxGeo(350, GLASS_T, 350), [HER_X + 400, HER_Y + 500 + col * 370 + 185, 500 + row * 380]);
+  }
+}
+addPart('Vitrine Lateral 4', 'closet_her', 'lana',
+  boxGeo(MDP_T, 2000, 350), [HER_X + 400, HER_Y + 500 + 3 * 370, 1400]);
+
+// Luggage
+addPart('Prateleira Malas', 'closet_her', 'lana',
+  boxGeo(2000, MDP_T, 600), [HER_X, HER_Y + 900, 2200]);
+
+// Steamer niche
+addPart('Nicho Steamer', 'closet_her', 'lana',
+  boxGeo(300, 1800, 400), [HER_X + 150, HER_Y + 3200, 900]);
+
+// ── ILHA CENTRAL ──
+const ILHA_X = ROOM_W / 2;
+const ILHA_Y = ROOM_D / 2;
+
+addPart('Ilha Base', 'ilha_central', 'lana',
+  boxGeo(1200, 864, 600), [ILHA_X, ILHA_Y, 450]);
+addPart('Ilha Tampo Vidro', 'ilha_central', 'glass',
+  boxGeo(1200, GLASS_T, 600), [ILHA_X, ILHA_Y, 900 + GLASS_T/2]);
+
+const categories = ['Lingerie', 'Pijamas', 'Biquinis', 'Cintos', 'Acessorios'];
+for (let i = 0; i < 5; i++) {
+  addPart('Gaveta ' + categories[i], 'ilha_central', 'lord',
+    boxGeo(1128, 140, MDP_T), [ILHA_X, ILHA_Y - 300 + MDP_T/2, 60 + i * 165]);
+}
+
+// ── MAKEUP AREA ──
+const MK_X = 700;
+const MK_Y = 400;
+
+addPart('Makeup Lateral E', 'makeup_area', 'lana', boxGeo(MDP_T, 750, 500), [MK_X - 595, MK_Y, 375]);
+addPart('Makeup Lateral D', 'makeup_area', 'lana', boxGeo(MDP_T, 750, 500), [MK_X + 595, MK_Y, 375]);
+addPart('Bancada Makeup', 'makeup_area', 'lord',
+  boxGeo(1190, MDP_T, 500), [MK_X, MK_Y, 750]);
+addPart('Espelho Makeup', 'makeup_area', 'mirror',
+  boxGeo(800, 1000, MIRROR_T), [MK_X, MK_Y - 250 + MIRROR_T/2, 800 + 500]);
+for (let i = 0; i < 2; i++) {
+  addPart('Gaveta Makeup ' + (i+1), 'makeup_area', 'lord',
+    boxGeo(500, 120, MDP_T), [MK_X - 300 + i * 600, MK_Y - 250 + MDP_T/2, 650]);
+}
+
+// ── AREA ARMAS ──
+const ARM_X = 800;
+const ARM_Y = ROOM_D - 300;
+
+addPart('Armas Lateral E', 'area_armas', 'lana', boxGeo(MDP_T, 2400, 600), [ARM_X - 680, ARM_Y, 1200]);
+addPart('Armas Lateral D', 'area_armas', 'lana', boxGeo(MDP_T, 2400, 600), [ARM_X + 680, ARM_Y, 1200]);
+addPart('Armas Topo', 'area_armas', 'lana', boxGeo(1324, MDP_T, 600), [ARM_X, ARM_Y, 2400 - MDP_T/2]);
+addPart('Armas Base', 'area_armas', 'lana', boxGeo(1324, MDP_T, 600), [ARM_X, ARM_Y, MDP_T/2]);
+
+for (let i = 0; i < 6; i++) {
+  addPart('Prateleira Armas ' + (i+1), 'area_armas', 'lana',
+    boxGeo(1324, MDP_T, 564), [ARM_X, ARM_Y, 300 + i * 350]);
+}
+addPart('Porta Espelho Armas', 'area_armas', 'mirror',
+  boxGeo(1324, 2364, MIRROR_T), [ARM_X, ARM_Y - 300 - MIRROR_T/2, 1200]);
+
+// ── CLOSET HIS ──
+const HIS_X = 400;
+const HIS_Y = ROOM_D * 0.2;
+const moduleConfigs = [
+  { name: 'Prateleiras His 1', w: 800, shelves: 8, bar: false },
+  { name: 'Prateleiras His 2', w: 800, shelves: 8, bar: false },
+  { name: 'Cabide His', w: 1200, shelves: 0, bar: true },
+  { name: 'Sapateira His', w: 1230, shelves: 8, bar: false },
+];
+
+let offY = 0;
+for (const mod of moduleConfigs) {
+  addPart(mod.name + ' Lat E', 'closet_his', 'lana',
+    boxGeo(MDP_T, 2400, 600), [HIS_X - mod.w/2, HIS_Y + offY, 1200]);
+  addPart(mod.name + ' Lat D', 'closet_his', 'lana',
+    boxGeo(MDP_T, 2400, 600), [HIS_X + mod.w/2, HIS_Y + offY, 1200]);
+
+  for (let s = 0; s < mod.shelves; s++) {
+    addPart(mod.name + ' Prat ' + (s+1), 'closet_his', 'lana',
+      boxGeo(mod.w - 2*MDP_T, MDP_T, 564), [HIS_X, HIS_Y + offY, 200 + s * 275]);
+  }
+
+  if (mod.bar) {
+    const hisBarGeo = new THREE.CylinderGeometry(12.5, 12.5, mod.w - 2*MDP_T, 16);
+    addPart(mod.name + ' Barra', 'closet_his', 'chrome',
+      hisBarGeo, [HIS_X, HIS_Y + offY, 1700], [0, 0, Math.PI/2]);
+  }
+
+  addPart(mod.name + ' Fundo', 'closet_his', 'lana',
+    boxGeo(mod.w - 2*MDP_T, 2364, 6), [HIS_X, HIS_Y + offY + 297, 1200]);
+
+  offY += mod.w + 5;
+}
+
+// ─── INTERACTION ────────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let hoveredMesh = null;
+const tooltip = document.getElementById('tooltip');
+
+function onPointerMove(e) {
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(allMeshes);
+
+  if (hoveredMesh && hoveredMesh !== (intersects[0] && intersects[0].object)) {
+    if (hoveredMesh.userData.material !== 'wall') {
+      if (hoveredMesh.material.emissive) hoveredMesh.material.emissive.setHex(0x000000);
+    }
+    hoveredMesh = null;
+    tooltip.style.display = 'none';
+  }
+
+  if (intersects.length > 0) {
+    const obj = intersects[0].object;
+    if (obj.userData.name && obj.userData.material !== 'wall') {
+      hoveredMesh = obj;
+      if (obj.material.emissive) obj.material.emissive.setHex(0x333333);
+
+      const info = partRegistry.find(function(p) { return p.mesh === obj; });
+      if (info) {
+        tooltip.querySelector('.tt-name').textContent = info.name;
+        tooltip.querySelector('.tt-dims').textContent = info.dims;
+        const matNames = { lana: 'MDP 18mm Lana', lord: 'MDP 18mm Lord', glass: 'Vidro Temperado 6mm', mirror: 'Espelho 4mm', chrome: 'Cromado 25mm' };
+        tooltip.querySelector('.tt-mat').textContent = matNames[info.material] || info.material;
+        tooltip.style.display = 'block';
+        tooltip.style.left = (e.clientX + 15) + 'px';
+        tooltip.style.top = (e.clientY + 15) + 'px';
+      }
+    }
+  }
+}
+renderer.domElement.addEventListener('pointermove', onPointerMove);
+
+// ─── SIDEBAR ────────────────────────────────────────────
+const zoneNames = {
+  closet_her: 'Closet Her',
+  ilha_central: 'Ilha Central',
+  makeup_area: 'Makeup Area',
+  area_armas: 'Area Armas',
+  closet_his: 'Closet His',
+};
+const sidebar = document.getElementById('sidebar');
+
+const grouped = {};
+for (let i = 0; i < partRegistry.length; i++) {
+  const p = partRegistry[i];
+  if (p.zone === 'room') continue;
+  if (!grouped[p.zone]) grouped[p.zone] = [];
+  grouped[p.zone].push(p);
+}
+
+for (const zone in grouped) {
+  const parts = grouped[zone];
+  const h3 = document.createElement('h3');
+  const dot = document.createElement('span');
+  dot.className = 'zone-dot';
+  dot.style.background = '#' + (zoneColors[zone] || 0xffffff).toString(16).padStart(6, '0');
+  h3.appendChild(dot);
+  h3.appendChild(document.createTextNode(zoneNames[zone] || zone));
+  sidebar.appendChild(h3);
+
+  const shown = {};
+  for (let i = 0; i < parts.length; i++) {
+    const p = parts[i];
+    const baseName = p.name.replace(/\s+\d+(-\d+)?$/, '');
+    let count = 0;
+    for (let j = 0; j < parts.length; j++) {
+      if (parts[j].name.replace(/\s+\d+(-\d+)?$/, '') === baseName) count++;
+    }
+    let displayName;
+    if (count > 1 && !shown[baseName]) {
+      displayName = baseName + ' (x' + count + ')';
+    } else if (shown[baseName]) {
+      continue;
+    } else {
+      displayName = p.name;
+    }
+    shown[baseName] = true;
+
+    const div = document.createElement('div');
+    div.className = 'part-item';
+    div.innerHTML = '<span>' + displayName + '</span><span class="dims">' + p.dims + '</span>';
+    (function(part) {
+      div.onclick = function() { focusOnPart(part); };
+    })(p);
+    sidebar.appendChild(div);
+  }
+}
+
+function focusOnPart(part) {
+  const worldPos = new THREE.Vector3();
+  part.mesh.getWorldPosition(worldPos);
+
+  const startPos = camera.position.clone();
+  const startTarget = controls.target.clone();
+  const endTarget = worldPos;
+  const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+  const endPos = worldPos.clone().add(dir.multiplyScalar(2000));
+
+  let t = 0;
+  function animFocus() {
+    t += 0.04;
+    if (t > 1) t = 1;
+    const ease = t * t * (3 - 2 * t);
+    camera.position.lerpVectors(startPos, endPos, ease);
+    controls.target.lerpVectors(startTarget, endTarget, ease);
+    controls.update();
+    if (t < 1) requestAnimationFrame(animFocus);
+  }
+  animFocus();
+
+  if (part.mesh.material.emissive) {
+    const origEmissive = part.mesh.material.emissive.getHex();
+    part.mesh.material.emissive.setHex(0xe94560);
+    setTimeout(function() { part.mesh.material.emissive.setHex(origEmissive); }, 800);
+  }
+}
+
+// ─── VIEW CONTROLS ──────────────────────────────────────
+const center = new THREE.Vector3(ROOM_W / 2, 1500, ROOM_D / 2);
+
+function animateCamera(pos, target) {
+  const startPos = camera.position.clone();
+  const startTarget = controls.target.clone();
+  let t = 0;
+  function anim() {
+    t += 0.03;
+    if (t > 1) t = 1;
+    const ease = t * t * (3 - 2 * t);
+    camera.position.lerpVectors(startPos, pos, ease);
+    controls.target.lerpVectors(startTarget, target, ease);
+    controls.update();
+    if (t < 1) requestAnimationFrame(anim);
+  }
+  anim();
+}
+
+window.setView = function(view) {
+  document.querySelectorAll('#controls .ctrl-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (event && event.target) event.target.classList.add('active');
+
+  const c = center.clone();
+  switch (view) {
+    case 'iso':
+      animateCamera(new THREE.Vector3(c.x + 6000, 5000, c.z + 6000), c);
+      break;
+    case 'top':
+      animateCamera(new THREE.Vector3(c.x, 9000, c.z + 10), c);
+      break;
+    case 'front':
+      animateCamera(new THREE.Vector3(c.x, 1500, c.z - 6000), c);
+      break;
+    case 'left':
+      animateCamera(new THREE.Vector3(c.x - 6000, 1500, c.z), c);
+      break;
+    case 'right':
+      animateCamera(new THREE.Vector3(c.x + 6000, 1500, c.z), c);
+      break;
+  }
+};
+
+// ─── EXPLODE ────────────────────────────────────────────
+let exploded = false;
+const explodeOffsets = {
+  closet_her: new THREE.Vector3(1500, 0, 0),
+  ilha_central: new THREE.Vector3(0, 800, 0),
+  makeup_area: new THREE.Vector3(-1200, 0, -800),
+  area_armas: new THREE.Vector3(-800, 0, 1200),
+  closet_his: new THREE.Vector3(-1500, 0, 0),
+};
+
+window.toggleExplode = function() {
+  exploded = !exploded;
+  document.getElementById('explode-btn').classList.toggle('active', exploded);
+
+  for (const zone in zoneGroups) {
+    if (zone === 'room') continue;
+    const group = zoneGroups[zone];
+    const offset = explodeOffsets[zone] || new THREE.Vector3(0, 0, 0);
+    const target = exploded ? offset : new THREE.Vector3(0, 0, 0);
+    const start = group.position.clone();
+    (function(g, s, tgt) {
+      let t = 0;
+      function step() {
+        t += 0.03;
+        if (t > 1) t = 1;
+        const ease = t * t * (3 - 2 * t);
+        g.position.lerpVectors(s, tgt, ease);
+        if (t < 1) requestAnimationFrame(step);
+      }
+      step();
+    })(group, start, target);
+  }
+};
+
+// ─── SIDEBAR TOGGLE ─────────────────────────────────────
+window.toggleSidebar = function() {
+  sidebar.classList.toggle('hidden');
+};
+
+// ─── RESIZE ─────────────────────────────────────────────
+window.addEventListener('resize', function() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ─── INITIAL CAMERA ─────────────────────────────────────
+camera.position.set(center.x + 6000, 5000, center.z + 6000);
+controls.update();
+
+// ─── ANIMATION LOOP ─────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+// Hide loading
+setTimeout(function() {
+  document.getElementById('loading').style.display = 'none';
+}, 500);
+
+</script>
+</body>
+</html>

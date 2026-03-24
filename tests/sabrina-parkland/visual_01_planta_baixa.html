@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; }
+  .title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 20px; }
+  .container { display: flex; gap: 30px; align-items: flex-start; }
+  .legend { margin-top: 20px; }
+  .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; }
+  .legend-color { width: 20px; height: 20px; border-radius: 3px; margin-right: 10px; border: 1px solid #ccc; }
+  .dims-table { margin-top: 20px; font-size: 12px; border-collapse: collapse; }
+  .dims-table td, .dims-table th { padding: 5px 10px; border: 1px solid #dee2e6; }
+  .dims-table th { background: #1a1a2e; color: #fff; font-size: 11px; }
+  svg text { font-family: 'Segoe UI', Arial, sans-serif; }
+</style>
+</head>
+<body>
+<div class="title">Planta Baixa 2D — Closet Sabrina Parkland</div>
+<div class="subtitle">Espaco: 5.13m x 3.64m (18.67 m2) | Pe-direito: 3.00m | Formato irregular</div>
+
+<div class="container">
+<svg width="700" height="560" viewBox="-30 -30 730 590">
+  <!-- Scale: 1m = 120px. 5.13m=615.6px, 3.64m=436.8px -->
+
+  <!-- Room outline -->
+  <rect x="0" y="0" width="615.6" height="436.8" fill="none" stroke="#1a1a2e" stroke-width="3"/>
+
+  <!-- Zone: Closet Her (north wall + east side) - pink -->
+  <!-- Closet Her occupies east wall (3.64m wide) x 3.81m deep from east -->
+  <!-- In our layout: east wall is right side. Depth 3.81m = 457.2px from right -->
+  <rect x="158.4" y="0" width="457.2" height="436.8" fill="#fce4ec" fill-opacity="0.6" stroke="#e91e63" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="387" y="220" text-anchor="middle" font-size="15" font-weight="700" fill="#c2185b">CLOSET HER</text>
+  <text x="387" y="238" text-anchor="middle" font-size="11" fill="#c2185b">3.64m x 3.81m</text>
+
+  <!-- Sub-zones within Closet Her -->
+  <!-- Sapateira (bottom-right corner) -->
+  <rect x="435.6" y="316.8" width="180" height="120" fill="#f8bbd0" fill-opacity="0.5" stroke="#e91e63" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="525.6" y="380" text-anchor="middle" font-size="9" fill="#880e4f">Sapateira</text>
+  <text x="525.6" y="392" text-anchor="middle" font-size="8" fill="#880e4f">30 pares + 6 botas</text>
+
+  <!-- Vitrines (top-right area) -->
+  <rect x="489.6" y="0" width="126" height="240" fill="#f8bbd0" fill-opacity="0.5" stroke="#e91e63" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="552.6" y="115" text-anchor="middle" font-size="9" fill="#880e4f">Vitrines</text>
+  <text x="552.6" y="127" text-anchor="middle" font-size="8" fill="#880e4f">15 bolsas</text>
+  <text x="552.6" y="139" text-anchor="middle" font-size="8" fill="#880e4f">LED + Vidro</text>
+
+  <!-- Hanging bars (center of Closet Her) -->
+  <rect x="250" y="10" width="230" height="80" fill="#f8bbd0" fill-opacity="0.4" stroke="#e91e63" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="365" y="45" text-anchor="middle" font-size="9" fill="#880e4f">Barras Cabide</text>
+  <text x="365" y="57" text-anchor="middle" font-size="8" fill="#880e4f">Vestidos + Camisas</text>
+
+  <!-- Luggage area (top of closet her) -->
+  <rect x="158.4" y="0" width="240" height="40" fill="#f48fb1" fill-opacity="0.3" stroke="#e91e63" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="278.4" y="25" text-anchor="middle" font-size="8" fill="#880e4f">Malas (H=2200mm)</text>
+
+  <!-- Zone: Closet His (west wall) - blue -->
+  <!-- 4.03m wide x 0.60m deep from west wall -->
+  <rect x="0" y="0" width="72" height="436.8" fill="#e3f2fd" fill-opacity="0.6" stroke="#1565c0" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="36" y="180" text-anchor="middle" font-size="13" font-weight="700" fill="#1565c0" writing-mode="tb">CLOSET HIS</text>
+  <text x="36" y="300" text-anchor="middle" font-size="9" fill="#1565c0" writing-mode="tb">4.03m x 0.60m</text>
+
+  <!-- Zone: Ilha Central - gold -->
+  <rect x="230" y="198" width="144" height="72" fill="#fff8e1" fill-opacity="0.8" stroke="#f9a825" stroke-width="2" rx="4"/>
+  <text x="302" y="230" text-anchor="middle" font-size="12" font-weight="700" fill="#e65100">ILHA CENTRAL</text>
+  <text x="302" y="248" text-anchor="middle" font-size="10" fill="#e65100">1.20m x 0.60m</text>
+  <text x="302" y="260" text-anchor="middle" font-size="8" fill="#bf360c">Vidro + Veludo + 5 Gavetas</text>
+
+  <!-- Zone: Makeup Area - lilac -->
+  <rect x="72" y="294" width="142.8" height="142.8" fill="#f3e5f5" fill-opacity="0.6" stroke="#7b1fa2" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="143.4" y="362" text-anchor="middle" font-size="12" font-weight="700" fill="#7b1fa2">MAKEUP</text>
+  <text x="143.4" y="378" text-anchor="middle" font-size="10" fill="#7b1fa2">1.19m x 1.93m</text>
+  <text x="143.4" y="392" text-anchor="middle" font-size="8" fill="#4a148c">Bancada + Espelho</text>
+  <text x="143.4" y="404" text-anchor="middle" font-size="8" fill="#4a148c">Iluminacao LED</text>
+
+  <!-- Zone: Area Armas - dark grey -->
+  <rect x="72" y="120" width="86.4" height="163.2" fill="#eceff1" fill-opacity="0.7" stroke="#37474f" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="115.2" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#263238">AREA</text>
+  <text x="115.2" y="205" text-anchor="middle" font-size="11" font-weight="700" fill="#263238">ARMAS</text>
+  <text x="115.2" y="222" text-anchor="middle" font-size="9" fill="#37474f">1.36m x 0.60m</text>
+  <text x="115.2" y="236" text-anchor="middle" font-size="8" fill="#546e7a">Porta Espelho</text>
+  <text x="115.2" y="248" text-anchor="middle" font-size="8" fill="#546e7a">LED + Sensor</text>
+
+  <!-- Entry door (south wall) -->
+  <rect x="250" y="426.8" width="108" height="10" fill="#4caf50" rx="2"/>
+  <text x="304" y="456" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">ENTRADA 0.90m</text>
+  <!-- Door swing arc -->
+  <path d="M 358 436.8 A 108 108 0 0 1 250 436.8" fill="none" stroke="#4caf50" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- Dimension lines - North wall (top) -->
+  <line x1="0" y1="-15" x2="615.6" y2="-15" stroke="#333" stroke-width="1"/>
+  <line x1="0" y1="-20" x2="0" y2="-10" stroke="#333" stroke-width="1"/>
+  <line x1="615.6" y1="-20" x2="615.6" y2="-10" stroke="#333" stroke-width="1"/>
+  <text x="307.8" y="-4" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">5.13m</text>
+
+  <!-- Dimension lines - East wall (right) -->
+  <line x1="630" y1="0" x2="630" y2="436.8" stroke="#333" stroke-width="1"/>
+  <line x1="625" y1="0" x2="635" y2="0" stroke="#333" stroke-width="1"/>
+  <line x1="625" y1="436.8" x2="635" y2="436.8" stroke="#333" stroke-width="1"/>
+  <text x="660" y="225" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e" writing-mode="tb">3.64m</text>
+
+  <!-- Dimension lines - Closet His depth -->
+  <line x1="0" y1="450" x2="72" y2="450" stroke="#1565c0" stroke-width="0.8"/>
+  <line x1="0" y1="445" x2="0" y2="455" stroke="#1565c0" stroke-width="0.8"/>
+  <line x1="72" y1="445" x2="72" y2="455" stroke="#1565c0" stroke-width="0.8"/>
+  <text x="36" y="465" text-anchor="middle" font-size="10" fill="#1565c0">0.60m</text>
+
+  <!-- Dimension lines - Closet Her depth -->
+  <line x1="158.4" y1="450" x2="615.6" y2="450" stroke="#c2185b" stroke-width="0.8"/>
+  <line x1="158.4" y1="445" x2="158.4" y2="455" stroke="#c2185b" stroke-width="0.8"/>
+  <line x1="615.6" y1="445" x2="615.6" y2="455" stroke="#c2185b" stroke-width="0.8"/>
+  <text x="387" y="465" text-anchor="middle" font-size="10" fill="#c2185b">3.81m</text>
+
+  <!-- Wall labels -->
+  <text x="307.8" y="-22" text-anchor="middle" font-size="10" fill="#888">Parede Norte</text>
+  <text x="307.8" y="485" text-anchor="middle" font-size="10" fill="#888">Parede Sul</text>
+
+  <!-- Compass -->
+  <g transform="translate(680, 50)">
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#999" stroke-width="1"/>
+    <polygon points="0,-15 -5,5 0,-2 5,5" fill="#c62828"/>
+    <polygon points="0,15 -5,-5 0,2 5,-5" fill="#999"/>
+    <text x="0" y="-20" text-anchor="middle" font-size="9" font-weight="700" fill="#c62828">N</text>
+  </g>
+</svg>
+
+<div>
+  <div class="legend">
+    <div style="font-size:14px; font-weight:700; color:#1a1a2e; margin-bottom:10px;">Legenda</div>
+    <div class="legend-item"><div class="legend-color" style="background:#fce4ec; border-color:#e91e63;"></div>Closet Her (3.64m x 3.81m)</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e3f2fd; border-color:#1565c0;"></div>Closet His (4.03m x 0.60m)</div>
+    <div class="legend-item"><div class="legend-color" style="background:#fff8e1; border-color:#f9a825;"></div>Ilha Central (1.20m x 0.60m)</div>
+    <div class="legend-item"><div class="legend-color" style="background:#f3e5f5; border-color:#7b1fa2;"></div>Makeup Area (1.19m x 1.93m)</div>
+    <div class="legend-item"><div class="legend-color" style="background:#eceff1; border-color:#37474f;"></div>Area Armas (1.36m x 0.60m)</div>
+    <div class="legend-item"><div class="legend-color" style="background:#4caf50;"></div>Porta de Entrada (0.90m)</div>
+  </div>
+
+  <table class="dims-table" style="margin-top:15px;">
+    <tr><th>Parede</th><th>Comprimento</th><th>Features</th></tr>
+    <tr><td>Norte</td><td>5.13m</td><td>-</td></tr>
+    <tr><td>Leste</td><td>3.64m</td><td>-</td></tr>
+    <tr><td>Sul</td><td>5.13m</td><td>Porta entrada (0.90m)</td></tr>
+    <tr><td>Oeste</td><td>3.64m</td><td>-</td></tr>
+  </table>
+</div>
+</div>
+</body>
+</html>

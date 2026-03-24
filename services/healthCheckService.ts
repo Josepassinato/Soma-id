@@ -27,9 +27,25 @@ export const HealthCheckService = {
     }
   },
 
+  checkBackendApi: async (): Promise<boolean> => {
+    try {
+      const res = await fetch('/health', { signal: AbortSignal.timeout(5000) });
+      return res.ok;
+    } catch {
+      try {
+        const res = await fetch('/api/catalog/materials', { signal: AbortSignal.timeout(5000) });
+        return res.ok;
+      } catch {
+        return false;
+      }
+    }
+  },
+
   checkInfrastructure: async (): Promise<{ healthTable: boolean; projectsTable: boolean; profilesTable: boolean; connection: boolean }> => {
-    if (!supabase) return { healthTable: false, projectsTable: false, profilesTable: false, connection: false };
-    
+    const backendOk = await HealthCheckService.checkBackendApi();
+
+    if (!supabase) return { healthTable: false, projectsTable: false, profilesTable: false, connection: backendOk };
+
     const checkTable = async (name: string) => {
         try {
           const { error } = await supabase.from(name).select('id').limit(1);

@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMA ID — Closet Sabrina Parkland — Planta Baixa Cotada — Folha 1/8</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .sheet {
+    background: #ffffff;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    width: 594mm;
+    height: 420mm;
+    overflow: hidden;
+  }
+  svg {
+    display: block;
+  }
+  @media print {
+    body { background: none; margin: 0; padding: 0; }
+    .sheet { box-shadow: none; margin: 0; }
+  }
+  @page {
+    size: A2 landscape;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 594 420" width="594mm" height="420mm">
+<defs>
+  <!-- Arrowhead marker for dimension lines -->
+  <marker id="arrow-start" markerWidth="3" markerHeight="2" refX="0" refY="1" orient="auto" markerUnits="strokeWidth">
+    <polygon points="3,0 0,1 3,2" fill="#000000"/>
+  </marker>
+  <marker id="arrow-end" markerWidth="3" markerHeight="2" refX="3" refY="1" orient="auto" markerUnits="strokeWidth">
+    <polygon points="0,0 3,1 0,2" fill="#000000"/>
+  </marker>
+  <!-- Section marker -->
+  <marker id="section-arrow" markerWidth="4" markerHeight="3" refX="4" refY="1.5" orient="auto">
+    <polygon points="0,0 4,1.5 0,3" fill="#000000"/>
+  </marker>
+  <!-- Hatch pattern for walls -->
+  <pattern id="wall-hatch" patternUnits="userSpaceOnUse" width="2" height="2" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="2" stroke="#999" stroke-width="0.15"/>
+  </pattern>
+</defs>
+
+<!-- ============================================================ -->
+<!-- DRAWING BORDER -->
+<!-- ============================================================ -->
+<rect x="5" y="5" width="584" height="410" fill="none" stroke="#000" stroke-width="0.5"/>
+<rect x="7" y="7" width="580" height="406" fill="none" stroke="#000" stroke-width="0.25"/>
+
+<!-- ============================================================ -->
+<!-- FLOOR PLAN - Scale 1:25 -->
+<!-- Origin offset: x=80, y=60 (to leave space for dimensions) -->
+<!-- Room: 5130x3640mm => 205.2x145.6mm at 1:25 -->
+<!-- Wall thickness: 150mm => 6mm at 1:25 -->
+<!-- ============================================================ -->
+
+<!-- COORDINATE SYSTEM:
+     Paper origin for room: ox=100, oy=80
+     Room interior: 205.2 x 145.6 mm at 1:25
+     Wall thickness: 6mm at 1:25
+     South wall = bottom, North wall = top
+     West wall = left, East wall = right
+-->
+
+<!-- === WALLS (filled rectangles with hatch) === -->
+<!-- South wall (bottom) - with door opening -->
+<g id="walls" stroke="#000" stroke-width="1.5" fill="url(#wall-hatch)">
+  <!-- South wall - left portion (to door) -->
+  <!-- Door centered: room width 205.2, door 36mm (900/25), gap starts at (205.2-36)/2 = 84.6 -->
+  <rect x="94" y="219.6" width="90.6" height="6"/>
+  <!-- South wall - right portion (after door) -->
+  <rect x="220.6" y="219.6" width="90.6" height="6"/>
+
+  <!-- North wall (top) -->
+  <rect x="94" y="68" width="217.2" height="6"/>
+
+  <!-- West wall (left) -->
+  <rect x="94" y="68" width="6" height="157.6"/>
+
+  <!-- East wall (right) -->
+  <rect x="305.2" y="68" width="6" height="157.6"/>
+</g>
+
+<!-- Wall interior fill (white for room) -->
+<rect x="100" y="74" width="205.2" height="145.6" fill="#ffffff" stroke="none"/>
+
+<!-- Re-draw wall outlines clean -->
+<g id="wall-outlines" stroke="#000" stroke-width="1.5" fill="none">
+  <!-- South wall left -->
+  <line x1="94" y1="219.6" x2="184.6" y2="219.6"/>
+  <line x1="94" y1="225.6" x2="184.6" y2="225.6"/>
+  <line x1="94" y1="219.6" x2="94" y2="225.6"/>
+  <line x1="184.6" y1="219.6" x2="184.6" y2="225.6"/>
+
+  <!-- South wall right -->
+  <line x1="220.6" y1="219.6" x2="311.2" y2="219.6"/>
+  <line x1="220.6" y1="225.6" x2="311.2" y2="225.6"/>
+  <line x1="220.6" y1="219.6" x2="220.6" y2="225.6"/>
+  <line x1="311.2" y1="219.6" x2="311.2" y2="225.6"/>
+
+  <!-- North wall -->
+  <line x1="94" y1="68" x2="311.2" y2="68"/>
+  <line x1="94" y1="74" x2="311.2" y2="74"/>
+
+  <!-- West wall -->
+  <line x1="94" y1="68" x2="94" y2="225.6"/>
+  <line x1="100" y1="74" x2="100" y2="219.6"/>
+
+  <!-- East wall -->
+  <line x1="305.2" y1="68" x2="305.2" y2="225.6"/>
+  <line x1="311.2" y1="68" x2="311.2" y2="225.6"/>
+</g>
+
+<!-- Wall hatch lines (diagonal lines inside wall sections) -->
+<g id="wall-hatch-lines" stroke="#888" stroke-width="0.15">
+  <!-- North wall hatch -->
+  <line x1="96" y1="74" x2="100" y2="70" />
+  <line x1="100" y1="74" x2="104" y2="70" />
+  <line x1="104" y1="74" x2="108" y2="70" />
+  <line x1="108" y1="74" x2="112" y2="70" />
+  <line x1="112" y1="74" x2="116" y2="70" />
+  <line x1="116" y1="74" x2="120" y2="70" />
+  <line x1="120" y1="74" x2="124" y2="70" />
+  <line x1="124" y1="74" x2="128" y2="70" />
+  <line x1="128" y1="74" x2="132" y2="70" />
+  <line x1="132" y1="74" x2="136" y2="70" />
+  <line x1="136" y1="74" x2="140" y2="70" />
+  <line x1="140" y1="74" x2="144" y2="70" />
+  <line x1="144" y1="74" x2="148" y2="70" />
+  <line x1="148" y1="74" x2="152" y2="70" />
+  <line x1="152" y1="74" x2="156" y2="70" />
+  <line x1="156" y1="74" x2="160" y2="70" />
+  <line x1="160" y1="74" x2="164" y2="70" />
+  <line x1="164" y1="74" x2="168" y2="70" />
+  <line x1="168" y1="74" x2="172" y2="70" />
+  <line x1="172" y1="74" x2="176" y2="70" />
+  <line x1="176" y1="74" x2="180" y2="70" />
+  <line x1="180" y1="74" x2="184" y2="70" />
+  <line x1="184" y1="74" x2="188" y2="70" />
+  <line x1="188" y1="74" x2="192" y2="70" />
+  <line x1="192" y1="74" x2="196" y2="70" />
+  <line x1="196" y1="74" x2="200" y2="70" />
+  <line x1="200" y1="74" x2="204" y2="70" />
+  <line x1="204" y1="74" x2="208" y2="70" />
+  <line x1="208" y1="74" x2="212" y2="70" />
+  <line x1="212" y1="74" x2="216" y2="70" />
+  <line x1="216" y1="74" x2="220" y2="70" />
+  <line x1="220" y1="74" x2="224" y2="70" />
+  <line x1="224" y1="74" x2="228" y2="70" />
+  <line x1="228" y1="74" x2="232" y2="70" />
+  <line x1="232" y1="74" x2="236" y2="70" />
+  <line x1="236" y1="74" x2="240" y2="70" />
+  <line x1="240" y1="74" x2="244" y2="70" />
+  <line x1="244" y1="74" x2="248" y2="70" />
+  <line x1="248" y1="74" x2="252" y2="70" />
+  <line x1="252" y1="74" x2="256" y2="70" />
+  <line x1="256" y1="74" x2="260" y2="70" />
+  <line x1="260" y1="74" x2="264" y2="70" />
+  <line x1="264" y1="74" x2="268" y2="70" />
+  <line x1="268" y1="74" x2="272" y2="70" />
+  <line x1="272" y1="74" x2="276" y2="70" />
+  <line x1="276" y1="74" x2="280" y2="70" />
+  <line x1="280" y1="74" x2="284" y2="70" />
+  <line x1="284" y1="74" x2="288" y2="70" />
+  <line x1="288" y1="74" x2="292" y2="70" />
+  <line x1="292" y1="74" x2="296" y2="70" />
+  <line x1="296" y1="74" x2="300" y2="70" />
+  <line x1="300" y1="74" x2="304" y2="70" />
+  <line x1="304" y1="74" x2="308" y2="70" />
+</g>
+
+<!-- === DOOR (south wall, centered) === -->
+<!-- Door opening: from x=184.6 to x=220.6 (36mm = 900mm real) -->
+<!-- Door swings inward (north), hinged on right side (east) -->
+<g id="door" stroke="#000" stroke-width="0.75" fill="none">
+  <!-- Door leaf (open position, 90 degrees, swinging west-to-north) -->
+  <line x1="220.6" y1="219.6" x2="220.6" y2="183.6" stroke="#000" stroke-width="0.75"/>
+  <!-- Door arc -->
+  <path d="M 184.6,219.6 A 36,36 0 0,1 220.6,183.6" stroke="#000" stroke-width="0.35" stroke-dasharray="1,0.5"/>
+  <!-- Door threshold lines -->
+  <line x1="184.6" y1="219.6" x2="184.6" y2="225.6" stroke="#000" stroke-width="0.5"/>
+  <line x1="220.6" y1="219.6" x2="220.6" y2="225.6" stroke="#000" stroke-width="0.5"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- FURNITURE / ZONES -->
+<!-- ============================================================ -->
+
+<!-- === ZONE 1: CLOSET HER (East wall, extending along north-east) === -->
+<!-- Along east wall: depth 600mm=24mm, width=3640mm=145.6mm (full room depth) -->
+<!-- From east wall (x=305.2) inward: x=305.2-24=281.2 -->
+<!-- Full height of room: y=74 to y=219.6 -->
+<g id="closet-her" stroke="#000" stroke-width="1.0" fill="none">
+  <!-- Main cabinet run along east wall -->
+  <rect x="281.2" y="74" width="24" height="145.6"/>
+  <!-- Internal divisions (shelving units) -->
+  <line x1="281.2" y1="98" x2="305.2" y2="98"/>
+  <line x1="281.2" y1="122" x2="305.2" y2="122"/>
+  <line x1="281.2" y1="146" x2="305.2" y2="146"/>
+  <line x1="281.2" y1="170" x2="305.2" y2="170"/>
+  <line x1="281.2" y1="195" x2="305.2" y2="195"/>
+  <!-- Vertical dividers -->
+  <line x1="293.2" y1="74" x2="293.2" y2="219.6"/>
+  <!-- Hanging rod symbols (circles) -->
+  <circle cx="287.2" cy="86" r="1" stroke="#000" stroke-width="0.35"/>
+  <circle cx="299.2" cy="86" r="1" stroke="#000" stroke-width="0.35"/>
+  <circle cx="287.2" cy="110" r="1" stroke="#000" stroke-width="0.35"/>
+  <circle cx="299.2" cy="110" r="1" stroke="#000" stroke-width="0.35"/>
+  <circle cx="287.2" cy="134" r="1" stroke="#000" stroke-width="0.35"/>
+  <circle cx="287.2" cy="158" r="1" stroke="#000" stroke-width="0.35"/>
+  <!-- Shelving indication (horizontal dashes in lower sections) -->
+  <line x1="283" y1="175" x2="291" y2="175" stroke="#000" stroke-width="0.25"/>
+  <line x1="283" y1="179" x2="291" y2="179" stroke="#000" stroke-width="0.25"/>
+  <line x1="283" y1="183" x2="291" y2="183" stroke="#000" stroke-width="0.25"/>
+  <line x1="283" y1="187" x2="291" y2="187" stroke="#000" stroke-width="0.25"/>
+  <line x1="295" y1="175" x2="303" y2="175" stroke="#000" stroke-width="0.25"/>
+  <line x1="295" y1="179" x2="303" y2="179" stroke="#000" stroke-width="0.25"/>
+  <line x1="295" y1="183" x2="303" y2="183" stroke="#000" stroke-width="0.25"/>
+  <line x1="295" y1="187" x2="303" y2="187" stroke="#000" stroke-width="0.25"/>
+  <!-- Drawer fronts in bottom section -->
+  <rect x="282.5" y="197" width="9.5" height="5" rx="0.3"/>
+  <rect x="282.5" y="203" width="9.5" height="5" rx="0.3"/>
+  <rect x="282.5" y="209" width="9.5" height="5" rx="0.3"/>
+  <rect x="294.5" y="197" width="9.5" height="5" rx="0.3"/>
+  <rect x="294.5" y="203" width="9.5" height="5" rx="0.3"/>
+  <rect x="294.5" y="209" width="9.5" height="5" rx="0.3"/>
+  <!-- Vitrine extensions into room from north-east corner -->
+  <rect x="257.2" y="74" width="24" height="32"/>
+  <line x1="269.2" y1="74" x2="269.2" y2="106"/>
+  <!-- Glass vitrine indication (dashed) -->
+  <rect x="258.2" y="75" width="10" height="30" stroke="#000" stroke-width="0.25" stroke-dasharray="1,0.5"/>
+  <rect x="270.2" y="75" width="10" height="30" stroke="#000" stroke-width="0.25" stroke-dasharray="1,0.5"/>
+</g>
+
+<!-- Zone label: Closet Her -->
+<text x="280" y="150" font-family="Arial" font-size="3" fill="#000" text-anchor="middle" transform="rotate(-90,280,150)">CLOSET HER</text>
+<text x="275" y="150" font-family="Arial" font-size="2.2" fill="#666" text-anchor="middle" transform="rotate(-90,275,150)">A = 2.18 m²</text>
+
+<!-- === ZONE 2: ILHA CENTRAL === -->
+<!-- 1200x600mm = 48x24mm at 1:25 -->
+<!-- Centered in room: cx = 100 + 205.2/2 = 202.6 -->
+<!-- cy = 74 + 145.6/2 = 146.8 -->
+<!-- But offset slightly south to account for furniture on walls -->
+<!-- x = 202.6 - 24 = 178.6, y = 146.8 - 12 = 134.8 -->
+<g id="ilha-central" stroke="#000" stroke-width="1.0" fill="none">
+  <rect x="170" y="135" width="48" height="24"/>
+  <!-- Countertop overhang indication -->
+  <rect x="169" y="134" width="50" height="26" stroke="#000" stroke-width="0.25" stroke-dasharray="1.5,0.75"/>
+  <!-- Internal drawers -->
+  <line x1="182" y1="135" x2="182" y2="159"/>
+  <line x1="194" y1="135" x2="194" y2="159"/>
+  <line x1="206" y1="135" x2="206" y2="159"/>
+  <!-- Drawer pulls -->
+  <line x1="175" y1="147" x2="179" y2="147" stroke="#000" stroke-width="0.35"/>
+  <line x1="187" y1="147" x2="191" y2="147" stroke="#000" stroke-width="0.35"/>
+  <line x1="199" y1="147" x2="203" y2="147" stroke="#000" stroke-width="0.35"/>
+  <line x1="211" y1="147" x2="215" y2="147" stroke="#000" stroke-width="0.35"/>
+</g>
+
+<!-- Zone label: Ilha Central -->
+<text x="194" y="145.5" font-family="Arial" font-size="3" fill="#000" text-anchor="middle">ILHA CENTRAL</text>
+<text x="194" y="149.5" font-family="Arial" font-size="2.2" fill="#666" text-anchor="middle">A = 0.72 m²</text>
+
+<!-- === ZONE 3: MAKEUP AREA (Southwest) === -->
+<!-- 1190x500mm = 47.6x20mm at 1:25 -->
+<!-- Near south-west corner, against south wall -->
+<!-- x = 100 (flush to west wall), y = 219.6 - 20 = 199.6 -->
+<g id="makeup-area" stroke="#000" stroke-width="1.0" fill="none">
+  <rect x="100" y="199.6" width="47.6" height="20"/>
+  <!-- Mirror indication (dashed arc on south side) -->
+  <ellipse cx="123.8" cy="199.6" rx="18" ry="3" stroke="#000" stroke-width="0.25" stroke-dasharray="1,0.5" fill="none"/>
+  <!-- Vanity top detail -->
+  <rect x="108" y="202" width="12" height="8" rx="2" stroke="#000" stroke-width="0.25"/>
+  <rect x="125" y="202" width="12" height="8" rx="2" stroke="#000" stroke-width="0.25"/>
+  <!-- Chair/stool symbol -->
+  <circle cx="123.8" cy="185" r="5" stroke="#000" stroke-width="0.35" fill="none"/>
+  <circle cx="123.8" cy="185" r="1" stroke="#000" stroke-width="0.25" fill="#000"/>
+</g>
+
+<!-- Zone label: Makeup Area -->
+<text x="123.8" y="210" font-family="Arial" font-size="3" fill="#000" text-anchor="middle">MAKEUP AREA</text>
+<text x="123.8" y="214" font-family="Arial" font-size="2.2" fill="#666" text-anchor="middle">A = 0.60 m²</text>
+
+<!-- === ZONE 4: AREA ARMAS (Northwest) === -->
+<!-- 1360x600mm = 54.4x24mm at 1:25 -->
+<!-- Near north-west area -->
+<!-- x = 100 (flush to west wall), y = 74 (flush to north wall) -->
+<g id="area-armas" stroke="#000" stroke-width="1.0" fill="none">
+  <rect x="100" y="74" width="54.4" height="24"/>
+  <!-- Internal security compartments -->
+  <line x1="118" y1="74" x2="118" y2="98"/>
+  <line x1="136" y1="74" x2="136" y2="98"/>
+  <!-- Lock symbol -->
+  <circle cx="109" cy="86" r="1.5" stroke="#000" stroke-width="0.35" fill="none"/>
+  <rect x="108" y="87.5" width="2" height="3" rx="0.3" stroke="#000" stroke-width="0.35" fill="none"/>
+  <circle cx="127" cy="86" r="1.5" stroke="#000" stroke-width="0.35" fill="none"/>
+  <rect x="126" y="87.5" width="2" height="3" rx="0.3" stroke="#000" stroke-width="0.35" fill="none"/>
+  <circle cx="145" cy="86" r="1.5" stroke="#000" stroke-width="0.35" fill="none"/>
+  <rect x="144" y="87.5" width="2" height="3" rx="0.3" stroke="#000" stroke-width="0.35" fill="none"/>
+  <!-- Reinforced door indication (double line) -->
+  <rect x="101" y="75" width="16" height="22" stroke="#000" stroke-width="0.25"/>
+  <rect x="119" y="75" width="16" height="22" stroke="#000" stroke-width="0.25"/>
+  <rect x="137" y="75" width="16" height="22" stroke="#000" stroke-width="0.25"/>
+</g>
+
+<!-- Zone label: Area Armas -->
+<text x="127.2" y="85" font-family="Arial" font-size="3" fill="#000" text-anchor="middle">AREA ARMAS</text>
+<text x="127.2" y="89" font-family="Arial" font-size="2.2" fill="#666" text-anchor="middle">A = 0.82 m²</text>
+
+<!-- === ZONE 5: CLOSET HIS (West wall) === -->
+<!-- 4030mm total (desdobrado, parede 2540mm) = 161.2mm at 1:25, depth 600mm = 24mm -->
+<!-- Along west wall from y=98 (below Area Armas) to y=199.6 (above Makeup) -->
+<!-- Actual available: 199.6 - 98 = 101.6mm, but total should be 161.2 -->
+<!-- He occupies full west wall minus armas and makeup zones -->
+<!-- From y=98 to y=199.6 = 101.6mm paper = 2540mm real -->
+<!-- Additional depth or wrapping needed. Let's place along west wall fully: y=98 to y=199.6 -->
+<g id="closet-his" stroke="#000" stroke-width="1.0" fill="none">
+  <rect x="100" y="98" width="24" height="101.6"/>
+  <!-- Internal divisions -->
+  <line x1="100" y1="118" x2="124" y2="118"/>
+  <line x1="100" y1="138" x2="124" y2="138"/>
+  <line x1="100" y1="158" x2="124" y2="158"/>
+  <line x1="100" y1="178" x2="124" y2="178"/>
+  <!-- Vertical divider -->
+  <line x1="112" y1="98" x2="112" y2="199.6"/>
+  <!-- Hanging rod symbols -->
+  <circle cx="106" cy="108" r="1" stroke="#000" stroke-width="0.35"/>
+  <circle cx="118" cy="108" r="1" stroke="#000" stroke-width="0.35"/>
+  <circle cx="106" cy="128" r="1" stroke="#000" stroke-width="0.35"/>
+  <circle cx="118" cy="128" r="1" stroke="#000" stroke-width="0.35"/>
+  <!-- Shelving -->
+  <line x1="101" y1="143" x2="111" y2="143" stroke="#000" stroke-width="0.25"/>
+  <line x1="101" y1="147" x2="111" y2="147" stroke="#000" stroke-width="0.25"/>
+  <line x1="101" y1="151" x2="111" y2="151" stroke="#000" stroke-width="0.25"/>
+  <line x1="101" y1="155" x2="111" y2="155" stroke="#000" stroke-width="0.25"/>
+  <line x1="113" y1="143" x2="123" y2="143" stroke="#000" stroke-width="0.25"/>
+  <line x1="113" y1="147" x2="123" y2="147" stroke="#000" stroke-width="0.25"/>
+  <line x1="113" y1="151" x2="123" y2="151" stroke="#000" stroke-width="0.25"/>
+  <line x1="113" y1="155" x2="123" y2="155" stroke="#000" stroke-width="0.25"/>
+  <!-- Drawer fronts bottom -->
+  <rect x="101" y="180" width="10" height="5" rx="0.3"/>
+  <rect x="101" y="186" width="10" height="5" rx="0.3"/>
+  <rect x="101" y="192" width="10" height="5" rx="0.3"/>
+  <rect x="113" y="180" width="10" height="5" rx="0.3"/>
+  <rect x="113" y="186" width="10" height="5" rx="0.3"/>
+  <rect x="113" y="192" width="10" height="5" rx="0.3"/>
+</g>
+
+<!-- Zone label: Closet His -->
+<text x="112" y="148.8" font-family="Arial" font-size="3" fill="#000" text-anchor="middle" transform="rotate(-90,112,148.8)">CLOSET HIS</text>
+<text x="107" y="148.8" font-family="Arial" font-size="2.2" fill="#666" text-anchor="middle" transform="rotate(-90,107,148.8)">A = 1.53 m²</text>
+
+<!-- ============================================================ -->
+<!-- DIMENSION LINES -->
+<!-- ============================================================ -->
+<g id="dimensions" stroke="#000" fill="#000" font-family="Arial" font-size="3">
+
+  <!-- ========== EXTERNAL DIMENSIONS ========== -->
+
+  <!-- Total room width (top, outside north wall) -->
+  <!-- Room outer: x=94 to x=311.2, y=68 (top of north wall) -->
+  <!-- Dimension line at y=55 -->
+  <!-- Extension lines -->
+  <line x1="94" y1="66" x2="94" y2="53" stroke="#000" stroke-width="0.25"/>
+  <line x1="311.2" y1="66" x2="311.2" y2="53" stroke="#000" stroke-width="0.25"/>
+  <!-- Dimension line with arrows -->
+  <line x1="94" y1="55" x2="311.2" y2="55" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="202.6" y="53.5" text-anchor="middle" font-size="3.5" font-weight="bold">5.130</text>
+
+  <!-- Total room depth (left, outside west wall) -->
+  <!-- Room outer: y=68 to y=225.6, x=94 -->
+  <!-- Dimension line at x=78 -->
+  <line x1="92" y1="68" x2="76" y2="68" stroke="#000" stroke-width="0.25"/>
+  <line x1="92" y1="225.6" x2="76" y2="225.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="78" y1="68" x2="78" y2="225.6" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="76.5" y="146.8" text-anchor="middle" font-size="3.5" font-weight="bold" transform="rotate(-90,76.5,146.8)">3.640</text>
+
+  <!-- ========== INTERNAL DIMENSIONS ========== -->
+
+  <!-- Zone 1: Closet Her depth (east wall) - 600mm = 24mm -->
+  <!-- Horizontal dimension inside room, near top -->
+  <line x1="281.2" y1="108" x2="281.2" y2="113" stroke="#000" stroke-width="0.25"/>
+  <line x1="305.2" y1="108" x2="305.2" y2="113" stroke="#000" stroke-width="0.25"/>
+  <line x1="281.2" y1="111" x2="305.2" y2="111" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="293.2" y="110" text-anchor="middle" font-size="2.5">600</text>
+
+  <!-- Zone 1: Closet Her width along east wall - 3640mm = 145.6mm -->
+  <!-- Vertical dimension, right side -->
+  <line x1="307" y1="74" x2="316" y2="74" stroke="#000" stroke-width="0.25"/>
+  <line x1="307" y1="219.6" x2="316" y2="219.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="314" y1="74" x2="314" y2="219.6" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="315.5" y="146.8" text-anchor="middle" font-size="2.5" transform="rotate(-90,315.5,146.8)">3.640</text>
+
+  <!-- Zone 4: Area Armas width - 1360mm = 54.4mm -->
+  <line x1="100" y1="100" x2="100" y2="105" stroke="#000" stroke-width="0.25"/>
+  <line x1="154.4" y1="100" x2="154.4" y2="105" stroke="#000" stroke-width="0.25"/>
+  <line x1="100" y1="103" x2="154.4" y2="103" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="127.2" y="102" text-anchor="middle" font-size="2.5">1.360</text>
+
+  <!-- Zone 4: Area Armas depth - 600mm = 24mm -->
+  <line x1="156" y1="74" x2="163" y2="74" stroke="#000" stroke-width="0.25"/>
+  <line x1="156" y1="98" x2="163" y2="98" stroke="#000" stroke-width="0.25"/>
+  <line x1="160" y1="74" x2="160" y2="98" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="161.5" y="87" text-anchor="middle" font-size="2.5" transform="rotate(-90,161.5,87)">600</text>
+
+  <!-- Zone 5: Closet His depth - 600mm = 24mm -->
+  <line x1="100" y1="162" x2="100" y2="167" stroke="#000" stroke-width="0.25"/>
+  <line x1="124" y1="162" x2="124" y2="167" stroke="#000" stroke-width="0.25"/>
+  <line x1="100" y1="165" x2="124" y2="165" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="112" y="164" text-anchor="middle" font-size="2.5">600</text>
+
+  <!-- Zone 5: Closet His length along wall -->
+  <line x1="86" y1="98" x2="92" y2="98" stroke="#000" stroke-width="0.25"/>
+  <line x1="86" y1="199.6" x2="92" y2="199.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="88" y1="98" x2="88" y2="199.6" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="86.5" y="148.8" text-anchor="middle" font-size="2.5" transform="rotate(-90,86.5,148.8)">2.540</text>
+
+  <!-- Zone 3: Makeup width - 1190mm = 47.6mm -->
+  <line x1="100" y1="221" x2="100" y2="228" stroke="#000" stroke-width="0.25"/>
+  <line x1="147.6" y1="221" x2="147.6" y2="228" stroke="#000" stroke-width="0.25"/>
+  <line x1="100" y1="225" x2="147.6" y2="225" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="123.8" y="229" text-anchor="middle" font-size="2.5">1.190</text>
+
+  <!-- Zone 3: Makeup depth - 500mm = 20mm -->
+  <line x1="149" y1="199.6" x2="155" y2="199.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="149" y1="219.6" x2="155" y2="219.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="152" y1="199.6" x2="152" y2="219.6" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="153.5" y="210" text-anchor="middle" font-size="2.5" transform="rotate(-90,153.5,210)">500</text>
+
+  <!-- Zone 2: Ilha Central - 1200x600mm = 48x24mm -->
+  <!-- Width dimension (below island) -->
+  <line x1="170" y1="161" x2="170" y2="167" stroke="#000" stroke-width="0.25"/>
+  <line x1="218" y1="161" x2="218" y2="167" stroke="#000" stroke-width="0.25"/>
+  <line x1="170" y1="165" x2="218" y2="165" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="194" y="164" text-anchor="middle" font-size="2.5">1.200</text>
+
+  <!-- Depth dimension (right of island) -->
+  <line x1="220" y1="135" x2="226" y2="135" stroke="#000" stroke-width="0.25"/>
+  <line x1="220" y1="159" x2="226" y2="159" stroke="#000" stroke-width="0.25"/>
+  <line x1="224" y1="135" x2="224" y2="159" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="225.5" y="148" text-anchor="middle" font-size="2.5" transform="rotate(-90,225.5,148)">600</text>
+
+  <!-- Island distance to west wall (Closet His face) -->
+  <!-- From x=124 (Closet His front face) to x=170 (Island west face) = 46mm = 1150mm -->
+  <line x1="124" y1="170" x2="124" y2="176" stroke="#000" stroke-width="0.25"/>
+  <line x1="170" y1="170" x2="170" y2="176" stroke="#000" stroke-width="0.25"/>
+  <line x1="124" y1="174" x2="170" y2="174" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="147" y="173" text-anchor="middle" font-size="2.5">1.150</text>
+
+  <!-- Island distance to east wall (Closet Her face) -->
+  <!-- From x=218 (Island east face) to x=281.2 (Closet Her front face) = 63.2mm = 1580mm -->
+  <line x1="218" y1="170" x2="218" y2="176" stroke="#000" stroke-width="0.25"/>
+  <line x1="281.2" y1="170" x2="281.2" y2="176" stroke="#000" stroke-width="0.25"/>
+  <line x1="218" y1="174" x2="281.2" y2="174" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="249.6" y="173" text-anchor="middle" font-size="2.5">1.580</text>
+
+  <!-- Island distance to north wall -->
+  <!-- From y=98 (Area Armas south face or north wall inner + armas) to y=135 (Island north face) = 37mm = 925mm -->
+  <!-- Actually from north inner wall y=74 to island y=135 = 61mm = 1525mm -->
+  <line x1="166" y1="74" x2="166" y2="135" stroke="#000" stroke-width="0.25"/>
+  <line x1="164" y1="74" x2="168" y2="74" stroke="#000" stroke-width="0.25"/>
+  <line x1="164" y1="135" x2="168" y2="135" stroke="#000" stroke-width="0.25"/>
+  <line x1="166" y1="74" x2="166" y2="135" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="164.5" y="104.5" text-anchor="middle" font-size="2.5" transform="rotate(-90,164.5,104.5)">1.525</text>
+
+  <!-- Island distance to south wall -->
+  <!-- From y=159 (Island south face) to y=219.6 (south inner wall) = 60.6mm = 1515mm -->
+  <line x1="166" y1="159" x2="166" y2="219.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="164" y1="159" x2="168" y2="159" stroke="#000" stroke-width="0.25"/>
+  <line x1="164" y1="219.6" x2="168" y2="219.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="166" y1="159" x2="166" y2="219.6" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="164.5" y="189.3" text-anchor="middle" font-size="2.5" transform="rotate(-90,164.5,189.3)">1.515</text>
+
+  <!-- CRITICAL DIMENSION: Passage between Makeup Area and Closet Her -->
+  <!-- From x=147.6 (makeup east edge) to x=281.2 (Closet Her west face) -->
+  <!-- But the critical passage is the clear floor space -->
+  <!-- From makeup top (y=199.6) going east to Closet Her face at x=281.2 -->
+  <!-- The passage width between makeup stool area and island/closet her -->
+  <!-- Let's show passage between Closet His front and Island -->
+  <!-- Already shown above as 1150mm. Let's also show the critical south passage -->
+
+  <!-- Passage: Makeup east edge to Closet Her front face -->
+  <!-- x=147.6 to x=281.2 = 133.6mm = 3340mm - this is wide, not critical -->
+
+  <!-- Critical passage: between island south face and makeup/door area -->
+  <!-- From island south (y=159) to makeup area top (y=199.6) -->
+  <!-- But more critical: passage between Closet His face (x=124) and island (x=170) = 1150mm -->
+
+  <!-- Most critical: passage between makeup area and opposite furniture -->
+  <!-- Makeup is at x=100-147.6, y=199.6-219.6 -->
+  <!-- The passage from makeup north face (y=199.6) to island south face (y=159) = 40.6mm = 1015mm -->
+  <!-- Show this critical dimension -->
+  <line x1="135" y1="159" x2="135" y2="199.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="133" y1="159" x2="137" y2="159" stroke="#000" stroke-width="0.25"/>
+  <line x1="133" y1="199.6" x2="137" y2="199.6" stroke="#000" stroke-width="0.25"/>
+  <line x1="135" y1="159" x2="135" y2="199.6" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <!-- Critical dimension highlighted -->
+  <rect x="127" y="176" width="16" height="5" fill="#fff" stroke="none"/>
+  <text x="135" y="179.5" text-anchor="middle" font-size="2.8" font-weight="bold" fill="#cc0000">1.015</text>
+  <text x="135" y="183" text-anchor="middle" font-size="1.8" fill="#cc0000">PASSAGEM</text>
+
+  <!-- Door opening dimension - 900mm -->
+  <line x1="184.6" y1="228" x2="184.6" y2="234" stroke="#000" stroke-width="0.25"/>
+  <line x1="220.6" y1="228" x2="220.6" y2="234" stroke="#000" stroke-width="0.25"/>
+  <line x1="184.6" y1="232" x2="220.6" y2="232" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="202.6" y="231" text-anchor="middle" font-size="2.5">900</text>
+
+  <!-- Door position from west wall -->
+  <line x1="100" y1="234" x2="100" y2="240" stroke="#000" stroke-width="0.25"/>
+  <line x1="184.6" y1="234" x2="184.6" y2="240" stroke="#000" stroke-width="0.25"/>
+  <line x1="100" y1="238" x2="184.6" y2="238" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="142.3" y="237" text-anchor="middle" font-size="2.5">2.115</text>
+
+  <!-- Door position from east wall -->
+  <line x1="220.6" y1="234" x2="220.6" y2="240" stroke="#000" stroke-width="0.25"/>
+  <line x1="305.2" y1="234" x2="305.2" y2="240" stroke="#000" stroke-width="0.25"/>
+  <line x1="220.6" y1="238" x2="305.2" y2="238" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="262.9" y="237" text-anchor="middle" font-size="2.5">2.115</text>
+
+  <!-- Vitrine extension width -->
+  <line x1="257.2" y1="108" x2="257.2" y2="115" stroke="#000" stroke-width="0.25"/>
+  <line x1="281.2" y1="108" x2="281.2" y2="115" stroke="#000" stroke-width="0.25"/>
+  <line x1="257.2" y1="113" x2="281.2" y2="113" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="269.2" y="112" text-anchor="middle" font-size="2.5">600</text>
+
+  <!-- Vitrine depth -->
+  <line x1="253" y1="74" x2="253" y2="106" stroke="#000" stroke-width="0.25"/>
+  <line x1="251" y1="74" x2="255" y2="74" stroke="#000" stroke-width="0.25"/>
+  <line x1="251" y1="106" x2="255" y2="106" stroke="#000" stroke-width="0.25"/>
+  <line x1="253" y1="74" x2="253" y2="106" stroke="#000" stroke-width="0.5" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="251.5" y="91" text-anchor="middle" font-size="2.5" transform="rotate(-90,251.5,91)">800</text>
+
+</g>
+
+<!-- ============================================================ -->
+<!-- SECTION MARKERS -->
+<!-- ============================================================ -->
+<g id="section-markers" stroke="#000" fill="#000" font-family="Arial" font-size="3.5">
+
+  <!-- Section A-A: East-West cut through center of room -->
+  <!-- Left side marker -->
+  <line x1="70" y1="147" x2="82" y2="147" stroke="#000" stroke-width="0.75" marker-end="url(#section-arrow)"/>
+  <circle cx="67" cy="147" r="4" stroke="#000" stroke-width="0.75" fill="#fff"/>
+  <text x="67" y="148.3" text-anchor="middle" font-size="3.5" font-weight="bold">A</text>
+  <line x1="65" y1="143" x2="69" y2="143" stroke="none"/>
+  <text x="67" y="152.5" text-anchor="middle" font-size="2.5">A</text>
+
+  <!-- Right side marker -->
+  <line x1="330" y1="147" x2="318" y2="147" stroke="#000" stroke-width="0.75" marker-end="url(#section-arrow)"/>
+  <circle cx="333" cy="147" r="4" stroke="#000" stroke-width="0.75" fill="#fff"/>
+  <text x="333" y="148.3" text-anchor="middle" font-size="3.5" font-weight="bold">A</text>
+  <text x="333" y="152.5" text-anchor="middle" font-size="2.5">A</text>
+
+  <!-- Section A-A dashed line through plan -->
+  <line x1="94" y1="147" x2="311.2" y2="147" stroke="#000" stroke-width="0.35" stroke-dasharray="4,1,1,1"/>
+
+  <!-- Section B-B: North-South cut through island area -->
+  <!-- Top marker -->
+  <line x1="194" y1="55" x2="194" y2="63" stroke="#000" stroke-width="0.75" marker-end="url(#section-arrow)"/>
+  <circle cx="194" cy="51" r="4" stroke="#000" stroke-width="0.75" fill="#fff"/>
+  <text x="194" y="52.3" text-anchor="middle" font-size="3.5" font-weight="bold">B</text>
+  <text x="198" y="52.3" text-anchor="start" font-size="2.5">B</text>
+
+  <!-- Bottom marker -->
+  <line x1="194" y1="242" x2="194" y2="234" stroke="#000" stroke-width="0.75" marker-end="url(#section-arrow)"/>
+  <circle cx="194" cy="246" r="4" stroke="#000" stroke-width="0.75" fill="#fff"/>
+  <text x="194" y="247.3" text-anchor="middle" font-size="3.5" font-weight="bold">B</text>
+  <text x="198" y="247.3" text-anchor="start" font-size="2.5">B</text>
+
+  <!-- Section B-B dashed line -->
+  <line x1="194" y1="68" x2="194" y2="225.6" stroke="#000" stroke-width="0.35" stroke-dasharray="4,1,1,1"/>
+
+  <!-- Section C-C: Cut through Closet Her (east wall elevation) -->
+  <!-- Top marker -->
+  <line x1="293" y1="55" x2="293" y2="63" stroke="#000" stroke-width="0.75" marker-end="url(#section-arrow)"/>
+  <circle cx="293" cy="51" r="4" stroke="#000" stroke-width="0.75" fill="#fff"/>
+  <text x="293" y="52.3" text-anchor="middle" font-size="3.5" font-weight="bold">C</text>
+  <text x="297" y="52.3" text-anchor="start" font-size="2.5">C</text>
+
+  <!-- Bottom marker -->
+  <line x1="293" y1="242" x2="293" y2="234" stroke="#000" stroke-width="0.75" marker-end="url(#section-arrow)"/>
+  <circle cx="293" cy="246" r="4" stroke="#000" stroke-width="0.75" fill="#fff"/>
+  <text x="293" y="247.3" text-anchor="middle" font-size="3.5" font-weight="bold">C</text>
+  <text x="297" y="247.3" text-anchor="start" font-size="2.5">C</text>
+
+  <!-- Section C-C dashed line -->
+  <line x1="293" y1="68" x2="293" y2="225.6" stroke="#000" stroke-width="0.35" stroke-dasharray="4,1,1,1"/>
+
+  <!-- Section D-D: Cut through Closet His (west wall elevation) -->
+  <!-- Top marker -->
+  <line x1="112" y1="55" x2="112" y2="63" stroke="#000" stroke-width="0.75" marker-end="url(#section-arrow)"/>
+  <circle cx="112" cy="51" r="4" stroke="#000" stroke-width="0.75" fill="#fff"/>
+  <text x="112" y="52.3" text-anchor="middle" font-size="3.5" font-weight="bold">D</text>
+  <text x="116" y="52.3" text-anchor="start" font-size="2.5">D</text>
+
+  <!-- Bottom marker -->
+  <line x1="112" y1="242" x2="112" y2="234" stroke="#000" stroke-width="0.75" marker-end="url(#section-arrow)"/>
+  <circle cx="112" cy="246" r="4" stroke="#000" stroke-width="0.75" fill="#fff"/>
+  <text x="112" y="247.3" text-anchor="middle" font-size="3.5" font-weight="bold">D</text>
+  <text x="116" y="247.3" text-anchor="start" font-size="2.5">D</text>
+
+  <!-- Section D-D dashed line -->
+  <line x1="112" y1="68" x2="112" y2="225.6" stroke="#000" stroke-width="0.35" stroke-dasharray="4,1,1,1"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- FLOOR FINISH INDICATION -->
+<!-- ============================================================ -->
+<text x="202.6" y="130" font-family="Arial" font-size="2.5" fill="#555" text-anchor="middle">PISO: N.A.</text>
+<text x="202.6" y="133" font-family="Arial" font-size="2" fill="#555" text-anchor="middle">P.D. = 3.000</text>
+
+<!-- ============================================================ -->
+<!-- NORTH ARROW -->
+<!-- ============================================================ -->
+<g id="north-arrow" transform="translate(540,50)">
+  <circle cx="0" cy="0" r="10" fill="none" stroke="#000" stroke-width="0.5"/>
+  <!-- Arrow pointing up (north) -->
+  <polygon points="0,-9 -2.5,2 0,0 2.5,2" fill="#000" stroke="#000" stroke-width="0.3"/>
+  <polygon points="0,-9 0,0 2.5,2" fill="#000"/>
+  <polygon points="0,-9 -2.5,2 0,0" fill="none" stroke="#000" stroke-width="0.3"/>
+  <line x1="0" y1="0" x2="0" y2="8" stroke="#000" stroke-width="0.5"/>
+  <text x="0" y="-11" text-anchor="middle" font-family="Arial" font-size="4" font-weight="bold" fill="#000">N</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- DRAWING TITLE (Top center) -->
+<!-- ============================================================ -->
+<text x="202.6" y="40" font-family="Arial" font-size="5" font-weight="bold" fill="#000" text-anchor="middle">PLANTA BAIXA COTADA</text>
+<text x="202.6" y="45" font-family="Arial" font-size="3" fill="#444" text-anchor="middle">ESCALA 1:25</text>
+
+<!-- ============================================================ -->
+<!-- LEGEND / NOTES -->
+<!-- ============================================================ -->
+<g id="notes" transform="translate(380,75)">
+  <text x="0" y="0" font-family="Arial" font-size="3.5" font-weight="bold" fill="#000">LEGENDA</text>
+  <line x1="0" y1="2" x2="40" y2="2" stroke="#000" stroke-width="0.5"/>
+
+  <!-- Wall symbol -->
+  <rect x="0" y="6" width="10" height="4" fill="url(#wall-hatch)" stroke="#000" stroke-width="0.75"/>
+  <text x="13" y="9.5" font-family="Arial" font-size="2.5" fill="#000">Alvenaria (e=150mm)</text>
+
+  <!-- Furniture symbol -->
+  <rect x="0" y="14" width="10" height="4" fill="none" stroke="#000" stroke-width="0.5"/>
+  <text x="13" y="17.5" font-family="Arial" font-size="2.5" fill="#000">Mobiliario</text>
+
+  <!-- Glass/vitrine symbol -->
+  <rect x="0" y="22" width="10" height="4" fill="none" stroke="#000" stroke-width="0.5" stroke-dasharray="1.5,0.75"/>
+  <text x="13" y="25.5" font-family="Arial" font-size="2.5" fill="#000">Vitrine / Vidro</text>
+
+  <!-- Door symbol -->
+  <line x1="0" y1="30" x2="6" y2="30" stroke="#000" stroke-width="0.5"/>
+  <path d="M 0,30 A 6,6 0 0,1 6,36" stroke="#000" stroke-width="0.35" stroke-dasharray="1,0.5" fill="none"/>
+  <text x="13" y="33.5" font-family="Arial" font-size="2.5" fill="#000">Porta (abertura 90°)</text>
+
+  <!-- Section cut symbol -->
+  <line x1="0" y1="40" x2="10" y2="40" stroke="#000" stroke-width="0.35" stroke-dasharray="4,1,1,1"/>
+  <text x="13" y="42" font-family="Arial" font-size="2.5" fill="#000">Linha de corte</text>
+
+  <!-- Critical dimension -->
+  <line x1="0" y1="48" x2="10" y2="48" stroke="#cc0000" stroke-width="0.5"/>
+  <text x="13" y="50" font-family="Arial" font-size="2.5" fill="#cc0000">Cota critica (min. 800mm)</text>
+
+  <!-- Hanging rod -->
+  <circle cx="5" cy="56" r="1" stroke="#000" stroke-width="0.35" fill="none"/>
+  <text x="13" y="58" font-family="Arial" font-size="2.5" fill="#000">Cabideiro (varao)</text>
+
+  <!-- Lock symbol -->
+  <circle cx="5" cy="64" r="1.5" stroke="#000" stroke-width="0.35" fill="none"/>
+  <rect x="4" y="65.5" width="2" height="2.5" rx="0.3" stroke="#000" stroke-width="0.35" fill="none"/>
+  <text x="13" y="66" font-family="Arial" font-size="2.5" fill="#000">Fechadura / Trancamento</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- ZONE SCHEDULE TABLE -->
+<!-- ============================================================ -->
+<g id="zone-schedule" transform="translate(380,160)">
+  <text x="0" y="0" font-family="Arial" font-size="3.5" font-weight="bold" fill="#000">QUADRO DE AREAS</text>
+  <line x1="0" y1="2" x2="120" y2="2" stroke="#000" stroke-width="0.5"/>
+
+  <!-- Table header -->
+  <rect x="0" y="4" width="120" height="7" fill="#eee" stroke="#000" stroke-width="0.35"/>
+  <text x="3" y="9" font-family="Arial" font-size="2.5" font-weight="bold">ZONA</text>
+  <line x1="55" y1="4" x2="55" y2="11" stroke="#000" stroke-width="0.35"/>
+  <text x="58" y="9" font-family="Arial" font-size="2.5" font-weight="bold">DIM. (mm)</text>
+  <line x1="90" y1="4" x2="90" y2="11" stroke="#000" stroke-width="0.35"/>
+  <text x="93" y="9" font-family="Arial" font-size="2.5" font-weight="bold">AREA (m²)</text>
+
+  <!-- Row 1 -->
+  <rect x="0" y="11" width="120" height="6" fill="none" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="15.5" font-family="Arial" font-size="2.2">1 — Closet Her (parede leste)</text>
+  <text x="58" y="15.5" font-family="Arial" font-size="2.2">3640 x 600</text>
+  <text x="93" y="15.5" font-family="Arial" font-size="2.2">2.18</text>
+
+  <!-- Row 2 -->
+  <rect x="0" y="17" width="120" height="6" fill="#f9f9f9" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="21.5" font-family="Arial" font-size="2.2">2 — Ilha Central</text>
+  <text x="58" y="21.5" font-family="Arial" font-size="2.2">1200 x 600</text>
+  <text x="93" y="21.5" font-family="Arial" font-size="2.2">0.72</text>
+
+  <!-- Row 3 -->
+  <rect x="0" y="23" width="120" height="6" fill="none" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="27.5" font-family="Arial" font-size="2.2">3 — Makeup Area (sudoeste)</text>
+  <text x="58" y="27.5" font-family="Arial" font-size="2.2">1190 x 500</text>
+  <text x="93" y="27.5" font-family="Arial" font-size="2.2">0.60</text>
+
+  <!-- Row 4 -->
+  <rect x="0" y="29" width="120" height="6" fill="#f9f9f9" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="33.5" font-family="Arial" font-size="2.2">4 — Area Armas (noroeste)</text>
+  <text x="58" y="33.5" font-family="Arial" font-size="2.2">1360 x 600</text>
+  <text x="93" y="33.5" font-family="Arial" font-size="2.2">0.82</text>
+
+  <!-- Row 5 -->
+  <rect x="0" y="35" width="120" height="6" fill="none" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="39.5" font-family="Arial" font-size="2.2">5 — Closet His (parede oeste)</text>
+  <text x="58" y="39.5" font-family="Arial" font-size="2.2">2540 x 600</text>
+  <text x="93" y="39.5" font-family="Arial" font-size="2.2">1.53</text>
+
+  <!-- Total row -->
+  <rect x="0" y="41" width="120" height="7" fill="#ddd" stroke="#000" stroke-width="0.35"/>
+  <text x="3" y="46" font-family="Arial" font-size="2.5" font-weight="bold">AREA TOTAL DO AMBIENTE</text>
+  <text x="58" y="46" font-family="Arial" font-size="2.5" font-weight="bold">5130 x 3640</text>
+  <text x="93" y="46" font-family="Arial" font-size="2.5" font-weight="bold">18.67</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- SECTION CUT SCHEDULE -->
+<!-- ============================================================ -->
+<g id="section-schedule" transform="translate(380,230)">
+  <text x="0" y="0" font-family="Arial" font-size="3.5" font-weight="bold" fill="#000">CORTES</text>
+  <line x1="0" y1="2" x2="80" y2="2" stroke="#000" stroke-width="0.5"/>
+
+  <rect x="0" y="4" width="80" height="6" fill="#eee" stroke="#000" stroke-width="0.35"/>
+  <text x="3" y="8.5" font-family="Arial" font-size="2.5" font-weight="bold">CORTE</text>
+  <line x1="20" y1="4" x2="20" y2="10" stroke="#000" stroke-width="0.35"/>
+  <text x="23" y="8.5" font-family="Arial" font-size="2.5" font-weight="bold">DESCRICAO</text>
+  <line x1="60" y1="4" x2="60" y2="10" stroke="#000" stroke-width="0.35"/>
+  <text x="63" y="8.5" font-family="Arial" font-size="2.5" font-weight="bold">FOLHA</text>
+
+  <rect x="0" y="10" width="80" height="5" fill="none" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="13.5" font-family="Arial" font-size="2.2">A — A</text>
+  <text x="23" y="13.5" font-family="Arial" font-size="2.2">Corte longitudinal (L-O)</text>
+  <text x="63" y="13.5" font-family="Arial" font-size="2.2">Folha 3/8</text>
+
+  <rect x="0" y="15" width="80" height="5" fill="#f9f9f9" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="18.5" font-family="Arial" font-size="2.2">B — B</text>
+  <text x="23" y="18.5" font-family="Arial" font-size="2.2">Corte transversal (centro)</text>
+  <text x="63" y="18.5" font-family="Arial" font-size="2.2">Folha 4/8</text>
+
+  <rect x="0" y="20" width="80" height="5" fill="none" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="23.5" font-family="Arial" font-size="2.2">C — C</text>
+  <text x="23" y="23.5" font-family="Arial" font-size="2.2">Elevacao Closet Her</text>
+  <text x="63" y="23.5" font-family="Arial" font-size="2.2">Folha 5/8</text>
+
+  <rect x="0" y="25" width="80" height="5" fill="#f9f9f9" stroke="#000" stroke-width="0.25"/>
+  <text x="3" y="28.5" font-family="Arial" font-size="2.2">D — D</text>
+  <text x="23" y="28.5" font-family="Arial" font-size="2.2">Elevacao Closet His</text>
+  <text x="63" y="28.5" font-family="Arial" font-size="2.2">Folha 6/8</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- GENERAL NOTES -->
+<!-- ============================================================ -->
+<g id="general-notes" transform="translate(380,290)">
+  <text x="0" y="0" font-family="Arial" font-size="3.5" font-weight="bold" fill="#000">NOTAS GERAIS</text>
+  <line x1="0" y1="2" x2="120" y2="2" stroke="#000" stroke-width="0.5"/>
+  <text x="3" y="7" font-family="Arial" font-size="2.2" fill="#000">1. Todas as cotas em milimetros, exceto quando indicado.</text>
+  <text x="3" y="11" font-family="Arial" font-size="2.2" fill="#000">2. Pe-direito livre: 3.000mm.</text>
+  <text x="3" y="15" font-family="Arial" font-size="2.2" fill="#000">3. Espessura das paredes: 150mm (alvenaria).</text>
+  <text x="3" y="19" font-family="Arial" font-size="2.2" fill="#000">4. Passagem minima entre mobiliarios: 800mm (atendido).</text>
+  <text x="3" y="23" font-family="Arial" font-size="2.2" fill="#000">5. Profundidade padrao dos armarios: 600mm.</text>
+  <text x="3" y="27" font-family="Arial" font-size="2.2" fill="#000">6. Area Armas: requer revestimento anti-fogo e trancamento biometrico.</text>
+  <text x="3" y="31" font-family="Arial" font-size="2.2" fill="#000">7. Vitrines com vidro temperado 8mm e iluminacao LED embutida.</text>
+  <text x="3" y="35" font-family="Arial" font-size="2.2" fill="#000">8. Ilha central com tampo em marmore ou quartzito.</text>
+  <text x="3" y="39" font-family="Arial" font-size="2.2" fill="#000">9. Verificar posicoes de pontos eletricos antes da fabricacao.</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- TITLE BLOCK (CARIMBO) — Bottom-right corner -->
+<!-- ============================================================ -->
+<g id="title-block">
+  <!-- Outer border (double line) -->
+  <rect x="380" y="345" width="200" height="62" fill="#fff" stroke="#000" stroke-width="1.0"/>
+  <rect x="382" y="347" width="196" height="58" fill="none" stroke="#000" stroke-width="0.35"/>
+
+  <!-- Horizontal dividers -->
+  <line x1="382" y1="362" x2="578" y2="362" stroke="#000" stroke-width="0.35"/>
+  <line x1="382" y1="372" x2="578" y2="372" stroke="#000" stroke-width="0.35"/>
+  <line x1="382" y1="382" x2="578" y2="382" stroke="#000" stroke-width="0.35"/>
+  <line x1="382" y1="392" x2="578" y2="392" stroke="#000" stroke-width="0.35"/>
+
+  <!-- Vertical dividers -->
+  <line x1="460" y1="362" x2="460" y2="405" stroke="#000" stroke-width="0.35"/>
+
+  <!-- Company name and project (large area top) -->
+  <text x="480" y="354" font-family="Arial" font-size="6" font-weight="bold" fill="#000" text-anchor="middle">SOMA ID</text>
+  <text x="480" y="360" font-family="Arial" font-size="3.5" fill="#000" text-anchor="middle">Closet Sabrina Parkland</text>
+
+  <!-- Row: Drawing title -->
+  <text x="385" y="369" font-family="Arial" font-size="2.5" fill="#666">TITULO:</text>
+  <text x="420" y="369" font-family="Arial" font-size="3" font-weight="bold" fill="#000">PLANTA BAIXA COTADA</text>
+
+  <!-- Row: Scale and Date -->
+  <text x="385" y="379" font-family="Arial" font-size="2.5" fill="#666">ESCALA:</text>
+  <text x="420" y="379" font-family="Arial" font-size="3" fill="#000">1:25</text>
+  <text x="463" y="379" font-family="Arial" font-size="2.5" fill="#666">DATA:</text>
+  <text x="485" y="379" font-family="Arial" font-size="3" fill="#000">03/22/2026</text>
+
+  <!-- Row: Sheet and Location -->
+  <text x="385" y="389" font-family="Arial" font-size="2.5" fill="#666">FOLHA:</text>
+  <text x="420" y="389" font-family="Arial" font-size="3" fill="#000">1/8</text>
+  <text x="463" y="389" font-family="Arial" font-size="2.5" fill="#666">LOCAL:</text>
+  <text x="485" y="389" font-family="Arial" font-size="3" fill="#000">Parkland, FL</text>
+
+  <!-- Row: Designer -->
+  <text x="385" y="399" font-family="Arial" font-size="2.5" fill="#666">PROJETISTA:</text>
+  <text x="420" y="399" font-family="Arial" font-size="3" fill="#000">SOMA ID AI Engine</text>
+  <text x="463" y="399" font-family="Arial" font-size="2.5" fill="#666">REV:</text>
+  <text x="485" y="399" font-family="Arial" font-size="3" fill="#000">R00</text>
+
+  <!-- Row: File reference -->
+  <text x="385" y="404" font-family="Arial" font-size="2" fill="#999">ARQ: folha_01_planta_baixa.html</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- REVISION TABLE (above title block) -->
+<!-- ============================================================ -->
+<g id="revision-table">
+  <rect x="380" y="330" width="200" height="13" fill="none" stroke="#000" stroke-width="0.5"/>
+  <rect x="380" y="330" width="200" height="6" fill="#eee" stroke="#000" stroke-width="0.35"/>
+  <text x="395" y="334.5" font-family="Arial" font-size="2.5" font-weight="bold" text-anchor="middle">REV</text>
+  <text x="430" y="334.5" font-family="Arial" font-size="2.5" font-weight="bold" text-anchor="middle">DATA</text>
+  <text x="500" y="334.5" font-family="Arial" font-size="2.5" font-weight="bold" text-anchor="middle">DESCRICAO</text>
+  <text x="565" y="334.5" font-family="Arial" font-size="2.5" font-weight="bold" text-anchor="middle">RESP.</text>
+
+  <line x1="410" y1="330" x2="410" y2="343" stroke="#000" stroke-width="0.25"/>
+  <line x1="450" y1="330" x2="450" y2="343" stroke="#000" stroke-width="0.25"/>
+  <line x1="550" y1="330" x2="550" y2="343" stroke="#000" stroke-width="0.25"/>
+
+  <text x="395" y="340.5" font-family="Arial" font-size="2.2" text-anchor="middle">R00</text>
+  <text x="430" y="340.5" font-family="Arial" font-size="2.2" text-anchor="middle">03/22/2026</text>
+  <text x="500" y="340.5" font-family="Arial" font-size="2.2" text-anchor="middle">Emissao inicial</text>
+  <text x="565" y="340.5" font-family="Arial" font-size="2.2" text-anchor="middle">SOMA</text>
+</g>
+
+</svg>
+</div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>SOMA ID - Parsed Briefing - Sabrina Parkland</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Courier New', monospace; background: #1e1e2e; color: #cdd6f4; padding: 20px; }
+  .container { max-width: 1000px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 25px; border-radius: 12px 12px 0 0; border-bottom: 2px solid #45475a; }
+  .header h1 { font-family: 'Segoe UI', sans-serif; font-size: 22px; font-weight: 300; color: #89b4fa; letter-spacing: 2px; }
+  .header p { font-family: 'Segoe UI', sans-serif; font-size: 13px; color: #a6adc8; margin-top: 5px; }
+  pre { background: #1e1e2e; padding: 20px; font-size: 12px; line-height: 1.6; overflow-x: auto; border-radius: 0 0 12px 12px; }
+  .key { color: #89b4fa; }
+  .string { color: #a6e3a1; }
+  .number { color: #fab387; }
+  .bracket { color: #f5c2e7; }
+  .null { color: #6c7086; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>SOMA ID &mdash; Parsed Briefing</h1>
+    <p>Projeto Sabrina Parkland | B.Home Concept | Designer: Alana | 2026-03-17</p>
+  </div>
+  <pre id="json"></pre>
+</div>
+<script>
+const data = {"client":{"name":"Sabrina","email":"TBD","phone":"TBD","referral":"B.Home Concept (Silmara, Deerfield Beach FL)"},"project":{"type":"closet","designer":"Alana","date_in":"2026-03-17","date_due":"TBD","location":"Parkland, FL","currency":"USD"},"space":{"total_area_m2":18.67,"ceiling_height_m":3.00,"shape":"irregular","walls":[{"id":"north","length_m":5.13,"features":[]},{"id":"east","length_m":3.64,"features":[]},{"id":"south","length_m":5.13,"features":["entry_door"]},{"id":"west","length_m":3.64,"features":[]}],"entry_point":{"wall":"south","width_m":0.90}},"zones":[{"name":"Closet Her","dimensions":{"width_m":3.64,"depth_m":3.81},"items":[{"type":"hanging_bar","subtype":"long_garments","priority":"high"},{"type":"hanging_bar","subtype":"short_garments","priority":"high"},{"type":"shelves","subtype":"folded_clothes"},{"type":"niches","subtype":"folded_clothes"},{"type":"shoe_rack","quantity":30,"subtype":"shoes"},{"type":"shoe_rack","quantity":6,"subtype":"boots"},{"type":"niche_vertical","subtype":"steamer_ladder"},{"type":"vitrine","quantity":15,"subtype":"bags","features":["glass_shelves","LED_strips","no_glass_door"]},{"type":"luggage_area","quantity":4,"sizes":["2_large","2_small"],"access":"frequent"}]},{"name":"Ilha Central","dimensions":{"width_m":1.20,"depth_m":0.60},"items":[{"type":"jewelry_display","features":["glass_top","velvet_dividers"]},{"type":"drawers","quantity":5,"categories":["lingerie","pijamas","biquinis","cintos","acessorios"]}]},{"name":"Makeup Area","dimensions":{"width_m":1.19,"depth_m":1.93},"items":[{"type":"vanity","features":["mirror","dedicated_lighting","seating_space"]}],"constraints":[{"type":"min_passage","value_mm":800,"relative_to":"opposite_tower"}]},{"name":"Area Armas","dimensions":{"width_m":1.36,"depth_m":0.60},"items":[{"type":"gun_cases_storage","features":["mirror_door_front","LED_shelves","door_sensor"]}]},{"name":"Closet His","dimensions":{"width_m":4.03,"depth_m":0.60},"items":[{"type":"shelves"},{"type":"shoe_rack"},{"type":"hanging_bar","subtype":"short_garments"}]}],"materials":{"colors":["Lana","Lord"],"mood_board":"elegant_neutral","primary_body":"MDP 18mm Lana","primary_front":"MDP 18mm Lord"}};
+
+function syntaxHighlight(json) {
+  json = JSON.stringify(json, null, 2);
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+    let cls = 'number';
+    if (/^"/.test(match)) { if (/:$/.test(match)) { cls = 'key'; } else { cls = 'string'; } }
+    else if (/true|false/.test(match)) { cls = 'number'; }
+    else if (/null/.test(match)) { cls = 'null'; }
+    return '<span class="' + cls + '">' + match + '</span>';
+  }).replace(/[{}\[\]]/g, m => '<span class="bracket">' + m + '</span>');
+}
+document.getElementById('json').innerHTML = syntaxHighlight(data);
+</script>
+</body>
+</html>

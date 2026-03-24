@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMA ID - Interference Report - Sabrina Parkland</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
+  .container { max-width: 1000px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
+  .header h1 { font-size: 24px; font-weight: 300; letter-spacing: 2px; }
+  .header h2 { font-size: 16px; font-weight: 400; opacity: 0.8; margin-top: 5px; }
+  .summary-bar { display: flex; gap: 0; }
+  .summary-item { flex: 1; padding: 20px; text-align: center; color: white; }
+  .summary-item .num { font-size: 36px; font-weight: 800; }
+  .summary-item .label { font-size: 12px; opacity: 0.9; margin-top: 4px; }
+  .bg-pass { background: #16a34a; }
+  .bg-fail { background: #dc2626; }
+  .bg-warn { background: #f59e0b; }
+  .bg-total { background: #1e40af; }
+  .section { background: white; padding: 25px; margin-bottom: 2px; }
+  .section:last-child { border-radius: 0 0 12px 12px; }
+  .check { border: 2px solid #e5e7eb; border-radius: 10px; padding: 20px; margin-bottom: 15px; transition: all 0.2s; }
+  .check:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .check-pass { border-left: 6px solid #16a34a; }
+  .check-fail { border-left: 6px solid #dc2626; background: #fef2f2; }
+  .check-warn { border-left: 6px solid #f59e0b; }
+  .check-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .check-title { font-size: 15px; font-weight: 600; }
+  .check-id { font-size: 11px; color: #888; font-family: monospace; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .badge-pass { background: #dcfce7; color: #166534; }
+  .badge-fail { background: #fee2e2; color: #991b1b; }
+  .badge-warn { background: #fef3c7; color: #92400e; }
+  .check-details { font-size: 13px; color: #555; margin: 10px 0; }
+  .check-calc { background: #f8fafc; padding: 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; color: #334155; margin: 10px 0; }
+  .check-notes { font-size: 12px; color: #666; font-style: italic; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb; }
+  .margin-indicator { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .margin-tight { background: #fef3c7; color: #92400e; }
+  .margin-ok { background: #dcfce7; color: #166534; }
+  .margin-negative { background: #fee2e2; color: #991b1b; }
+  .recs { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; border-radius: 0 8px 8px 0; }
+  .recs h4 { color: #1e40af; margin-bottom: 10px; }
+  .recs li { margin-bottom: 8px; font-size: 13px; }
+  .blocking { background: #fef2f2; border-left: 4px solid #dc2626; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 15px; }
+  .blocking h4 { color: #991b1b; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>SOMA ID</h1>
+    <h2>Interference Report &mdash; Projeto Sabrina Parkland</h2>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-item bg-total"><div class="num">8</div><div class="label">Total Checks</div></div>
+    <div class="summary-item bg-pass"><div class="num">7</div><div class="label">PASS</div></div>
+    <div class="summary-item bg-fail"><div class="num">1</div><div class="label">FAIL</div></div>
+    <div class="summary-item bg-warn"><div class="num">4</div><div class="label">Warnings</div></div>
+  </div>
+
+  <div class="section">
+    <div class="blocking">
+      <h4>BLOQUEIO: 1 falha critica impede producao</h4>
+      <p style="font-size:13px"><strong>CHK-004:</strong> Clearance insuficiente frente/fundo da ilha central (360mm disponivel, 600mm necessario). Ilha precisa ser reposicionada ou redimensionada antes de prosseguir.</p>
+    </div>
+
+    <div class="check check-pass">
+      <div class="check-header">
+        <div><span class="check-id">CHK-001</span> <span class="check-title">Passagem Makeup vs Torre Oposta</span></div>
+        <span class="badge badge-pass">PASS</span>
+      </div>
+      <div class="check-details">Constraint: minimo 800mm | Zona: Makeup Area | Severidade: CRITICAL</div>
+      <div class="check-calc">Espaco entre paredes: 1930mm<br>Bancada makeup: 500mm | Torre oposta: 600mm<br>Passagem livre: 1930 - 500 - 600 = <strong>830mm</strong></div>
+      <div>Margem: <span class="margin-indicator margin-tight">+30mm (apertado)</span></div>
+      <div class="check-notes">Atende o minimo, mas margem apertada. Considerar reduzir bancada para 450mm (+50mm folga).</div>
+    </div>
+
+    <div class="check check-pass">
+      <div class="check-header">
+        <div><span class="check-id">CHK-002</span> <span class="check-title">Swing Porta Espelho Area Armas</span></div>
+        <span class="badge badge-pass">PASS</span>
+      </div>
+      <div class="check-details">Constraint: 500mm projecao | Zona: Area Armas | Severidade: CRITICAL</div>
+      <div class="check-calc">Largura porta: 1324mm (swing completo)<br>Espaco disponivel em frente: ~2440mm<br>Folga apos abertura: 2440 - 1324 = <strong>1116mm</strong></div>
+      <div>Margem: <span class="margin-indicator margin-ok">+1116mm (ampla)</span></div>
+      <div class="check-notes">Porta abre completamente. Verificar que ilha nao esta posicionada na frente.</div>
+    </div>
+
+    <div class="check check-pass check-warn">
+      <div class="check-header">
+        <div><span class="check-id">CHK-003</span> <span class="check-title">Clearance Ilha — Lados (Esq/Dir)</span></div>
+        <span class="badge badge-warn">PASS + WARNING</span>
+      </div>
+      <div class="check-details">Constraint: minimo 600mm cada lado | Zona: Ilha Central | Severidade: WARNING</div>
+      <div class="check-calc">Espaco entre torres: 3640 - 600 - 600 = 2440mm<br>Ilha largura: 1200mm<br>Clearance cada lado: (2440 - 1200) / 2 = <strong>620mm</strong></div>
+      <div>Margem: <span class="margin-indicator margin-tight">+20mm (muito apertado)</span></div>
+      <div class="check-notes">Tecnicamente passa, mas 20mm de margem e insuficiente na pratica. Reduzir ilha para 1100mm ganha 50mm/lado.</div>
+    </div>
+
+    <div class="check check-fail">
+      <div class="check-header">
+        <div><span class="check-id">CHK-004</span> <span class="check-title">Clearance Ilha — Frente/Fundo</span></div>
+        <span class="badge badge-fail">FAIL</span>
+      </div>
+      <div class="check-details">Constraint: minimo 600mm | Zona: Ilha Central | Severidade: CRITICAL</div>
+      <div class="check-calc">Closet Her profundidade: 3810mm<br>Espaco restante no eixo: 5130 - 3810 = 1320mm<br>Ilha profundidade: 600mm<br>Clearance se centralizada: (1320 - 600) / 2 = <strong>360mm</strong><br><strong style="color:#dc2626">DEFICIT: -240mm abaixo do minimo</strong></div>
+      <div>Margem: <span class="margin-indicator margin-negative">-240mm (FALHA)</span></div>
+      <div class="check-notes"><strong>ACAO NECESSARIA:</strong> Reposicionar ilha no eixo longitudinal (paralela a parede 3.64m), reduzir profundidade para 450mm, ou deslocar ilha para zona de maior espaco. Este check bloqueia producao.</div>
+    </div>
+
+    <div class="check check-pass check-warn">
+      <div class="check-header">
+        <div><span class="check-id">CHK-005</span> <span class="check-title">Altura Area de Malas</span></div>
+        <span class="badge badge-warn">PASS + WARNING</span>
+      </div>
+      <div class="check-details">Constraint: maximo 2200mm | Zona: Closet Her — Luggage | Severidade: WARNING</div>
+      <div class="check-calc">Base da prateleira: 2200mm do chao<br>Topo do compartimento: 2800mm<br>Teto: 3000mm (200mm painel de fundo)</div>
+      <div>Margem: <span class="margin-indicator margin-tight">0mm (no limite)</span></div>
+      <div class="check-notes">No limite exato. Mulher de estatura media (~1.65m) pode precisar de banco. Considerar barra de puxar retratil ou baixar para 2000mm.</div>
+    </div>
+
+    <div class="check check-pass">
+      <div class="check-header">
+        <div><span class="check-id">CHK-006</span> <span class="check-title">Gavetas Ilha vs Paredes Laterais</span></div>
+        <span class="badge badge-pass">PASS</span>
+      </div>
+      <div class="check-details">Constraint: 500mm extensao gaveta | Zona: Ilha Central | Severidade: WARNING</div>
+      <div class="check-calc">Extensao completa gaveta: 500mm<br>Clearance lateral disponivel: 620mm<br>Folga: 620 - 500 = <strong>120mm</strong></div>
+      <div>Margem: <span class="margin-indicator margin-ok">+120mm (OK)</span></div>
+    </div>
+
+    <div class="check check-pass">
+      <div class="check-header">
+        <div><span class="check-id">CHK-007</span> <span class="check-title">Closet Her — Largura Total vs Parede</span></div>
+        <span class="badge badge-pass">PASS</span>
+      </div>
+      <div class="check-details">Constraint: &le; 3640mm | Zona: Closet Her | Severidade: INFO</div>
+      <div class="check-calc">Sapateira: 1500 + Botas: 1050 + Steamer: 300 = 2850mm<br>Parede: 3640mm | Sobra: <strong>790mm</strong></div>
+      <div>Margem: <span class="margin-indicator margin-ok">+790mm (ampla)</span></div>
+    </div>
+
+    <div class="check check-pass check-warn">
+      <div class="check-header">
+        <div><span class="check-id">CHK-008</span> <span class="check-title">Closet His — Largura Total vs Parede</span></div>
+        <span class="badge badge-warn">PASS + WARNING</span>
+      </div>
+      <div class="check-details">Constraint: &le; 4030mm | Zona: Closet His | Severidade: WARNING</div>
+      <div class="check-calc">Modulos: 800 + 800 + 1200 + 1230 = 4030mm<br>Parede: 4030mm | Margem: <strong>0mm</strong></div>
+      <div>Margem: <span class="margin-indicator margin-tight">0mm (encaixe exato)</span></div>
+      <div class="check-notes">Paredes nunca sao perfeitamente retas. Reduzir ultimo modulo em 15mm para absorver irregularidades.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="recs">
+      <h4>Recomendacoes (ordenadas por prioridade)</h4>
+      <ol>
+        <li><strong>[BLOQUEANTE]</strong> Reposicionar ilha central no eixo longitudinal OU reduzir profundidade para 450mm (resolve CHK-004)</li>
+        <li>Reduzir largura da ilha de 1200mm para 1100mm (melhora CHK-003: +70mm/lado)</li>
+        <li>Reduzir ultimo modulo Closet His em 15mm: 1230 &rarr; 1215mm (resolve CHK-008)</li>
+        <li>Baixar area de malas de 2200mm para 2000mm (melhora CHK-005: acesso sem banco)</li>
+        <li>Considerar reduzir bancada makeup de 500mm para 450mm (melhora CHK-001: passagem 880mm)</li>
+      </ol>
+    </div>
+  </div>
+</div>
+</body>
+</html>

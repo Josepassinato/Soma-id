@@ -3,17 +3,34 @@ import React from 'react';
 import { BlueprintData } from '../types';
 
 interface Props {
-  data: BlueprintData;
+  data: BlueprintData | null;
   wallWidth: number;
+  wallHeight?: number;
 }
 
-export const Blueprint2D: React.FC<Props> = ({ data, wallWidth }) => {
+export const Blueprint2D: React.FC<Props> = ({ data, wallWidth, wallHeight: wallHeightProp }) => {
   const padding = 60;
   const svgWidth = 800;
   const scale = (svgWidth - padding * 2) / wallWidth;
-  const heightScale = scale; // Manter proporção
-  const wallHeight = 2700; // Altura padrão de teto
+  const heightScale = scale;
+  const wallHeight = wallHeightProp || 2700;
   const svgHeight = (wallHeight * heightScale) + padding * 2;
+
+  if (!data) {
+    return (
+      <div className="bg-[#0F172A] rounded-xl border border-blue-500/30 overflow-hidden shadow-2xl relative group">
+        <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+          <rect x={padding} y={padding} width={wallWidth * scale} height={wallHeight * heightScale} fill="#1E293B" fillOpacity="0.15" stroke="#334155" strokeWidth="1" strokeDasharray="8" />
+          <text x={svgWidth / 2} y={svgHeight / 2 - 15} fill="#475569" fontSize="14" fontFamily="JetBrains Mono" textAnchor="middle" fontWeight="bold">
+            {wallWidth}mm x {wallHeight}mm
+          </text>
+          <text x={svgWidth / 2} y={svgHeight / 2 + 10} fill="#334155" fontSize="10" fontFamily="JetBrains Mono" textAnchor="middle">
+            Planta sendo gerada...
+          </text>
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#0F172A] rounded-xl border border-blue-500/30 overflow-hidden shadow-2xl relative group">

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -16,6 +16,7 @@ import asyncio
 import httpx
 from bs4 import BeautifulSoup
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+from auth import create_access_token, get_current_user
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -91,10 +92,12 @@ class GeneratePromptRequest(BaseModel):
     styleDescription: str
     angle: Optional[str] = "Frontal View"
     language: Optional[str] = "pt"  # pt, en, es
+    selectedMaterials: list[dict] = []
 
 class GenerateImageRequest(BaseModel):
     prompt: str
     materialPhoto: Optional[str] = None
+    selectedMaterials: list[dict] = []
 
 class GenerateTechnicalDataRequest(BaseModel):
     clientName: str
@@ -334,10 +337,27 @@ async def get_status_checks():
     return status_checks
 
 
+# ============== AUTH ROUTES ==============
+
+class AuthTokenRequest(BaseModel):
+    api_key: str
+
+@api_router.post("/auth/token")
+async def create_auth_token(request: AuthTokenRequest):
+    """Exchange a valid API key for a JWT access token."""
+    expected_key = os.environ.get("SOMA_API_KEY")
+    if not expected_key:
+        raise HTTPException(status_code=500, detail="SOMA_API_KEY not configured on server")
+    if request.api_key != expected_key:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    token = create_access_token(data={"sub": "soma-id-client"})
+    return {"access_token": token, "token_type": "bearer"}
+
+
 # ============== GEMINI API ROUTES ==============
 
 @api_router.post("/gemini/analyze-consultation")
-async def analyze_consultation(request: AnalyzeConsultationRequest):
+async def analyze_consultation(request: AnalyzeConsultationRequest, _user: dict = Depends(get_current_user)):
     """Analyze a consultation input (text, audio, image, pdf) and extract insights"""
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
@@ -369,6 +389,12 @@ async def analyze_consultation(request: AnalyzeConsultationRequest):
             "en": "Analyze this document/audio. Extract information about the client, room type, mentioned measurements and style preferences.",
             "es": "Analice este documento/audio. Extraiga información sobre el cliente, tipo de ambiente, medidas mencionadas y preferencias de estilo."
         }
+
+        pdf_prompts = {
+            "pt": "Analise este documento PDF. Extraia todas as informações sobre o projeto de marcenaria: cliente, tipo de ambiente, medidas, materiais, estilo e especificações técnicas.",
+            "en": "Analyze this PDF document. Extract all information about the cabinetry project: client, room type, measurements, materials, style and technical specifications.",
+            "es": "Analice este documento PDF. Extraiga toda la información sobre el proyecto de carpintería: cliente, tipo de ambiente, medidas, materiales, estilo y especificaciones técnicas."
+        }
         
         lang = request.language or "pt"
         
@@ -396,8 +422,17 @@ Analyze the following and return a JSON with these fields: clientName (string), 
                     media_type=request.input.mimeType or "image/jpeg"
                 )]
             )
+        elif request.input.type == 'PDF':
+            # PDF - send as document to Gemini (native PDF support)
+            message = UserMessage(
+                text=pdf_prompts.get(lang, pdf_prompts["pt"]) + user_context,
+                images=[ImageContent(
+                    base64_data=request.input.content,
+                    media_type="application/pdf"
+                )]
+            )
         else:
-            # For audio/pdf - treat as text description for now
+            # For audio - treat as text description for now
             message = UserMessage(text=audio_prompts.get(lang, audio_prompts["pt"]) + f"\n\nConteúdo: {request.input.content[:1000]}" + user_context)
 
         response = await chat.send_message(message)
@@ -421,29 +456,154 @@ Analyze the following and return a JSON with these fields: clientName (string), 
         raise HTTPException(status_code=500, detail=f"Failed to analyze consultation: {str(e)}")
 
 
+@api_router.post("/gemini/analyze-multi-environment")
+async def analyze_multi_environment(request: AnalyzeConsultationRequest, _user: dict = Depends(get_current_user)):
+    """Analyze a document and extract ALL environments/rooms as separate projects"""
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
+
+    try:
+        lang = request.language or "pt"
+        language_instruction = get_language_instruction(lang)
+
+        system_prompt = f"""{SYSTEM_INSTRUCTION_DEBURADOR}
+
+{language_instruction}
+
+Você receberá um documento (PDF, texto ou imagem) contendo um orçamento ou briefing de marcenaria com MÚLTIPLOS ambientes/cômodos.
+
+Sua tarefa é extrair CADA ambiente separadamente e retornar um JSON com esta estrutura EXATA:
+
+{{
+  "projectName": "Nome do projeto geral (ex: Cabinet Quote - Residence)",
+  "totalEnvironments": <número de ambientes detectados>,
+  "environments": [
+    {{
+      "id": "env_1",
+      "roomType": "Kitchen",
+      "wallWidth": 3500,
+      "wallHeight": 2440,
+      "styleDescription": "Descrição do estilo e acabamento",
+      "suggestedMaterials": ["Material 1", "Material 2"],
+      "installationType": "PISO",
+      "analysisStatus": "COMPLETO",
+      "notes": "Detalhes específicos deste ambiente"
+    }}
+  ]
+}}
+
+REGRAS:
+1. Extraia TODOS os ambientes mencionados no documento, mesmo que tenham pouca informação
+2. O campo "id" deve ser sequencial: env_1, env_2, env_3, etc.
+3. wallWidth e wallHeight em milímetros. Se não informado, ESTIME baseado no tipo de ambiente:
+   - Kitchen: 3500mm x 2440mm
+   - Laundry: 1800mm x 2440mm
+   - Bathroom/Vanity: 1500mm x 2440mm
+   - Closet: 2400mm x 2440mm (usar dimensões do documento se fornecidas, ex: 96H x 16D = 2438mm x 406mm)
+   - Powder Room: 1200mm x 2440mm
+4. installationType: PISO para armários de chão, SUSPENSO para aéreos, ou "PISO e SUSPENSO" quando ambos
+5. analysisStatus: COMPLETO se tem info suficiente para iniciar projeto, INCOMPLETO se faltam dados
+6. Banheiros numerados (Bath 01, 02, 03) podem ser agrupados em um único ambiente se tiverem specs iguais, com notes indicando a quantidade
+7. Converter medidas imperiais para milímetros: 1 inch = 25.4mm, 1 foot = 304.8mm
+"""
+
+        chat = create_gemini_chat(f"multi-env-{uuid.uuid4()}", system_prompt)
+
+        # Build message based on input type (same logic as analyze-consultation)
+        if request.input.type == 'TEXT':
+            message = UserMessage(text=request.input.content)
+        elif request.input.type == 'IMAGE':
+            message = UserMessage(
+                text="Analise este documento/imagem e extraia TODOS os ambientes de marcenaria como projetos separados.",
+                images=[ImageContent(
+                    base64_data=request.input.content,
+                    media_type=request.input.mimeType or "image/jpeg"
+                )]
+            )
+        elif request.input.type == 'PDF':
+            message = UserMessage(
+                text="Analise este documento PDF e extraia TODOS os ambientes de marcenaria como projetos separados.",
+                images=[ImageContent(
+                    base64_data=request.input.content,
+                    media_type="application/pdf"
+                )]
+            )
+        else:
+            message = UserMessage(text=f"Analise e extraia TODOS os ambientes:\n\n{request.input.content[:2000]}")
+
+        response = await chat.send_message(message)
+        result = extract_json(response)
+
+        # Ensure required fields
+        result.setdefault('projectName', 'Multi-Environment Project')
+        if 'environments' not in result or not isinstance(result['environments'], list):
+            result['environments'] = []
+        result['totalEnvironments'] = len(result['environments'])
+
+        # Ensure each environment has required fields
+        for i, env in enumerate(result['environments']):
+            env.setdefault('id', f'env_{i + 1}')
+            env.setdefault('roomType', 'Room')
+            env.setdefault('wallWidth', 3000)
+            env.setdefault('wallHeight', 2440)
+            env.setdefault('styleDescription', '')
+            env.setdefault('suggestedMaterials', [])
+            env.setdefault('installationType', 'PISO')
+            env.setdefault('analysisStatus', 'INCOMPLETO')
+            env.setdefault('notes', '')
+
+        return {"status": "success", "data": result}
+
+    except Exception as e:
+        logger.error(f"Error analyzing multi-environment: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to analyze multi-environment: {str(e)}")
+
+
 @api_router.post("/gemini/generate-prompt")
-async def generate_enchantment_prompt(request: GeneratePromptRequest):
+async def generate_enchantment_prompt(request: GeneratePromptRequest, _user: dict = Depends(get_current_user)):
     """Generate an architectural visualization prompt for image generation"""
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
     
     try:
         style_keywords = get_style_keywords(request.styleDescription)
-        
+
         system_prompt = AGENT_ENCHANTMENT_VISUALIZER_INSTRUCTION
-        
+
+        # Build material instruction from catalog selections
+        if request.selectedMaterials:
+            material_names = [f"{m.get('name','?')} ({m.get('category','?')}, {m.get('texture','?')})" for m in request.selectedMaterials]
+            material_block = "\n".join([f"- {m}" for m in material_names])
+            material_instruction = f"""
+MATERIAIS OBRIGATÓRIOS DO CATÁLOGO — use EXCLUSIVAMENTE estes materiais:
+{material_block}
+NÃO invente outros materiais, cores, texturas ou acabamentos além dos listados acima.
+Cada superfície visível deve usar um destes materiais especificados."""
+        else:
+            material_instruction = "Use high-end premium materials appropriate for luxury cabinetry."
+
         prompt = f"""TASK: Research 2025 architectural trends for {request.styleDescription}.
 PROJECT: {request.clientName} | {request.roomType}.
 SPECIFICATIONS: Wall width {request.wallWidth}mm, Height {request.wallHeight}mm.
 STYLE CONTEXT: {style_keywords}.
-OBJECTIVE: Create a hyper-realistic architectural photography prompt for {request.angle}. 
-Incorporate tunable lighting, specific wood grain orientations (Freijó, Walnut), and 2025 hardware."""
+{material_instruction}
+OBJECTIVE: Create a hyper-realistic architectural photography prompt for {request.angle}.
+Incorporate tunable lighting, specific grain orientations matching the specified materials, and 2025 hardware."""
         
         chat = create_gemini_chat(f"prompt-{uuid.uuid4()}", system_prompt)
         response = await chat.send_message(UserMessage(text=prompt))
         result = clean_response(response)
-        
-        return {"status": "success", "data": {"prompt": result}}
+
+        # Append explicit material names so they appear in the final prompt
+        if request.selectedMaterials:
+            mat_names = [m.get('name', '') for m in request.selectedMaterials if m.get('name')]
+            mat_suffix = f"\n\nMATERIALS (use exclusively): {', '.join(mat_names)}."
+            if isinstance(result, str):
+                result = result.rstrip() + mat_suffix
+            else:
+                result = str(result).rstrip() + mat_suffix
+
+        return {"status": "success", "data": {"prompt": str(result)}}
         
     except Exception as e:
         logger.error(f"Error generating prompt: {str(e)}")
@@ -451,7 +611,7 @@ Incorporate tunable lighting, specific wood grain orientations (Freijó, Walnut)
 
 
 @api_router.post("/gemini/generate-image")
-async def generate_enchantment_image(request: GenerateImageRequest):
+async def generate_enchantment_image(request: GenerateImageRequest, _user: dict = Depends(get_current_user)):
     """Generate an architectural visualization image using Gemini Nano Banana via Emergent Integration"""
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="EMERGENT_LLM_KEY not configured for image generation")
@@ -461,10 +621,13 @@ async def generate_enchantment_image(request: GenerateImageRequest):
         
         # Build the detailed image generation prompt
         material_instruction = ""
-        if request.materialPhoto:
+        if request.selectedMaterials:
+            mat_desc = ", ".join([m.get('name', '?') for m in request.selectedMaterials[:3]])
+            material_instruction = f"Use these specific materials: {mat_desc}. Do not use any other materials."
+        elif request.materialPhoto:
             material_instruction = "Use warm wood tones with natural grain patterns similar to walnut or oak."
         else:
-            material_instruction = "Use high-end natural oak/walnut textures with deep grains and matte finish."
+            material_instruction = "Use high-end natural wood textures and premium finishes."
         
         image_prompt = f"""Generate a photorealistic architectural interior render:
 
@@ -533,7 +696,7 @@ QUALITY: Photorealistic, high detail, no artifacts"""
 
 
 @api_router.post("/gemini/generate-technical-data")
-async def generate_technical_data(request: GenerateTechnicalDataRequest):
+async def generate_technical_data(request: GenerateTechnicalDataRequest, _user: dict = Depends(get_current_user)):
     """Generate technical blueprint data for manufacturing"""
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="Emergent LLM key not configured")
@@ -580,7 +743,7 @@ Return a JSON object with this structure:
 
 
 @api_router.get("/gemini/health")
-async def check_gemini_health():
+async def check_gemini_health(_user: dict = Depends(get_current_user)):
     """Check if Gemini API is working"""
     if not EMERGENT_LLM_KEY:
         return {"status": "error", "message": "Emergent LLM key not configured", "latency": 0}
@@ -1254,7 +1417,7 @@ async def get_catalog_modules():
         return {"status": "success", "data": STANDARD_CATALOG, "source": "fallback"}
 
 @api_router.get("/catalog/modules/{module_id}")
-async def get_module_by_id(module_id: str):
+async def get_module_by_id(module_id: str, _user: dict = Depends(get_current_user)):
     """Get a specific module by ID"""
     try:
         if db is None:
@@ -1288,7 +1451,7 @@ async def get_catalog_materials():
             return {"status": "success", "data": MOCK_MATERIALS, "source": "fallback"}
         
         materials_collection = db.materials
-        materials = await materials_collection.find({}, {"_id": 0}).to_list(length=100)
+        materials = await materials_collection.find({}, {"_id": 0}).to_list(length=500)
         
         if not materials:
             return {"status": "success", "data": MOCK_MATERIALS, "source": "fallback"}
@@ -1299,7 +1462,7 @@ async def get_catalog_materials():
         return {"status": "success", "data": MOCK_MATERIALS, "source": "fallback"}
 
 @api_router.get("/catalog/materials/{material_id}")
-async def get_material_by_id(material_id: str):
+async def get_material_by_id(material_id: str, _user: dict = Depends(get_current_user)):
     """Get a specific material by ID"""
     try:
         if db is None:
@@ -1325,7 +1488,7 @@ async def get_material_by_id(material_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/catalog/materials/categories")
-async def get_material_categories():
+async def get_material_categories(_user: dict = Depends(get_current_user)):
     """Get all unique material categories"""
     try:
         if db is None:

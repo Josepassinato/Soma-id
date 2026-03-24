@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMA ID Chat — Teste Upload Briefing</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { color: #1a1a2e; margin-bottom: 8px; }
+  h2 { color: #555; font-weight: 400; font-size: 14px; margin-bottom: 24px; }
+  .upload-form {
+    background: #fff; border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;
+  }
+  label { display: block; font-weight: 600; margin-bottom: 6px; color: #333; }
+  input[type="file"], textarea {
+    width: 100%; padding: 10px; border: 1px solid #ddd;
+    border-radius: 8px; margin-bottom: 16px; font-size: 14px;
+  }
+  textarea { height: 80px; resize: vertical; }
+  button {
+    background: #2c3e50; color: #fff; border: none; padding: 12px 32px;
+    border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 600;
+  }
+  button:hover { background: #34495e; }
+  button:disabled { background: #95a5a6; cursor: not-allowed; }
+  .status { margin-top: 16px; padding: 12px; border-radius: 8px; display: none; }
+  .status.loading { display: block; background: #fff3cd; color: #856404; }
+  .status.success { display: block; background: #d4edda; color: #155724; }
+  .status.error { display: block; background: #f8d7da; color: #721c24; }
+  .result {
+    background: #fff; border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none;
+  }
+  .result.visible { display: block; }
+  pre {
+    background: #1a1a2e; color: #e0e0e0; padding: 16px;
+    border-radius: 8px; overflow-x: auto; font-size: 13px;
+    max-height: 600px; overflow-y: auto;
+  }
+  .sources { margin-bottom: 16px; }
+  .source-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 16px;
+    font-size: 12px; font-weight: 600; margin-right: 6px; margin-bottom: 4px;
+  }
+  .source-badge.pdf { background: #e74c3c; color: #fff; }
+  .source-badge.image { background: #3498db; color: #fff; }
+  .source-badge.audio { background: #2ecc71; color: #fff; }
+  .source-badge.text { background: #9b59b6; color: #fff; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>SOMA ID Chat — Teste de Briefing</h1>
+  <h2>Fase 1: Endpoint de recepcao de briefing (PDF + imagem + audio + texto)</h2>
+
+  <div class="upload-form">
+    <form id="briefingForm" enctype="multipart/form-data">
+      <label for="files">Arquivos (PDF, imagem, audio):</label>
+      <input type="file" id="files" name="files" multiple
+        accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.wav,.mp3,.ogg,.m4a,.aac" />
+
+      <label for="text">Mensagem de texto (opcional):</label>
+      <textarea id="text" name="text" placeholder="Descreva detalhes adicionais do projeto..."></textarea>
+
+      <button type="submit" id="submitBtn">Enviar Briefing</button>
+    </form>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="result" id="result">
+    <h3 style="margin-bottom:12px;">Resultado da Analise</h3>
+    <div class="sources" id="sources"></div>
+    <pre id="json"></pre>
+  </div>
+</div>
+
+<script>
+const form = document.getElementById('briefingForm');
+const status = document.getElementById('status');
+const result = document.getElementById('result');
+const sourcesDiv = document.getElementById('sources');
+const jsonPre = document.getElementById('json');
+const submitBtn = document.getElementById('submitBtn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData();
+  const fileInput = document.getElementById('files');
+  const textInput = document.getElementById('text');
+
+  for (const file of fileInput.files) {
+    formData.append('file', file);
+  }
+  if (textInput.value.trim()) {
+    formData.append('text', textInput.value.trim());
+  }
+
+  status.className = 'status loading';
+  status.textContent = 'Processando briefing... (pode levar 10-30s)';
+  submitBtn.disabled = true;
+  result.classList.remove('visible');
+
+  try {
+    const res = await fetch('/briefing', { method: 'POST', body: formData });
+    const data = await res.json();
+
+    if (data.success) {
+      status.className = 'status success';
+      status.textContent = 'Briefing processado com sucesso!';
+    } else {
+      status.className = 'status error';
+      status.textContent = 'Erro: ' + (data.error || 'Falha no processamento');
+    }
+
+    // Show sources
+    sourcesDiv.innerHTML = '<strong>Fontes processadas:</strong> ';
+    for (const src of data.sources_processed || []) {
+      sourcesDiv.innerHTML += '<span class="source-badge ' + src.type + '">' + src.type.toUpperCase() + (src.filename ? ': ' + src.filename : '') + '</span>';
+    }
+
+    // Show JSON
+    jsonPre.textContent = JSON.stringify(data, null, 2);
+    result.classList.add('visible');
+  } catch (err) {
+    status.className = 'status error';
+    status.textContent = 'Erro de rede: ' + err.message;
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

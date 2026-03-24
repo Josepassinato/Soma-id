@@ -1,35 +1,33 @@
 
 import { STANDARD_CATALOG } from '../constants';
 import { StandardModuleDefinition } from '../types';
-import { supabase } from './supabaseClient';
 
 let cachedModules: StandardModuleDefinition[] = [];
 
 /**
  * Service Layer para Catálogo Técnico.
- * Centraliza a lógica de busca de módulos e especificações de engenharia.
+ * Fonte primária: MongoDB via backend API.
+ * Fallback: dados locais (STANDARD_CATALOG) se o backend estiver indisponível.
  */
 export const CatalogService = {
   initialize: async () => {
     if (cachedModules.length > 0) return;
 
-    if (supabase) {
-        try {
-            const { data, error } = await supabase.from('modules').select('*');
-            if (data && data.length > 0) {
-                // Adaptação dos dados do banco para a interface (caso necessário)
-                // Assumindo que o JSONB no banco casa com a interface TS
-                cachedModules = data as unknown as StandardModuleDefinition[];
-                console.log(`✅ ${data.length} módulos carregados do Supabase.`);
-                return;
-            }
-            if (error) console.warn("⚠️ Falha ao buscar módulos do banco:", error.message);
-        } catch (e) {
-            console.error("Erro no fetch de módulos:", e);
+    try {
+      const res = await fetch('/api/catalog/modules');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.status === 'success' && json.data && json.data.length > 0) {
+          cachedModules = json.data as StandardModuleDefinition[];
+          console.log(`✅ ${cachedModules.length} módulos carregados do MongoDB (source: ${json.source}).`);
+          return;
         }
+      }
+      console.warn('⚠️ Backend não retornou módulos. Usando catálogo local.');
+    } catch (e) {
+      console.warn('⚠️ Backend indisponível para catálogo. Usando catálogo local.', e);
     }
 
-    console.warn("⚠️ Usando Catálogo de Módulos Local. Execute o SQL de Seed.");
     cachedModules = STANDARD_CATALOG;
   },
 

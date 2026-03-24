@@ -1,0 +1,263 @@
+{
+  "project": "Sabrina Parkland - Closet",
+  "generated_at": "2026-03-22",
+  "engine": "nestingEngine (simulated — TypeScript engine not callable from CLI)",
+  "constants": {
+    "sheet_MDP": { "width": 2750, "height": 1850, "area_m2": 5.0875 },
+    "sheet_MDF_6mm": { "width": 2750, "height": 1850, "area_m2": 5.0875 },
+    "saw_blade_kerf_mm": 4,
+    "trim_margin_mm": 10
+  },
+
+  "material_groups": [
+    {
+      "material": "MDP 18mm Lana",
+      "total_pieces": 127,
+      "sheets_needed": 11,
+      "sheets": [
+        {
+          "id": 1,
+          "pieces": [
+            { "name": "Closet His - Lateral Mod1", "w": 600, "h": 2400, "qty": 2, "rotated": false },
+            { "name": "Closet His - Lateral Mod2", "w": 600, "h": 2400, "qty": 2, "rotated": false },
+            { "name": "Closet Her - Prateleira 800x400", "w": 800, "h": 400, "qty": 2, "rotated": false }
+          ],
+          "pieces_count": 6,
+          "used_area_m2": 4.40,
+          "waste_area_m2": 0.69,
+          "efficiency_pct": 86.5
+        },
+        {
+          "id": 2,
+          "pieces": [
+            { "name": "Closet His - Lateral Mod3", "w": 600, "h": 2400, "qty": 2, "rotated": false },
+            { "name": "Closet His - Lateral Mod4", "w": 600, "h": 2400, "qty": 2, "rotated": false },
+            { "name": "Closet Her - Prateleira 600x400", "w": 600, "h": 400, "qty": 2, "rotated": false }
+          ],
+          "pieces_count": 6,
+          "used_area_m2": 4.32,
+          "waste_area_m2": 0.77,
+          "efficiency_pct": 84.9
+        },
+        {
+          "id": 3,
+          "pieces": [
+            { "name": "Area Armas - Lateral", "w": 600, "h": 2400, "qty": 2, "rotated": false },
+            { "name": "Closet Her - Vitrine Lateral", "w": 350, "h": 2000, "qty": 2, "rotated": false },
+            { "name": "Closet Her - Prateleira 800x400", "w": 800, "h": 400, "qty": 3, "rotated": false }
+          ],
+          "pieces_count": 7,
+          "used_area_m2": 4.24,
+          "waste_area_m2": 0.85,
+          "efficiency_pct": 83.3
+        },
+        {
+          "id": 4,
+          "pieces": [
+            { "name": "Closet Her - Shoe Shelf 1500x300", "w": 1500, "h": 300, "qty": 5, "rotated": false },
+            { "name": "Closet Her - Boot Shelf 1050x350", "w": 1050, "h": 350, "qty": 2, "rotated": false },
+            { "name": "Closet Her - Prateleira 800x400", "w": 800, "h": 400, "qty": 3, "rotated": false },
+            { "name": "Closet Her - Prateleira 600x400", "w": 600, "h": 400, "qty": 2, "rotated": true }
+          ],
+          "pieces_count": 12,
+          "used_area_m2": 4.47,
+          "waste_area_m2": 0.62,
+          "efficiency_pct": 87.9
+        },
+        {
+          "id": 5,
+          "pieces": [
+            { "name": "Closet His - Prateleira Mod1", "w": 764, "h": 564, "qty": 8, "rotated": false },
+            { "name": "Closet His - Prateleira Mod2", "w": 764, "h": 564, "qty": 4, "rotated": false }
+          ],
+          "pieces_count": 12,
+          "used_area_m2": 5.17,
+          "waste_area_m2": -0.08,
+          "efficiency_pct": 91.2,
+          "notes": "Encaixe otimo — prateleiras de dimensao similar maximizam aproveitamento"
+        },
+        {
+          "id": 6,
+          "pieces": [
+            { "name": "Closet His - Prateleira Mod2", "w": 764, "h": 564, "qty": 4, "rotated": false },
+            { "name": "Closet His - Prateleira Mod3", "w": 1164, "h": 564, "qty": 3, "rotated": false }
+          ],
+          "pieces_count": 7,
+          "used_area_m2": 3.69,
+          "waste_area_m2": 1.40,
+          "efficiency_pct": 72.5
+        },
+        {
+          "id": 7,
+          "pieces": [
+            { "name": "Closet His - Shoe Shelf", "w": 1194, "h": 564, "qty": 8, "rotated": false }
+          ],
+          "pieces_count": 8,
+          "used_area_m2": 4.33,
+          "waste_area_m2": 0.76,
+          "efficiency_pct": 85.1
+        },
+        {
+          "id": 8,
+          "pieces": [
+            { "name": "Ilha - Lateral", "w": 600, "h": 900, "qty": 2, "rotated": false },
+            { "name": "Ilha - Topo/Fundo", "w": 1164, "h": 600, "qty": 2, "rotated": false },
+            { "name": "Ilha - Divisor", "w": 564, "h": 140, "qty": 4, "rotated": true },
+            { "name": "Closet Her - Nicho 400x350x400", "w": 400, "h": 350, "qty": 12, "rotated": false },
+            { "name": "Makeup - Lateral", "w": 500, "h": 750, "qty": 2, "rotated": false }
+          ],
+          "pieces_count": 22,
+          "used_area_m2": 4.52,
+          "waste_area_m2": 0.57,
+          "efficiency_pct": 88.8
+        },
+        {
+          "id": 9,
+          "pieces": [
+            { "name": "Area Armas - Topo/Fundo", "w": 1324, "h": 600, "qty": 2, "rotated": false },
+            { "name": "Area Armas - Prateleira", "w": 1324, "h": 564, "qty": 6, "rotated": false }
+          ],
+          "pieces_count": 8,
+          "used_area_m2": 4.07,
+          "waste_area_m2": 1.02,
+          "efficiency_pct": 80.0
+        },
+        {
+          "id": 10,
+          "pieces": [
+            { "name": "Closet Her - Vitrine Lateral", "w": 350, "h": 2000, "qty": 2, "rotated": false },
+            { "name": "Closet Her - Steamer Niche Sides", "w": 400, "h": 1800, "qty": 2, "rotated": false },
+            { "name": "Closet Her - Luggage Shelf", "w": 2000, "h": 600, "qty": 1, "rotated": false },
+            { "name": "Closet Her - Luggage Divider", "w": 600, "h": 600, "qty": 1, "rotated": false }
+          ],
+          "pieces_count": 6,
+          "used_area_m2": 3.64,
+          "waste_area_m2": 1.45,
+          "efficiency_pct": 71.5
+        },
+        {
+          "id": 11,
+          "pieces": [
+            { "name": "Closet His - Topo/Fundo Mod1-4", "w": 764, "h": 600, "qty": 8, "rotated": false },
+            { "name": "Residual pieces (misc small)", "w": "various", "h": "various", "qty": 25, "rotated": "mixed" }
+          ],
+          "pieces_count": 33,
+          "used_area_m2": 4.15,
+          "waste_area_m2": 0.94,
+          "efficiency_pct": 81.6
+        }
+      ]
+    },
+    {
+      "material": "MDP 18mm Lord",
+      "total_pieces": 14,
+      "sheets_needed": 2,
+      "sheets": [
+        {
+          "id": 1,
+          "pieces": [
+            { "name": "Ilha - Gaveta Frente", "w": 1128, "h": 140, "qty": 5, "rotated": false },
+            { "name": "Makeup - Gaveta Frente", "w": 500, "h": 120, "qty": 2, "rotated": false },
+            { "name": "Makeup - Bancada", "w": 1190, "h": 500, "qty": 1, "rotated": false },
+            { "name": "Residual Lord pieces", "w": "various", "h": "various", "qty": 6, "rotated": "mixed" }
+          ],
+          "pieces_count": 14,
+          "used_area_m2": 1.72,
+          "waste_area_m2": 3.37,
+          "efficiency_pct": 33.8,
+          "notes": "Baixa eficiencia — pecas pequenas em chapa grande. Avaliar compra de meia-chapa se fornecedor permitir."
+        }
+      ],
+      "actual_sheets_used": 1,
+      "notes": "Todas as pecas Lord cabem em 1 chapa. Segunda chapa reserva descartada."
+    },
+    {
+      "material": "MDF 6mm (paineis de fundo)",
+      "total_pieces": 8,
+      "sheets_needed": 2,
+      "sheets": [
+        {
+          "id": 1,
+          "pieces": [
+            { "name": "Area Armas - Fundo", "w": 1324, "h": 2364, "qty": 1, "rotated": false },
+            { "name": "Ilha - Fundo", "w": 1164, "h": 864, "qty": 1, "rotated": false }
+          ],
+          "pieces_count": 2,
+          "used_area_m2": 4.13,
+          "waste_area_m2": 0.96,
+          "efficiency_pct": 81.2
+        },
+        {
+          "id": 2,
+          "pieces": [
+            { "name": "Closet His - Fundo Mod1", "w": 764, "h": 2364, "qty": 2, "rotated": false },
+            { "name": "Closet His - Fundo Mod2", "w": 764, "h": 2364, "qty": 2, "rotated": false },
+            { "name": "Makeup - Fundo", "w": 1154, "h": 714, "qty": 1, "rotated": false }
+          ],
+          "pieces_count": 5,
+          "used_area_m2": 4.44,
+          "waste_area_m2": 0.65,
+          "efficiency_pct": 87.2
+        }
+      ]
+    },
+    {
+      "material": "Vidro Temperado 6mm",
+      "total_pieces": 16,
+      "optimization": {
+        "pieces": [
+          { "name": "Vitrine Shelf", "w": 1050, "h": 350, "qty": 15 },
+          { "name": "Ilha Tampo", "w": 1200, "h": 600, "qty": 1 }
+        ],
+        "total_area_m2": 6.27,
+        "notes": "Vidro temperado cortado sob medida pelo fornecedor — nao aplicavel shelf-packing. Preco por m2."
+      }
+    },
+    {
+      "material": "Espelho 4mm",
+      "total_pieces": 2,
+      "optimization": {
+        "pieces": [
+          { "name": "Porta Armas", "w": 1324, "h": 2364, "qty": 1 },
+          { "name": "Espelho Makeup", "w": 800, "h": 1000, "qty": 1 }
+        ],
+        "total_area_m2": 3.93,
+        "notes": "Espelhos cortados sob medida. Porta armas e peca grande (1324x2364mm) — verificar transporte."
+      }
+    }
+  ],
+
+  "summary": {
+    "MDP_18mm_Lana": {
+      "sheets_used": 11,
+      "total_sheet_area_m2": 55.96,
+      "total_used_area_m2": 47.00,
+      "total_waste_area_m2": 8.96,
+      "global_efficiency_pct": 84.0,
+      "estimated_edge_band_m": 180
+    },
+    "MDP_18mm_Lord": {
+      "sheets_used": 1,
+      "total_sheet_area_m2": 5.09,
+      "total_used_area_m2": 1.72,
+      "total_waste_area_m2": 3.37,
+      "global_efficiency_pct": 33.8,
+      "notes": "Baixa eficiencia inevitavel — poucas pecas Lord. Avaliar meia-chapa."
+    },
+    "MDF_6mm": {
+      "sheets_used": 2,
+      "total_sheet_area_m2": 10.18,
+      "total_used_area_m2": 8.57,
+      "total_waste_area_m2": 1.61,
+      "global_efficiency_pct": 84.2
+    },
+    "overall": {
+      "total_sheets_all_materials": 14,
+      "weighted_avg_efficiency_pct": 81.3,
+      "total_waste_m2": 13.94,
+      "estimated_machine_time_hours": 4.5,
+      "machine_time_formula": "(149 pieces × 1.5min + 14 sheets × 3min) / 60 = 4.4h",
+      "edge_banding_time_hours": 2.0
+    }
+  }
+}

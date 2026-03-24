@@ -1,0 +1,497 @@
+[
+  {
+    "name": "wall_north",
+    "zone": "room",
+    "material": "wall"
+  },
+  {
+    "name": "wall_south_left",
+    "zone": "room",
+    "material": "wall"
+  },
+  {
+    "name": "wall_south_right",
+    "zone": "room",
+    "material": "wall"
+  },
+  {
+    "name": "wall_door_header",
+    "zone": "room",
+    "material": "wall"
+  },
+  {
+    "name": "wall_east",
+    "zone": "room",
+    "material": "wall"
+  },
+  {
+    "name": "wall_west",
+    "zone": "room",
+    "material": "wall"
+  },
+  {
+    "name": "her_bar_long",
+    "zone": "closet_her",
+    "material": "chrome"
+  },
+  {
+    "name": "her_bar_short_upper",
+    "zone": "closet_her",
+    "material": "chrome"
+  },
+  {
+    "name": "her_bar_short_lower",
+    "zone": "closet_her",
+    "material": "chrome"
+  },
+  {
+    "name": "her_shelf_0",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shelf_1",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shelf_2",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shelf_3",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shelf_4",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shelf_5",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shelf_6",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shelf_7",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shoe_shelf_0",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shoe_shelf_1",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shoe_shelf_2",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shoe_shelf_3",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_shoe_shelf_4",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_boot_shelf_0",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_boot_shelf_1",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_vitrine_side_0",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_vitrine_glass_0_0",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_0_1",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_0_2",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_0_3",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_0_4",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_side_1",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_vitrine_glass_1_0",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_1_1",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_1_2",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_1_3",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_1_4",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_side_2",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_vitrine_glass_2_0",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_2_1",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_2_2",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_2_3",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_glass_2_4",
+    "zone": "closet_her",
+    "material": "glass"
+  },
+  {
+    "name": "her_vitrine_side_3",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "her_luggage_shelf",
+    "zone": "closet_her",
+    "material": "lana"
+  },
+  {
+    "name": "ilha_base",
+    "zone": "ilha_central",
+    "material": "lana"
+  },
+  {
+    "name": "ilha_glass_top",
+    "zone": "ilha_central",
+    "material": "glass"
+  },
+  {
+    "name": "ilha_drawer_0",
+    "zone": "ilha_central",
+    "material": "lord"
+  },
+  {
+    "name": "ilha_drawer_1",
+    "zone": "ilha_central",
+    "material": "lord"
+  },
+  {
+    "name": "ilha_drawer_2",
+    "zone": "ilha_central",
+    "material": "lord"
+  },
+  {
+    "name": "ilha_drawer_3",
+    "zone": "ilha_central",
+    "material": "lord"
+  },
+  {
+    "name": "ilha_drawer_4",
+    "zone": "ilha_central",
+    "material": "lord"
+  },
+  {
+    "name": "makeup_countertop",
+    "zone": "makeup_area",
+    "material": "lord"
+  },
+  {
+    "name": "makeup_side_0",
+    "zone": "makeup_area",
+    "material": "lana"
+  },
+  {
+    "name": "makeup_side_1",
+    "zone": "makeup_area",
+    "material": "lana"
+  },
+  {
+    "name": "makeup_mirror",
+    "zone": "makeup_area",
+    "material": "mirror"
+  },
+  {
+    "name": "armas_side_0",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_side_1",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_tb_0",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_tb_1",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_shelf_0",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_shelf_1",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_shelf_2",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_shelf_3",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_shelf_4",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_shelf_5",
+    "zone": "area_armas",
+    "material": "lana"
+  },
+  {
+    "name": "armas_mirror_door",
+    "zone": "area_armas",
+    "material": "mirror"
+  },
+  {
+    "name": "his_shelves_1_side_0",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_side_1",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_shelf_0",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_shelf_1",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_shelf_2",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_shelf_3",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_shelf_4",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_shelf_5",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_shelf_6",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_1_shelf_7",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_side_0",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_side_1",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_shelf_0",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_shelf_1",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_shelf_2",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_shelf_3",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_shelf_4",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_shelf_5",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_shelf_6",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shelves_2_shelf_7",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_hanging_side_0",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_hanging_side_1",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_hanging_bar",
+    "zone": "closet_his",
+    "material": "chrome"
+  },
+  {
+    "name": "his_shoes_side_0",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_side_1",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_shelf_0",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_shelf_1",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_shelf_2",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_shelf_3",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_shelf_4",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_shelf_5",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_shelf_6",
+    "zone": "closet_his",
+    "material": "lana"
+  },
+  {
+    "name": "his_shoes_shelf_7",
+    "zone": "closet_his",
+    "material": "lana"
+  }
+]

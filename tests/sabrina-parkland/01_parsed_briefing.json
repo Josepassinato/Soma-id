@@ -1,0 +1,98 @@
+{
+  "client": {
+    "name": "Sabrina",
+    "email": "TBD",
+    "phone": "TBD",
+    "referral": "B.Home Concept (Silmara, Deerfield Beach FL)"
+  },
+  "project": {
+    "type": "closet",
+    "designer": "Alana",
+    "date_in": "2026-03-17",
+    "date_due": "TBD",
+    "location": "Parkland, FL",
+    "currency": "USD"
+  },
+  "space": {
+    "total_area_m2": 18.67,
+    "ceiling_height_m": 3.00,
+    "shape": "irregular",
+    "walls": [
+      { "id": "north", "length_m": 5.13, "features": [] },
+      { "id": "east", "length_m": 3.64, "features": [] },
+      { "id": "south", "length_m": 5.13, "features": ["entry_door"] },
+      { "id": "west", "length_m": 3.64, "features": [] }
+    ],
+    "entry_point": { "wall": "south", "width_m": 0.90 }
+  },
+  "zones": [
+    {
+      "name": "Closet Her",
+      "dimensions": { "width_m": 3.64, "depth_m": 3.81 },
+      "items": [
+        { "type": "hanging_bar", "subtype": "long_garments", "description": "Vestidos, roupas longas", "priority": "high" },
+        { "type": "hanging_bar", "subtype": "short_garments", "description": "Camisas, calcas, blusas", "priority": "high" },
+        { "type": "shelves", "subtype": "folded_clothes", "description": "Prateleiras para roupas dobradas", "priority": "medium" },
+        { "type": "niches", "subtype": "folded_clothes", "description": "Nichos para roupas dobradas", "priority": "medium" },
+        { "type": "shoe_rack", "quantity": 30, "subtype": "shoes", "description": "Sapateira para sapatos regulares" },
+        { "type": "shoe_rack", "quantity": 6, "subtype": "boots", "description": "Sapateira para botas (altura maior)" },
+        { "type": "niche_vertical", "subtype": "steamer_ladder", "description": "Nicho vertical para steamer de torre + escada", "priority": "low" },
+        { "type": "vitrine", "quantity": 15, "subtype": "bags", "description": "Expositor aberto para bolsas", "features": ["glass_shelves", "LED_strips", "no_glass_door"] },
+        { "type": "luggage_area", "quantity": 4, "sizes": ["2_large", "2_small"], "description": "Area superior para malas", "access": "frequent", "constraint_note": "Cliente viaja todo mes, acesso facil obrigatorio" }
+      ]
+    },
+    {
+      "name": "Ilha Central",
+      "dimensions": { "width_m": 1.20, "depth_m": 0.60 },
+      "items": [
+        { "type": "jewelry_display", "description": "Tampo de vidro com divisores em veludo para joias e oculos", "features": ["glass_top", "velvet_dividers"] },
+        { "type": "drawers", "quantity": 5, "categories": ["lingerie", "pijamas", "biquinis", "cintos", "acessorios"], "description": "Gavetas categorizadas" }
+      ]
+    },
+    {
+      "name": "Makeup Area",
+      "dimensions": { "width_m": 1.19, "depth_m": 1.93 },
+      "items": [
+        { "type": "vanity", "description": "Bancada elegante com iluminacao dedicada", "features": ["mirror", "dedicated_lighting", "seating_space"] }
+      ],
+      "constraints": [
+        { "type": "min_passage", "value_mm": 800, "relative_to": "opposite_tower", "description": "Passagem entre makeup e torre oposta NAO pode estrangular" }
+      ]
+    },
+    {
+      "name": "Area Armas",
+      "dimensions": { "width_m": 1.36, "depth_m": 0.60 },
+      "items": [
+        { "type": "gun_cases_storage", "description": "Armazenamento de cases (mais cases que armas penduradas)", "features": ["mirror_door_front", "LED_shelves", "door_sensor"] },
+        { "type": "mirror_door", "description": "Porta de espelho na frente — fecha disfarçando area" },
+        { "type": "shelves_internal", "description": "Prateleiras internas com LED + sensor de acendimento ao abrir porta" }
+      ]
+    },
+    {
+      "name": "Closet His",
+      "dimensions": { "width_m": 4.03, "depth_m": 0.60 },
+      "items": [
+        { "type": "shelves", "description": "Prateleiras gerais" },
+        { "type": "shoe_rack", "description": "Espaco para sapatos" },
+        { "type": "hanging_bar", "subtype": "short_garments", "description": "Area de cabide" }
+      ]
+    }
+  ],
+  "materials": {
+    "colors": ["Lana", "Lord"],
+    "mood_board": "elegant_neutral",
+    "primary_body": "MDP 18mm Lana",
+    "primary_front": "MDP 18mm Lord",
+    "glass": "Vidro temperado 6mm (vitrines, ilha)",
+    "mirror": "Espelho 4mm (porta area armas)",
+    "led": "Fita LED branco quente 3000K",
+    "velvet": "Veludo cinza para divisores ilha"
+  },
+  "_meta": {
+    "parsed_by": "SOMA-ID Pipeline Test",
+    "parsed_at": "2026-03-22",
+    "source_format": "text_briefing + hand_drawn_floorplan",
+    "confidence": "high",
+    "notes": "Dados extraidos manualmente do briefing real para teste de capacidade do pipeline"
+  }
+}

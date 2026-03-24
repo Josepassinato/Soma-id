@@ -1,33 +1,33 @@
 
 import { MOCK_MATERIALS } from '../constants';
 import { Material } from '../types';
-import { supabase } from './supabaseClient';
 
 let cachedMaterials: Material[] = [];
 
 /**
  * Service Layer para Materiais.
- * Híbrido: Tenta buscar do Banco, se falhar ou estiver vazio, usa Mocks.
+ * Fonte primária: MongoDB via backend API.
+ * Fallback: dados locais (MOCK_MATERIALS) se o backend estiver indisponível.
  */
 export const MaterialService = {
   initialize: async () => {
     if (cachedMaterials.length > 0) return;
 
-    if (supabase) {
-        try {
-            const { data, error } = await supabase.from('materials').select('*');
-            if (data && data.length > 0) {
-                cachedMaterials = data;
-                console.log(`✅ ${data.length} materiais carregados do Supabase.`);
-                return;
-            }
-            if (error) console.warn("⚠️ Falha ao buscar materiais do banco:", error.message);
-        } catch (e) {
-            console.error("Erro no fetch de materiais:", e);
+    try {
+      const res = await fetch('/api/catalog/materials');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.status === 'success' && json.data && json.data.length > 0) {
+          cachedMaterials = json.data as Material[];
+          console.log(`✅ ${cachedMaterials.length} materiais carregados do MongoDB (source: ${json.source}).`);
+          return;
         }
+      }
+      console.warn('⚠️ Backend não retornou materiais. Usando catálogo local.');
+    } catch (e) {
+      console.warn('⚠️ Backend indisponível para materiais. Usando catálogo local.', e);
     }
-    
-    console.warn("⚠️ Usando Catálogo de Materiais Local (Mock). Execute o SQL de Seed.");
+
     cachedMaterials = MOCK_MATERIALS;
   },
 
@@ -52,7 +52,7 @@ export const MaterialService = {
   getCategories: (): string[] => {
     return ['Todos', ...new Set(MaterialService.getAll().map(m => m.category))];
   },
-  
+
   getTextures: (): string[] => {
     return ['Todas', ...new Set(MaterialService.getAll().map(m => m.texture))];
   }

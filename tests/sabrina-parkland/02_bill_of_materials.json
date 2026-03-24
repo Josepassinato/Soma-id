@@ -1,0 +1,397 @@
+{
+  "project": "Sabrina Parkland - Closet",
+  "generated_at": "2026-03-22",
+  "engine": "calcEngine (simulated — TypeScript engine not callable from CLI)",
+  "units": { "dimensions": "mm", "prices": "USD", "area": "m2" },
+  "constants_used": {
+    "MDP_THICKNESS": 18,
+    "BACK_PANEL_THICKNESS": 6,
+    "GLASS_THICKNESS": 6,
+    "MIRROR_THICKNESS": 4,
+    "DOOR_GAP": 3,
+    "SHELF_SETBACK": 20,
+    "SHEET_MDP": { "width": 2750, "height": 1850 },
+    "SAW_BLADE_KERF": 4
+  },
+
+  "zones": {
+    "closet_her": {
+      "hanging_bars": {
+        "long_garments": {
+          "bar_length_mm": 1500,
+          "bar_height_mm": 1700,
+          "quantity": 1,
+          "notes": "Vestidos, roupas longas. Barra cromada 25mm diametro"
+        },
+        "short_garments": {
+          "bar_length_mm": 2000,
+          "bar_height_upper_mm": 1700,
+          "bar_height_lower_mm": 900,
+          "quantity": 2,
+          "notes": "Dupla altura: camisas/blusas em cima, calcas embaixo"
+        },
+        "total_linear_m": 5.5
+      },
+      "shelves_and_niches": {
+        "shelves": [
+          { "width_mm": 800, "depth_mm": 400, "thickness_mm": 18, "quantity": 8, "material": "MDP Lana" },
+          { "width_mm": 600, "depth_mm": 400, "thickness_mm": 18, "quantity": 4, "material": "MDP Lana" }
+        ],
+        "niches": [
+          { "width_mm": 400, "height_mm": 350, "depth_mm": 400, "quantity": 6, "material": "MDP Lana", "notes": "Nichos abertos para roupas dobradas" }
+        ]
+      },
+      "shoe_rack": {
+        "shoes_regular": {
+          "pairs": 30,
+          "space_per_pair_mm": { "width": 250, "depth": 300, "height": 150 },
+          "rows": 5,
+          "pairs_per_row": 6,
+          "total_width_mm": 1500,
+          "total_height_mm": 750,
+          "shelf_quantity": 5,
+          "shelf_dims": { "width_mm": 1500, "depth_mm": 300, "thickness_mm": 18 },
+          "material": "MDP Lana"
+        },
+        "boots": {
+          "pairs": 6,
+          "space_per_pair_mm": { "width": 350, "depth": 350, "height": 400 },
+          "rows": 2,
+          "pairs_per_row": 3,
+          "total_width_mm": 1050,
+          "total_height_mm": 800,
+          "shelf_quantity": 2,
+          "shelf_dims": { "width_mm": 1050, "depth_mm": 350, "thickness_mm": 18 },
+          "material": "MDP Lana"
+        }
+      },
+      "steamer_niche": {
+        "width_mm": 300,
+        "height_mm": 1800,
+        "depth_mm": 400,
+        "quantity": 1,
+        "material": "MDP Lana",
+        "notes": "Nicho vertical para steamer de torre + escada"
+      },
+      "vitrines_bags": {
+        "bags": 15,
+        "display_per_bag_mm": { "width": 350, "height": 400 },
+        "columns": 3,
+        "shelves_per_column": 5,
+        "total_width_mm": 1050,
+        "total_height_mm": 2000,
+        "glass_shelves": {
+          "width_mm": 1050,
+          "depth_mm": 350,
+          "thickness_mm": 6,
+          "quantity": 15,
+          "material": "Vidro temperado 6mm"
+        },
+        "led_strips": {
+          "length_per_shelf_mm": 1050,
+          "total_length_m": 15.75,
+          "type": "LED strip 3000K warm white"
+        },
+        "side_panels": {
+          "width_mm": 350,
+          "height_mm": 2000,
+          "thickness_mm": 18,
+          "quantity": 4,
+          "material": "MDP Lana"
+        }
+      },
+      "luggage_area": {
+        "position": "top_shelf",
+        "height_from_floor_mm": 2200,
+        "compartment_height_mm": 600,
+        "width_mm": 2000,
+        "depth_mm": 600,
+        "dividers": 1,
+        "quantity_large": 2,
+        "quantity_small": 2,
+        "shelf_dims": { "width_mm": 2000, "depth_mm": 600, "thickness_mm": 18 },
+        "material": "MDP Lana",
+        "notes": "Altura maxima 2200mm base da prateleira — acesso sem escada. Topo ate 2800mm aproveitado com painel de fundo"
+      }
+    },
+
+    "ilha_central": {
+      "external_dims": { "width_mm": 1200, "depth_mm": 600, "height_mm": 900 },
+      "glass_top": {
+        "width_mm": 1200,
+        "depth_mm": 600,
+        "thickness_mm": 6,
+        "material": "Vidro temperado 6mm",
+        "quantity": 1
+      },
+      "velvet_dividers": {
+        "tray_width_mm": 1164,
+        "tray_depth_mm": 564,
+        "divider_strips": 12,
+        "material": "Veludo cinza",
+        "area_m2": 0.66
+      },
+      "drawers": {
+        "quantity": 5,
+        "categories": ["lingerie", "pijamas", "biquinis", "cintos", "acessorios"],
+        "drawer_dims": {
+          "width_mm": 1128,
+          "depth_mm": 500,
+          "height_mm": 120,
+          "front_height_mm": 140
+        },
+        "front_material": "MDP Lord",
+        "body_material": "MDP Lana",
+        "slides": { "type": "Telescopica com soft-close 500mm", "quantity": 5, "pairs": true }
+      },
+      "structure": {
+        "sides": { "width_mm": 600, "height_mm": 900, "thickness_mm": 18, "quantity": 2, "material": "MDP Lana" },
+        "top_bottom": { "width_mm": 1164, "height_mm": 600, "thickness_mm": 18, "quantity": 2, "material": "MDP Lana" },
+        "back_panel": { "width_mm": 1164, "height_mm": 864, "thickness_mm": 6, "quantity": 1, "material": "MDF 6mm" },
+        "shelf_divider": { "width_mm": 564, "height_mm": 140, "thickness_mm": 18, "quantity": 4, "material": "MDP Lana" }
+      }
+    },
+
+    "makeup_area": {
+      "vanity_dims": { "width_mm": 1190, "depth_mm": 500, "height_mm": 750 },
+      "countertop": { "width_mm": 1190, "depth_mm": 500, "thickness_mm": 18, "quantity": 1, "material": "MDP Lord" },
+      "sides": { "width_mm": 500, "height_mm": 750, "thickness_mm": 18, "quantity": 2, "material": "MDP Lana" },
+      "back_panel": { "width_mm": 1154, "height_mm": 714, "thickness_mm": 6, "quantity": 1, "material": "MDF 6mm" },
+      "drawers": {
+        "quantity": 2,
+        "dims": { "width_mm": 500, "depth_mm": 450, "height_mm": 100, "front_height_mm": 120 },
+        "front_material": "MDP Lord",
+        "slides": { "type": "Telescopica soft-close 450mm", "quantity": 2, "pairs": true }
+      },
+      "mirror": { "width_mm": 800, "height_mm": 1000, "thickness_mm": 4, "quantity": 1, "material": "Espelho 4mm" },
+      "lighting": { "type": "LED strip 4000K neutral white", "length_mm": 800, "quantity": 2, "notes": "Laterais do espelho" }
+    },
+
+    "area_armas": {
+      "cabinet_dims": { "width_mm": 1360, "depth_mm": 600, "height_mm": 2400 },
+      "mirror_door": {
+        "width_mm": 1324,
+        "height_mm": 2364,
+        "thickness_mm": 4,
+        "quantity": 1,
+        "material": "Espelho 4mm",
+        "notes": "Porta unica com dobradicas conceito"
+      },
+      "internal_shelves": {
+        "width_mm": 1324,
+        "depth_mm": 564,
+        "thickness_mm": 18,
+        "quantity": 6,
+        "material": "MDP Lana"
+      },
+      "led_system": {
+        "strips_per_shelf": 1,
+        "strip_length_mm": 1324,
+        "total_length_m": 7.94,
+        "door_sensor": { "type": "Magnetic reed sensor", "quantity": 1 },
+        "led_driver": { "type": "12V 60W", "quantity": 1 }
+      },
+      "structure": {
+        "sides": { "width_mm": 600, "height_mm": 2400, "thickness_mm": 18, "quantity": 2, "material": "MDP Lana" },
+        "top_bottom": { "width_mm": 1324, "height_mm": 600, "thickness_mm": 18, "quantity": 2, "material": "MDP Lana" },
+        "back_panel": { "width_mm": 1324, "height_mm": 2364, "thickness_mm": 6, "quantity": 1, "material": "MDF 6mm" }
+      },
+      "hinges": { "type": "Dobradica conceito 110° soft-close", "quantity": 4 }
+    },
+
+    "closet_his": {
+      "total_width_mm": 4030,
+      "modules": [
+        {
+          "name": "Modulo prateleiras",
+          "width_mm": 800,
+          "height_mm": 2400,
+          "depth_mm": 600,
+          "shelves": 8,
+          "material_body": "MDP Lana"
+        },
+        {
+          "name": "Modulo prateleiras 2",
+          "width_mm": 800,
+          "height_mm": 2400,
+          "depth_mm": 600,
+          "shelves": 8,
+          "material_body": "MDP Lana"
+        },
+        {
+          "name": "Modulo cabide",
+          "width_mm": 1200,
+          "height_mm": 2400,
+          "depth_mm": 600,
+          "hanging_bar": true,
+          "bar_height_mm": 1700,
+          "material_body": "MDP Lana"
+        },
+        {
+          "name": "Modulo sapateira",
+          "width_mm": 1230,
+          "height_mm": 2400,
+          "depth_mm": 600,
+          "shoe_shelves": 8,
+          "shelf_angle_deg": 15,
+          "material_body": "MDP Lana"
+        }
+      ],
+      "structure_per_module": {
+        "sides": { "quantity_per_module": 2, "total": 8 },
+        "shelves_total": 24,
+        "back_panels": 4
+      }
+    }
+  },
+
+  "bill_of_materials_summary": {
+    "MDP_18mm_Lana": {
+      "description": "Corpo (laterais, prateleiras, divisores, estrutura)",
+      "cut_pieces": 127,
+      "estimated_sheets": 11,
+      "sheet_size": "2750x1850mm",
+      "unit_price_usd": 85.00,
+      "total_usd": 935.00
+    },
+    "MDP_18mm_Lord": {
+      "description": "Frentes (gavetas, bancada, detalhes)",
+      "cut_pieces": 14,
+      "estimated_sheets": 2,
+      "sheet_size": "2750x1850mm",
+      "unit_price_usd": 92.00,
+      "total_usd": 184.00
+    },
+    "MDF_6mm_back_panels": {
+      "description": "Paineis de fundo",
+      "cut_pieces": 8,
+      "estimated_sheets": 2,
+      "sheet_size": "2750x1850mm",
+      "unit_price_usd": 35.00,
+      "total_usd": 70.00
+    },
+    "vidro_temperado_6mm": {
+      "description": "Vitrines bolsas + tampo ilha",
+      "pieces": 16,
+      "total_area_m2": 6.27,
+      "unit_price_per_m2_usd": 45.00,
+      "total_usd": 282.15
+    },
+    "espelho_4mm": {
+      "description": "Porta area armas + espelho makeup",
+      "pieces": 2,
+      "total_area_m2": 3.93,
+      "unit_price_per_m2_usd": 55.00,
+      "total_usd": 216.15
+    },
+    "fita_LED_3000K": {
+      "description": "Vitrines + area armas + makeup",
+      "total_length_m": 25.29,
+      "unit_price_per_m_usd": 4.50,
+      "total_usd": 113.81
+    },
+    "sensor_magnetico_porta": {
+      "description": "Sensor LED porta area armas",
+      "quantity": 1,
+      "unit_price_usd": 12.00,
+      "total_usd": 12.00
+    },
+    "driver_LED_12V_60W": {
+      "description": "Fonte para LEDs area armas",
+      "quantity": 1,
+      "unit_price_usd": 25.00,
+      "total_usd": 25.00
+    },
+    "driver_LED_12V_100W": {
+      "description": "Fonte para LEDs vitrines",
+      "quantity": 1,
+      "unit_price_usd": 35.00,
+      "total_usd": 35.00
+    },
+    "barras_cabide_cromadas_25mm": {
+      "description": "Barras para pendurar roupas",
+      "total_length_m": 6.7,
+      "unit_price_per_m_usd": 8.00,
+      "total_usd": 53.60
+    },
+    "suportes_barra_cabide": {
+      "description": "Flanges de fixacao",
+      "quantity": 10,
+      "unit_price_usd": 3.50,
+      "total_usd": 35.00
+    },
+    "corredicas_telescopicas_500mm_soft_close": {
+      "description": "Corrediças gavetas ilha (5 pares)",
+      "quantity_pairs": 5,
+      "unit_price_pair_usd": 18.00,
+      "total_usd": 90.00
+    },
+    "corredicas_telescopicas_450mm_soft_close": {
+      "description": "Corrediças gavetas makeup (2 pares)",
+      "quantity_pairs": 2,
+      "unit_price_pair_usd": 16.00,
+      "total_usd": 32.00
+    },
+    "dobradicas_conceito_110_soft_close": {
+      "description": "Dobradicas porta espelho area armas",
+      "quantity": 4,
+      "unit_price_usd": 12.00,
+      "total_usd": 48.00
+    },
+    "puxadores_embutidos": {
+      "description": "Puxadores para gavetas",
+      "quantity": 7,
+      "unit_price_usd": 8.00,
+      "total_usd": 56.00
+    },
+    "veludo_cinza_divisores": {
+      "description": "Divisores tampo ilha",
+      "area_m2": 0.66,
+      "unit_price_per_m2_usd": 25.00,
+      "total_usd": 16.50
+    },
+    "fita_de_borda_Lana_22mm": {
+      "description": "Acabamento bordas visiveis corpo",
+      "total_length_m": 180.0,
+      "unit_price_per_m_usd": 0.45,
+      "total_usd": 81.00
+    },
+    "fita_de_borda_Lord_22mm": {
+      "description": "Acabamento bordas visiveis frentes",
+      "total_length_m": 25.0,
+      "unit_price_per_m_usd": 0.50,
+      "total_usd": 12.50
+    },
+    "parafusos_minifix_cavilhas": {
+      "description": "Kit fixacao (minifix + cavilhas + parafusos)",
+      "kit_quantity": 3,
+      "unit_price_usd": 45.00,
+      "total_usd": 135.00
+    },
+    "pes_regulaveis_100mm": {
+      "description": "Pes ajustaveis para modulos de piso",
+      "quantity": 24,
+      "unit_price_usd": 2.50,
+      "total_usd": 60.00
+    }
+  },
+
+  "totals": {
+    "total_MDP_MDF_sheets": 15,
+    "total_cut_pieces": 149,
+    "total_glass_area_m2": 6.27,
+    "total_mirror_area_m2": 3.93,
+    "total_LED_length_m": 25.29,
+    "total_edge_band_m": 205.0,
+    "material_cost_usd": 2472.71,
+    "hardware_cost_usd": 456.00,
+    "consumables_cost_usd": 228.50,
+    "grand_total_materials_usd": 3157.21,
+    "notes": [
+      "Precos baseados em valores tipicos de South Florida wholesale (Home Depot Pro, 84 Lumber, specialty glass shops)",
+      "NAO inclui mao de obra, transporte, instalacao",
+      "Vidro temperado cortado sob medida — pode variar ±15% dependendo do fornecedor",
+      "Espelho porta armas: peca unica grande (1324x2364mm) — verificar disponibilidade"
+    ]
+  }
+}

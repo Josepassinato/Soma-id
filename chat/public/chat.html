@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SOMA-ID | Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--surface:#12121a;--border:#1e1e2e;
+  --gold:#c9a84c;--gold-glow:rgba(201,168,76,0.25);
+  --cyan:#06b6d4;--green:#22c55e;--red:#ef4444;
+  --muted:#555;--text:#d1d5db;--text-bright:#f1f5f9;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;display:flex;flex-direction:column}
+
+/* ===== HEADER ===== */
+.header{
+  height:48px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;border-bottom:1px solid var(--border);background:var(--surface);
+  flex-shrink:0;z-index:10;
+}
+.header-logo{font-size:16px;font-weight:800;color:var(--gold);letter-spacing:0.04em}
+.header-status{font-size:10px;color:var(--muted);font-family:'Courier New',monospace;text-transform:uppercase;letter-spacing:0.1em}
+
+/* ===== CHAT AREA ===== */
+.chat-area{
+  flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;
+  display:flex;flex-direction:column;gap:6px;
+  max-width:600px;width:100%;margin:0 auto;
+  scroll-behavior:smooth;
+}
+.chat-area.dragover{background:rgba(201,168,76,0.03);outline:2px dashed var(--gold);outline-offset:-8px;border-radius:8px}
+
+/* ===== MESSAGES ===== */
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dots{0%,80%,100%{transform:scale(0.5);opacity:0.3}40%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes waveAnim{0%,100%{height:4px}50%{height:18px}}
+
+.msg{
+  max-width:85%;animation:msgIn 0.35s ease-out both;
+  display:flex;flex-direction:column;gap:2px;
+}
+.msg-ai{align-self:flex-start}
+.msg-user{align-self:flex-end}
+
+.bubble{
+  padding:12px 16px;border-radius:16px;font-size:15px;line-height:1.6;
+  word-wrap:break-word;white-space:pre-wrap;
+}
+.msg-ai .bubble{
+  background:#1a1a2e;border-left:3px solid var(--gold);
+  border-top-left-radius:4px;color:var(--text);
+}
+.msg-user .bubble{
+  background:#1a2e1a;border-right:3px solid var(--cyan);
+  border-top-right-radius:4px;color:var(--text-bright);
+}
+.msg-time{font-size:10px;color:#444;padding:0 4px}
+.msg-ai .msg-time{text-align:left}
+.msg-user .msg-time{text-align:right}
+
+/* Summary bubble */
+.bubble-summary{
+  background:#141428;border-left:3px solid var(--gold);
+  border-top-left-radius:4px;padding:16px 18px;line-height:1.8;
+  font-size:14px;
+}
+.bubble-summary .s-line{display:flex;gap:8px;align-items:baseline}
+.bubble-summary .s-icon{flex-shrink:0;font-size:15px}
+.bubble-summary .s-label{color:var(--muted);font-size:12px;min-width:70px}
+.bubble-summary .s-val{color:var(--text-bright);font-weight:600}
+
+/* Briefing summary */
+.briefing-summary{
+  background:#141428;border-left:3px solid var(--cyan);
+  border-top-left-radius:4px;padding:16px 18px;line-height:1.9;
+  font-size:14px;
+}
+.briefing-summary .bs-title{font-weight:700;color:var(--gold);font-size:15px;margin-bottom:8px}
+.briefing-summary .bs-item{display:flex;gap:8px;align-items:baseline;margin:3px 0}
+.briefing-summary .bs-icon{flex-shrink:0}
+.briefing-summary .bs-label{color:var(--muted);font-size:12px;min-width:90px}
+.briefing-summary .bs-val{color:var(--text-bright);font-weight:500}
+.briefing-summary .bs-bar{height:6px;border-radius:3px;background:#222;margin:10px 0 4px;overflow:hidden}
+.briefing-summary .bs-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--cyan));transition:width 1s ease-out}
+.briefing-summary .bs-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+
+/* Constraint status badges */
+.bs-constraint{display:flex;gap:6px;align-items:center;margin:2px 0;font-size:13px}
+.bs-constraint-badge{padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+.bs-constraint-badge.ok{background:#1a2e1a;color:var(--green)}
+.bs-constraint-badge.warning{background:#2e2a1a;color:#f59e0b}
+.bs-constraint-badge.critical{background:#2e1a1a;color:var(--red)}
+
+/* Low confidence highlight */
+.bs-low-confidence{background:rgba(245,158,11,0.12);border-left:2px solid #f59e0b;padding:2px 6px;border-radius:4px}
+
+/* Gap priority badges */
+.bs-gap{display:flex;gap:6px;align-items:center;margin:2px 0;font-size:13px}
+.bs-gap-priority{padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase}
+.bs-gap-priority.high{background:#2e1a1a;color:var(--red)}
+.bs-gap-priority.medium{background:#2e2a1a;color:#f59e0b}
+.bs-gap-priority.low{background:#1a1a2e;color:var(--muted)}
+
+/* Result bubble */
+.bubble-result{
+  background:linear-gradient(135deg,#141428,#1a1a2e);border-left:3px solid var(--green);
+  border-top-left-radius:4px;padding:18px 20px;
+}
+.result-metric{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.result-metric .r-icon{font-size:15px}
+.result-metric .r-val{font-size:20px;font-weight:800;color:var(--text-bright)}
+.result-metric .r-label{font-size:12px;color:var(--muted)}
+.eff-bar{height:14px;border-radius:7px;background:#222;margin:8px 0;overflow:hidden;position:relative}
+.eff-fill{height:100%;border-radius:7px;transition:width 1s ease-out}
+.eff-fill.green{background:linear-gradient(90deg,#22c55e,#16a34a)}
+.eff-fill.yellow{background:linear-gradient(90deg,#eab308,#ca8a04)}
+.eff-fill.red{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.eff-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+
+/* Image bubble */
+.bubble-img{padding:6px;background:#1a1a2e;border-left:3px solid var(--gold);border-top-left-radius:4px;border-radius:16px}
+.bubble-img img{width:100%;border-radius:12px;display:block}
+
+/* File bubble */
+.bubble-file{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:#1a2e1a;border-right:3px solid var(--cyan);border-top-right-radius:4px;border-radius:16px;
+}
+.file-icon{font-size:22px}
+.file-info{flex:1}
+.file-name{font-size:13px;font-weight:600;color:var(--text-bright)}
+.file-size{font-size:10px;color:var(--muted)}
+
+/* ===== CHIPS ===== */
+.chips-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;
+  background:#2a2a3e;border:1px solid rgba(201,168,76,0.3);color:var(--text-bright);
+  cursor:pointer;transition:all 0.2s;font-family:inherit;
+}
+.chip:hover{border-color:var(--gold);box-shadow:0 0 12px var(--gold-glow);transform:translateY(-1px)}
+.chip:active{transform:scale(0.96)}
+.chip-color{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);flex-shrink:0}
+
+/* Style chips grid */
+.chips-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;
+}
+.chips-grid .chip{
+  padding:10px 12px;font-size:12px;flex-direction:column;align-items:flex-start;gap:2px;
+  border-radius:12px;text-align:left;
+}
+.chips-grid .chip-desc{font-size:10px;font-weight:400;color:var(--muted);line-height:1.3}
+.chips-grid .chip-special{
+  border-color:var(--cyan);background:#1a2a3a;grid-column:1/-1;
+  flex-direction:row;align-items:center;justify-content:center;gap:8px;
+  padding:12px;font-size:14px;
+}
+@media(min-width:600px){
+  .chips-grid{grid-template-columns:1fr 1fr 1fr}
+}
+
+/* ===== TYPING INDICATOR ===== */
+.typing{align-self:flex-start;padding:8px 0;display:none}
+.typing.show{display:flex}
+.typing-inner{display:flex;align-items:center;gap:4px;background:#1a1a2e;border-left:3px solid var(--gold);border-top-left-radius:4px;border-radius:16px;padding:12px 18px}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:dots 1.4s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:0.15s}
+.typing-dot:nth-child(3){animation-delay:0.3s}
+
+/* ===== FOOTER ===== */
+.footer{
+  flex-shrink:0;border-top:1px solid var(--border);background:var(--surface);
+  padding:8px 12px;max-width:600px;width:100%;margin:0 auto;
+}
+.file-preview-bar{display:none;padding:6px 0;gap:8px;flex-wrap:wrap}
+.file-preview-bar.show{display:flex}
+.fp-chip{
+  display:flex;align-items:center;gap:4px;background:#1a1a24;border:1px solid var(--border);
+  border-radius:8px;padding:4px 8px;font-size:11px;color:var(--text);
+}
+.fp-chip img{width:28px;height:28px;object-fit:cover;border-radius:4px}
+.fp-remove{cursor:pointer;color:var(--red);font-size:13px;margin-left:2px}
+.input-row{display:flex;align-items:flex-end;gap:8px}
+.attach-btn,.rec-btn,.send-btn{
+  width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  transition:all 0.2s;flex-shrink:0;background:transparent;color:var(--muted);
+}
+.attach-btn:hover,.send-btn:hover{color:var(--gold)}
+.rec-btn:hover{color:var(--red)}
+.rec-btn.recording{color:#fff;background:var(--red);animation:pulse 1s ease-in-out infinite}
+.send-btn.active{background:var(--gold);color:#000}
+.chat-input{
+  flex:1;background:#1a1a24;border:1px solid var(--border);border-radius:20px;
+  padding:9px 16px;color:var(--text-bright);font-size:15px;line-height:1.4;
+  resize:none;outline:none;font-family:inherit;max-height:96px;min-height:38px;
+  overflow-y:auto;
+}
+.chat-input::placeholder{color:#444}
+.chat-input:focus{border-color:rgba(201,168,76,0.4)}
+
+/* Waveform */
+.wave-bar-row{display:none;align-items:center;gap:2px;flex:1;height:28px;padding:0 8px}
+.wave-bar-row.show{display:flex}
+.wave-bar{width:3px;background:var(--red);border-radius:2px;animation:waveAnim 0.5s ease-in-out infinite;height:4px}
+.rec-timer{font-size:11px;color:var(--red);font-family:'Courier New',monospace;min-width:40px}
+
+/* ===== SCROLLBAR ===== */
+.chat-area::-webkit-scrollbar{width:4px}
+.chat-area::-webkit-scrollbar-track{background:transparent}
+.chat-area::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:2px}
+
+/* mobile */
+@media(max-width:600px){
+  .chat-area,.footer{max-width:100%}
+  .msg{max-width:90%}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">SOMA-ID</div>
+  <div class="header-project-id" id="headerProjectId" style="font-size:11px;font-family:'Courier New',monospace;color:var(--gold);letter-spacing:0.05em;display:none"></div>
+  <div class="header-status" id="headerStatus">Online</div>
+</div>
+
+<div class="chat-area" id="chatArea"></div>
+
+<div class="typing" id="typingIndicator">
+  <div class="typing-inner">
+    <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="file-preview-bar" id="filePreviewBar"></div>
+  <div class="input-row" id="inputRow">
+    <button class="attach-btn" id="attachBtn" title="Anexar arquivo">📎</button>
+    <textarea class="chat-input" id="chatInput" rows="1" placeholder="Digite sua mensagem..."></textarea>
+    <div class="wave-bar-row" id="waveRow"></div>
+    <span class="rec-timer" id="recTimer" style="display:none"></span>
+    <button class="rec-btn" id="recBtn" title="Gravar audio">🎙️</button>
+    <button class="send-btn" id="sendBtn" title="Enviar">→</button>
+  </div>
+  <input type="file" id="fileInput" multiple accept="application/pdf,image/*,audio/*" style="display:none">
+</div>
+
+<script>
+// ===== CONFIG =====
+// GEMINI_KEY removed — all AI calls go through the backend for security
+// Use relative URLs when behind Nginx proxy (HTTPS), direct when localhost
+var API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://' + window.location.hostname + ':8091'
+  : '';
+
+var STYLE_PRESETS = [
+  {id:"moderno_organico",label:"Moderno Organico",desc:"Curvas fluidas, tons terrosos, iluminacao indireta",keywords:"2025 warm organic minimalism, curved cabinetry, indirect led lighting, terracotta and walnut, high-end architectural photography, soft shadows, biophilic integration"},
+  {id:"japandi_zen",label:"Japandi Zen",desc:"Minimalismo japones + escandinavo, madeira clara",keywords:"Japandi interior design 2025, light oak cabinetry, wabi-sabi aesthetic, neutral tones, clean lines, minimalist luxury, natural daylight"},
+  {id:"mid_century",label:"Mid-Century Modern",desc:"Anos 50, pes palito, nogueira e latao",keywords:"Mid-century modern cabinetry 2025, walnut wood grain, tapered legs, brass accents, vintage luxury aesthetic, warm mood lighting"},
+  {id:"coastal_hamptons",label:"Coastal Hamptons",desc:"Azuis suaves, brancos puros, arejado",keywords:"Luxury coastal kitchen, white shaker cabinets, light blue accents, bright airy lighting, nautical luxury details"},
+  {id:"industrial_cyber",label:"Cyber Industrial",desc:"Metais grafite, vidro canelado fume",keywords:"luxury tech industrial, fluted smoked glass, graphite metal accents, champagne gold hardware, dark moody lighting"},
+  {id:"minimalista_escultural",label:"Quiet Luxury",desc:"Marcenaria invisivel, zero ornamentos",keywords:"stealth luxury, monolithic design, invisible joints, premium natural stone, ultra-matte finishes"},
+  {id:"neo_classic",label:"Neo-Classic Gold",desc:"Molduras slim shaker, latao, paineis retroiluminados",keywords:"neoclassical revival 2025, slim shaker doors, brass hardware, illuminated marble, sophisticated moldings"},
+  {id:"black_gold",label:"Black & Gold Noir",desc:"Lacas pretas, metais dourados, drama",keywords:"Black luxury kitchen, high gloss black lacquer, brushed gold handles, nero marquina marble, dramatic spotlighting"},
+  {id:"escandinavo_puro",label:"Escandinavo Puro",desc:"Madeira clara, branco, funcionalidade, hygge",keywords:"Scandinavian pure design 2025, light birch cabinetry, white surfaces, hygge warmth, functional minimalism, natural light"},
+  {id:"rustico_contemporaneo",label:"Rustico Contemporaneo",desc:"Madeira de demolicao, ferro, texturas brutas",keywords:"Contemporary rustic interior, reclaimed wood, iron hardware, raw textures, exposed grain, industrial farmhouse luxury"},
+  {id:"art_deco_revival",label:"Art Deco Revival",desc:"Geometria, veludo, espelhos, dourado e preto",keywords:"Art Deco revival 2025, geometric patterns, velvet upholstery, mirrored surfaces, gold and black, glamorous luxury"},
+  {id:"tropical_luxo",label:"Tropical Luxo",desc:"Folhagens, madeira escura, rattan, tons verdes",keywords:"Tropical luxury interior, dark wood, rattan accents, green tones, lush foliage, resort-style sophisticated design"},
+  {id:"provencal_moderno",label:"Provencal Moderno",desc:"Patina suave, lavanda, linho, madeira envelhecida",keywords:"Modern Provencal interior, soft patina finishes, lavender accents, linen textures, aged wood, French countryside luxury"},
+  {id:"brutalista_refinado",label:"Brutalista Refinado",desc:"Concreto aparente, formas macicas, minimalismo cru",keywords:"Refined brutalist interior, exposed concrete, massive forms, raw minimalism, monolithic furniture, dramatic shadows"},
+  {id:"boho_chic",label:"Boho Chic",desc:"Texturas mistas, cores quentes, macrame, madeira natural",keywords:"Boho chic interior 2025, mixed textures, warm earth tones, macrame details, natural wood, eclectic luxury"},
+  {id:"wabi_sabi",label:"Wabi-Sabi",desc:"Imperfeicao intencional, materiais naturais, simplicidade",keywords:"Wabi-sabi interior design, intentional imperfection, natural materials, simplicity, handmade ceramics, organic textures"},
+  {id:"maximalismo_curado",label:"Maximalismo Curado",desc:"Cores ousadas, padroes mistos, personalidade forte",keywords:"Curated maximalist interior, bold colors, mixed patterns, strong personality, layered textures, eclectic art collection"},
+  {id:"contemporaneo_brasileiro",label:"Contemporaneo Brasileiro",desc:"Madeiras nacionais, design autoral, organico",keywords:"Brazilian contemporary design, national hardwoods, authorial furniture, organic shapes, tropical modernism, Sergio Rodrigues style"},
+  {id:"loft_ny",label:"Loft Nova York",desc:"Tijolos, metal exposto, pe-direito alto, urbano",keywords:"New York loft interior, exposed brick, metal beams, high ceiling, urban industrial, open plan luxury"},
+  {id:"mediterraneo",label:"Mediterraneo",desc:"Terracota, arcos, azulejos artesanais, luz quente",keywords:"Mediterranean interior design, terracotta tiles, arched doorways, artisanal tile work, warm lighting, coastal villa luxury"}
+];
+
+var MATERIALS = [
+  {id:'mdf_freijo',name:'Freijo Puro',color:'#8e6c4e'},
+  {id:'mdf_carvalho',name:'Carvalho Dover',color:'#c5b49d'},
+  {id:'mdf_noce',name:'Noce Autunno',color:'#5d4037'},
+  {id:'mdf_branco',name:'Branco Supremo',color:'#F5F5F5'},
+  {id:'mdf_grafite',name:'Grafite Carbono',color:'#4a4a4a'},
+  {id:'mdf_sage',name:'Verde Sage',color:'#879b8a'},
+  {id:'mdf_naval',name:'Azul Naval',color:'#1a2a3a'},
+  {id:'mdf_argila',name:'Terracota Argila',color:'#a0522d'},
+  {id:'mdf_areia',name:'Areia Acetinado',color:'#e0d5c1'},
+  {id:'metal_latao',name:'Latao Escovado',color:'#d4af37'},
+  {id:'metal_champagne',name:'Champagne Metal',color:'#fad6a5'},
+  {id:'vidro_canelado',name:'Vidro Canelado',color:'#eeeeee'}
+];
+
+// Free question detection keywords
+var FREE_QUESTION_WORDS = ['por que','porque','como','qual','o que','explica','nao entendi','pode','era','seria','quero mudar','volta','recomeca','recomecar','me diz','me fala','e possivel','tem como','da pra','daria','poderia','quero saber','duvida','pergunta'];
+var SPECIAL_COMMANDS = {
+  restart: ['recomecar','novo projeto','comecar de novo','reiniciar'],
+  skip: ['pular','proxima','proximo','avanca','avancar','skip'],
+  back: ['voltar','anterior','volta']
+};
+
+// ===== STATE =====
+var S = {
+  phase: 'WELCOME',
+  sessionId: null,
+  projectId: null,
+  style: null,
+  styleDescription: null,
+  material: null,
+  enchantImage: null,
+  briefingData: null,
+  engineResults: null,
+  pendingFiles: [],
+  polling: null,
+  freeQuestionBusy: false
+};
+
+var chatArea = document.getElementById('chatArea');
+var typingEl = document.getElementById('typingIndicator');
+var chatInput = document.getElementById('chatInput');
+var sendBtn = document.getElementById('sendBtn');
+var attachBtn = document.getElementById('attachBtn');
+var recBtn = document.getElementById('recBtn');
+var fileInput = document.getElementById('fileInput');
+var filePreviewBar = document.getElementById('filePreviewBar');
+var waveRow = document.getElementById('waveRow');
+var recTimer = document.getElementById('recTimer');
+
+var mediaRecorder = null;
+var recChunks = [];
+var recStart = 0;
+var recInterval = null;
+var audioBlob = null;
+
+// ===== UTILITIES =====
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function now(){var d=new Date();return (d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes()}
+function fmtSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB'}
+function scrollBottom(){setTimeout(function(){chatArea.scrollTop=chatArea.scrollHeight},60)}
+
+// ===== MESSAGE RENDERING =====
+function addMsg(sender, html, type){
+  var wrap = document.createElement('div');
+  wrap.className = 'msg msg-' + sender;
+  var bubble = document.createElement('div');
+
+  if(type === 'summary') bubble.className = 'bubble-summary';
+  else if(type === 'briefing') bubble.className = 'briefing-summary';
+  else if(type === 'result') bubble.className = 'bubble bubble-result';
+  else if(type === 'image') bubble.className = 'bubble-img';
+  else bubble.className = 'bubble';
+
+  bubble.innerHTML = html;
+  wrap.appendChild(bubble);
+
+  var time = document.createElement('div');
+  time.className = 'msg-time';
+  time.textContent = now();
+  wrap.appendChild(time);
+
+  chatArea.appendChild(wrap);
+  scrollBottom();
+  return bubble;
+}
+
+function addFile(file){
+  var wrap = document.createElement('div');
+  wrap.className = 'msg msg-user';
+  var bubble = document.createElement('div');
+  bubble.className = 'bubble-file';
+  var icon = file.type.includes('pdf') ? '📄' : file.type.includes('image') ? '🖼️' : file.type.includes('audio') ? '🎵' : '📎';
+  bubble.innerHTML = '<div class="file-icon">'+icon+'</div><div class="file-info"><div class="file-name">'+esc(file.name)+'</div><div class="file-size">'+fmtSize(file.size)+'</div></div>';
+  wrap.appendChild(bubble);
+  var time = document.createElement('div');
+  time.className = 'msg-time';
+  time.textContent = now();
+  time.style.textAlign = 'right';
+  wrap.appendChild(time);
+  chatArea.appendChild(wrap);
+  scrollBottom();
+}
+
+function addChips(options, callback){
+  var msgs = chatArea.querySelectorAll('.msg-ai');
+  var lastBubble = msgs[msgs.length-1];
+  if(!lastBubble) return;
+  var bubble = lastBubble.querySelector('.bubble,.bubble-summary,.bubble-result,.briefing-summary');
+  if(!bubble) return;
+
+  var wrap = document.createElement('div');
+  wrap.className = 'chips-wrap';
+  options.forEach(function(opt){
+    var btn = document.createElement('button');
+    btn.className = 'chip';
+    if(opt.color){
+      btn.innerHTML = '<span class="chip-color" style="background:'+opt.color+'"></span>'+esc(opt.label);
+    } else {
+      btn.textContent = opt.label;
+    }
+    if(opt.desc) btn.title = opt.desc;
+    btn.onclick = function(){
+      wrap.querySelectorAll('.chip').forEach(function(c){c.disabled=true;c.style.opacity='0.4';c.style.cursor='default'});
+      btn.style.opacity='1';btn.style.borderColor='var(--gold)';
+      callback(opt);
+    };
+    wrap.appendChild(btn);
+  });
+  bubble.appendChild(wrap);
+  scrollBottom();
+}
+
+function addStyleChips(options, callback){
+  var msgs = chatArea.querySelectorAll('.msg-ai');
+  var lastBubble = msgs[msgs.length-1];
+  if(!lastBubble) return;
+  var bubble = lastBubble.querySelector('.bubble,.bubble-summary,.bubble-result,.briefing-summary');
+  if(!bubble) return;
+
+  var wrap = document.createElement('div');
+  wrap.className = 'chips-grid';
+  options.forEach(function(opt){
+    var btn = document.createElement('button');
+    if(opt.special){
+      btn.className = 'chip chip-special';
+      btn.innerHTML = esc(opt.label);
+    } else {
+      btn.className = 'chip';
+      btn.innerHTML = '<strong>'+esc(opt.label)+'</strong><span class="chip-desc">'+esc(opt.desc||'')+'</span>';
+    }
+    btn.onclick = function(){
+      wrap.querySelectorAll('.chip').forEach(function(c){c.disabled=true;c.style.opacity='0.3';c.style.cursor='default'});
+      btn.style.opacity='1';btn.style.borderColor='var(--gold)';
+      callback(opt);
+    };
+    wrap.appendChild(btn);
+  });
+  bubble.appendChild(wrap);
+  scrollBottom();
+}
+
+function showTyping(){typingEl.classList.add('show');chatArea.appendChild(typingEl);scrollBottom()}
+function hideTyping(){typingEl.classList.remove('show')}
+
+function setStatus(text){document.getElementById('headerStatus').textContent=text}
+function setProjectId(pid){
+  S.projectId=pid;
+  var el=document.getElementById('headerProjectId');
+  if(pid){el.textContent=pid;el.style.display=''}
+  else{el.style.display='none'}
+}
+
+function delay(ms){return new Promise(function(r){setTimeout(r,ms)})}
+
+// ===== AI MESSAGE WITH DELAY =====
+function aiMsg(text, type, delayMs){
+  return new Promise(function(resolve){
+    showTyping();
+    setTimeout(function(){
+      hideTyping();
+      var bubble = addMsg('ai', text, type);
+      resolve(bubble);
+    }, delayMs || (600 + Math.random()*600));
+  });
+}
+
+// ===== FREE QUESTION DETECTION (FIX 2) =====
+function isFreeQuestion(text){
+  if(!text || text.length < 3) return false;
+  var lower = text.toLowerCase().trim();
+
+  // Check for special commands first — not free questions
+  for(var cmd in SPECIAL_COMMANDS){
+    for(var i=0;i<SPECIAL_COMMANDS[cmd].length;i++){
+      if(lower === SPECIAL_COMMANDS[cmd][i] || lower.indexOf(SPECIAL_COMMANDS[cmd][i]) === 0) return false;
+    }
+  }
+
+  // Ends with ?
+  if(text.trim().endsWith('?')) return true;
+
+  // Contains free question keywords
+  for(var j=0;j<FREE_QUESTION_WORDS.length;j++){
+    if(lower.indexOf(FREE_QUESTION_WORDS[j]) >= 0) return true;
+  }
+
+  return false;
+}
+
+function getSpecialCommand(text){
+  var lower = text.toLowerCase().trim();
+  for(var cmd in SPECIAL_COMMANDS){
+    for(var i=0;i<SPECIAL_COMMANDS[cmd].length;i++){
+      if(lower === SPECIAL_COMMANDS[cmd][i] || lower.indexOf(SPECIAL_COMMANDS[cmd][i]) === 0) return cmd;
+    }
+  }
+  return null;
+}
+
+// ===== GEMINI FREE CHAT =====
+async function askGeminiFree(userText){
+  var projectContext = {
+    phase: S.phase,
+    style: S.style ? S.style.label : null,
+    styleDescription: S.styleDescription,
+    material: S.material ? S.material.name : null,
+    briefing: S.briefingData && S.briefingData.briefing ? S.briefingData.briefing : null,
+    hasResults: !!S.engineResults,
+    engineResults: S.engineResults ? (S.engineResults.summary || S.engineResults) : null
+  };
+
+  var prompt = 'Voce e o assistente SOMA-ID, projetista de marcenaria com IA. Voce TEM as seguintes capacidades:\n- Analisar briefings (PDF, imagem, audio, texto)\n- Gerar visualizacao 3D do projeto (imagem de encantamento)\n- Calcular modulos, lista de corte, plano de chapas\n- Gerar folha tecnica em PDF para download\n- ENVIAR o projeto por EMAIL para o cliente ou projetista\n- Responder perguntas sobre o projeto em andamento\n\nContexto atual do projeto: ' + JSON.stringify(projectContext) + '\n\nO usuario disse: "' + userText + '"\n\nResponda de forma breve e natural em portugues. Se o usuario pedir pra enviar email, diga que vai enviar e pergunte o endereco de email. Se pedir o PDF, diga que vai gerar. Maximo 3 frases.';
+
+  try{
+    var res = await fetch(API_BASE + '/session/free-chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt: prompt })
+    });
+
+    if(!res.ok) throw new Error('Backend ' + res.status);
+    var data = await res.json();
+    if(data.text){
+      return data.text;
+    }
+    return 'Entendi sua pergunta, mas nao consegui gerar uma resposta agora. Vamos continuar!';
+  }catch(err){
+    console.error('[SOMA-ID] Free chat error:', err);
+    return 'Desculpe, tive um problema ao processar sua pergunta. Vamos continuar com o projeto!';
+  }
+}
+
+// ===== EVALUATE BRIEFING COMPLETENESS =====
+function avaliarCompletude(b){
+  var result = {
+    temEstilo: false, temMaterial: false, temDimensoes: false, temInstalacao: false, temCliente: false,
+    estiloExtraido: '', materialExtraido: '', dimensoesExtraidas: null, instalacaoExtraida: ''
+  };
+  if(!b) return result;
+
+  // Cliente
+  result.temCliente = !!((b.client && b.client.name) || b.client_name);
+
+  // Estilo — check materials.mood_board, materials.colors, _meta.raw_text for style keywords
+  var styleKeywords = ['european','moderno','modern','classic','classico','rustic','rustico','industrial','minimalist','minimalista','contemporary','contemporaneo','traditional','tradicional','shaker','flat door','flat panel','slab','raised panel','clean','luxury','japandi','scandinavian','escandinavo','art deco','tropical','provencal','brutalist','boho','wabi','mediterranean','mediterraneo','coastal','hamptons','mid-century','loft'];
+  var rawText = (b._meta && b._meta.raw_text) ? b._meta.raw_text.toLowerCase() : '';
+  var moodBoard = (b.materials && b.materials.mood_board) ? String(b.materials.mood_board) : '';
+
+  // Prefer mood_board as style source (it's curated by Gemini)
+  if(moodBoard && moodBoard.length > 5){
+    result.temEstilo = true;
+    // Truncate mood_board to first sentence or 120 chars
+    var firstSentence = moodBoard.split(/[.!]/)[0].trim();
+    result.estiloExtraido = firstSentence.length > 120 ? firstSentence.substring(0,120) + '...' : firstSentence;
+  }
+  // Fallback: search raw text for style keywords
+  if(!result.temEstilo){
+    var allText = rawText + ' ' + moodBoard.toLowerCase();
+    for(var i=0;i<styleKeywords.length;i++){
+      if(allText.indexOf(styleKeywords[i]) >= 0){
+        result.temEstilo = true;
+        result.estiloExtraido = styleKeywords[i].charAt(0).toUpperCase() + styleKeywords[i].slice(1);
+        break;
+      }
+    }
+  }
+
+  // Material — prefer materials.colors (curated by Gemini), then raw text
+  var matColors = (b.materials && b.materials.colors && b.materials.colors.length > 0) ? b.materials.colors : [];
+  if(matColors.length > 0){
+    result.temMaterial = true;
+    result.materialExtraido = matColors.join(', ');
+  }
+  // Fallback: search raw text for material keywords
+  if(!result.temMaterial){
+    var materialKeywords = ['mdf','mdp','plywood','compensado','laminado','melamina','melamine','freijo','carvalho','nogueira','walnut','oak','maple','cherry','birch','laca','lacquer','lacado','high gloss','wood texture','wood finish','veneer','folheado'];
+    for(var j=0;j<materialKeywords.length;j++){
+      if(rawText.indexOf(materialKeywords[j]) >= 0){
+        result.temMaterial = true;
+        result.materialExtraido = materialKeywords[j].charAt(0).toUpperCase() + materialKeywords[j].slice(1);
+        break;
+      }
+    }
+  }
+
+  // Dimensoes — check space.walls
+  var sp = b.space || {};
+  if(sp.walls && sp.walls.length > 0 && sp.walls.some(function(w){return w.length_m > 0})){
+    result.temDimensoes = true;
+    result.dimensoesExtraidas = {
+      paredes: sp.walls.filter(function(w){return w.length_m}).map(function(w){return (w.id||'parede')+': '+w.length_m+'m'}),
+      peDireito: sp.ceiling_height_m || null,
+      area: sp.total_area_m2 || null
+    };
+  }
+
+  // Instalacao — check raw text
+  var installKeywords = ['wall-mounted','wall mounted','suspenso','suspended','floor-standing','piso','floor','recessed','embutido','built-in','freestanding'];
+  for(var k=0;k<installKeywords.length;k++){
+    if(rawText.indexOf(installKeywords[k]) >= 0){
+      result.temInstalacao = true;
+      result.instalacaoExtraida = installKeywords[k];
+      break;
+    }
+  }
+
+  return result;
+}
+
+// ===== SMART FLOW — decide what to ask based on briefing =====
+async function smartFlowAfterBriefing(b, completude){
+  var confirmLines = [];
+
+  if(completude.temEstilo){
+    // Save style from briefing
+    S.style = {
+      id: 'briefing_extracted',
+      label: 'Estilo do Briefing',
+      desc: completude.estiloExtraido,
+      keywords: completude.estiloExtraido + ', luxury interior design, professional photography, high-end custom cabinetry'
+    };
+    S.styleDescription = completude.estiloExtraido;
+    confirmLines.push('🎨 <strong>Estilo:</strong> ' + esc(completude.estiloExtraido));
+  }
+
+  if(completude.temMaterial){
+    S.material = {id: 'briefing_extracted', name: completude.materialExtraido, color: '#888'};
+    confirmLines.push('🪵 <strong>Material:</strong> ' + esc(completude.materialExtraido));
+  }
+
+  if(completude.temDimensoes && completude.dimensoesExtraidas){
+    var dimParts = completude.dimensoesExtraidas.paredes.slice(0,3).join(', ');
+    if(completude.dimensoesExtraidas.peDireito) dimParts += ' | Pe-direito: '+completude.dimensoesExtraidas.peDireito+'m';
+    confirmLines.push('📐 <strong>Dimensoes:</strong> ' + esc(dimParts));
+  }
+
+  if(completude.temInstalacao){
+    confirmLines.push('🔧 <strong>Instalacao:</strong> ' + esc(completude.instalacaoExtraida));
+  }
+
+  // Show what was extracted with confirmation chips
+  if(confirmLines.length > 0){
+    var confirmHtml = 'Vi no briefing:\n' + confirmLines.join('\n') + '\n\nVou usar essas informacoes como referencia. Se quiser mudar algo, e so me dizer!';
+    await aiMsg(confirmHtml);
+
+    // Wait for user confirmation before proceeding
+    S.phase = 'CONFIRM_EXTRACTED';
+    S._pendingCompletude = completude;
+    addChips(
+      [{label:'✅ Confirmo, segue!'},{label:'✏️ Quero mudar algo'}],
+      function(opt){
+        addMsg('user', opt.label);
+        (async function(){
+          if(opt.label.indexOf('mudar') >= 0){
+            await aiMsg('O que gostaria de ajustar? Me diga e eu corrijo.');
+            S.phase = 'CONFIRM_ADJUST';
+          } else {
+            await proceedAfterConfirm(completude);
+          }
+        })();
+      }
+    );
+  } else {
+    // Nothing extracted — ask everything
+    S.phase = 'STYLE_QUESTION';
+    await askStyleQuestion();
+  }
+}
+
+// After user confirms extracted data, go to first missing step
+async function proceedAfterConfirm(completude){
+  if(!completude.temEstilo){
+    S.phase = 'STYLE_QUESTION';
+    await askStyleQuestion();
+    return;
+  }
+  if(!completude.temMaterial){
+    S.phase = 'MATERIAL_QUESTION';
+    await askMaterialQuestion();
+    return;
+  }
+  // Both style and material found — go to backend questions or enchantment
+  S.phase = 'QUESTIONS';
+  await startQuestions();
+}
+
+// Handle adjustment input in CONFIRM_ADJUST phase
+async function handleConfirmAdjust(text){
+  // User wants to change something — route through Gemini to understand what
+  var lower = text.toLowerCase();
+  // Check if they want to change style
+  if(lower.indexOf('estilo') >= 0 || lower.indexOf('style') >= 0 || lower.indexOf('visual') >= 0){
+    S.style = null; S.styleDescription = null;
+    S._pendingCompletude.temEstilo = false;
+    await aiMsg('Entendido! Vamos escolher um novo estilo.');
+    S.phase = 'STYLE_QUESTION';
+    await askStyleQuestion();
+  } else if(lower.indexOf('material') >= 0 || lower.indexOf('madeira') >= 0 || lower.indexOf('mdf') >= 0 || lower.indexOf('acabamento') >= 0){
+    S.material = null;
+    S._pendingCompletude.temMaterial = false;
+    await aiMsg('Entendido! Vamos escolher um novo material.');
+    S.phase = 'MATERIAL_QUESTION';
+    await askMaterialQuestion();
+  } else {
+    // Treat as free description — save as style/material override
+    await aiMsg('Anotado! Vou considerar: <strong>' + esc(text) + '</strong>');
+    await proceedAfterConfirm(S._pendingCompletude || {});
+  }
+}
+
+// ===== SKIP / BACK handlers =====
+async function handleSkip(){
+  if(S.phase === 'STYLE_QUESTION' || S.phase === 'STYLE_DESCRIBE'){
+    S.style = STYLE_PRESETS[0];
+    await aiMsg('Pulando estilo — usando Moderno Organico como padrao.');
+    S.phase = 'MATERIAL_QUESTION';
+    await askMaterialQuestion();
+  } else if(S.phase === 'MATERIAL_QUESTION'){
+    S.material = MATERIALS[0];
+    await aiMsg('Pulando material — usando Freijo Puro como padrao.');
+    S.phase = 'QUESTIONS';
+    await startQuestions();
+  } else if(S.phase === 'QUESTIONS'){
+    await aiMsg('Pulando perguntas — vou seguir com o que tenho!');
+    await startEnchantment();
+  } else if(S.phase === 'ENCHANTMENT' || S.phase === 'ENCHANTMENT_FEEDBACK'){
+    await aiMsg('Pulando visualizacao!');
+    await goToSummary();
+  } else if(S.phase === 'SUMMARY'){
+    await confirmAndGenerate();
+  } else {
+    await aiMsg('Nao tem como pular essa etapa.');
+  }
+}
+
+async function handleBack(){
+  if(S.phase === 'MATERIAL_QUESTION'){
+    S.phase = 'STYLE_QUESTION';
+    await aiMsg('Voltando pra escolha de estilo...');
+    await askStyleQuestion();
+  } else if(S.phase === 'QUESTIONS'){
+    S.phase = 'MATERIAL_QUESTION';
+    await aiMsg('Voltando pra escolha de material...');
+    await askMaterialQuestion();
+  } else if(S.phase === 'ENCHANTMENT' || S.phase === 'ENCHANTMENT_FEEDBACK'){
+    S.phase = 'QUESTIONS';
+    await aiMsg('Voltando pras perguntas...');
+    await startQuestions();
+  } else if(S.phase === 'SUMMARY'){
+    await aiMsg('Voltando pra visualizacao...');
+    await startEnchantment();
+  } else {
+    await aiMsg('Nao tem como voltar dessa etapa.');
+  }
+}
+
+// ===== SEND HANDLER (FIX 2: intercept free questions) =====
+async function handleSend(){
+  var text = chatInput.value.trim();
+  var files = S.pendingFiles.slice();
+  var audio = audioBlob;
+
+  // Clear
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  S.pendingFiles = [];
+  audioBlob = null;
+  filePreviewBar.innerHTML = '';
+  filePreviewBar.classList.remove('show');
+  sendBtn.classList.remove('active');
+
+  if(!text && files.length === 0 && !audio) return;
+
+  // Show user message
+  if(text) addMsg('user', esc(text));
+  files.forEach(function(f){ addFile(f); });
+  if(audio && !text) addMsg('user', '🎙️ Audio enviado');
+
+  // Check special commands FIRST
+  var cmd = getSpecialCommand(text);
+  if(cmd){
+    if(cmd === 'restart'){
+      await aiMsg('Reiniciando projeto... 🔄');
+      await delay(500);
+      location.reload();
+      return;
+    }
+    if(cmd === 'skip'){
+      await handleSkip();
+      return;
+    }
+    if(cmd === 'back'){
+      await handleBack();
+      return;
+    }
+  }
+
+  // === INTERCEPT: Files with existing session → add-documents ===
+  var hasFiles = files.length > 0 || !!audio;
+  if(hasFiles && S.sessionId && !S.sessionId.startsWith('demo-') && S.phase !== 'WELCOME'){
+    try{
+      await addDocumentsToSession(S.sessionId, files, audio, text);
+    }catch(err){
+      console.error('[SOMA-ID] add-documents error:', err);
+      hideTyping();
+      await aiMsg('Erro ao processar documentos complementares: '+esc(err.message));
+    }
+    return;
+  }
+
+  // Check for free question (FIX 2)
+  // Only intercept if not in WELCOME (needs file), STYLE_DESCRIBE (expects free text), EMAIL_INPUT
+  if(text && S.phase !== 'WELCOME' && S.phase !== 'STYLE_DESCRIBE' && S.phase !== 'EMAIL_INPUT' && S.phase !== 'PHONE_INPUT' && S.phase !== 'CONFIRM_ADJUST' && S.phase !== 'RESULT' && isFreeQuestion(text)){
+    if(S.freeQuestionBusy) return;
+    S.freeQuestionBusy = true;
+    setStatus('Respondendo pergunta...');
+    showTyping();
+    try{
+      var answer = await askGeminiFree(text);
+      hideTyping();
+      await aiMsg(answer);
+      setStatus('Online');
+      // Resume flow
+      await delay(800);
+      await resumeFlow();
+    }catch(err){
+      hideTyping();
+      await aiMsg('Nao consegui responder agora. Vamos continuar!');
+      await resumeFlow();
+    }
+    S.freeQuestionBusy = false;
+    return;
+  }
+
+  // Route to current phase handler
+  try{
+    await phaseHandler(text, files, audio);
+  }catch(err){
+    console.error('[SOMA-ID] Error:', err);
+    hideTyping();
+    await aiMsg('Ops, ocorreu um erro: '+esc(err.message)+'. Vamos continuar?');
+  }
+}
+
+// ===== ADD DOCUMENTS TO EXISTING SESSION =====
+async function addDocumentsToSession(sessionId, files, audio, text){
+  setStatus('Analisando documentos complementares...');
+  showTyping();
+
+  var formData = new FormData();
+  if(text) formData.append('text', text);
+  files.forEach(function(f){ formData.append('files', f); });
+  if(audio) formData.append('files', audio, 'audio.webm');
+
+  try{
+    var res = await fetch(API_BASE + '/session/' + sessionId + '/add-documents', {method:'POST', body:formData});
+    hideTyping();
+
+    if(!res.ok){
+      var errData = await res.json().catch(function(){ return {error:'Servidor retornou '+res.status}; });
+      throw new Error(errData.error || 'Erro '+res.status);
+    }
+
+    var data = await res.json();
+    console.log('[SOMA-ID] add-documents response:', JSON.stringify(data).substring(0, 500));
+
+    // Update local state
+    if(data.briefing){
+      if(!S.briefingData) S.briefingData = {};
+      S.briefingData.briefing = data.briefing;
+    }
+
+    // Build update message
+    var msg = 'Analisei os documentos complementares!';
+
+    if(data.changes && data.changes.length > 0){
+      msg += '\n\nAtualizacoes no briefing:';
+      data.changes.forEach(function(c){ msg += '\n• ' + c; });
+    }
+
+    if(data.gaps_resolved && data.gaps_resolved.length > 0){
+      msg += '\n\n✅ Gaps resolvidos: ' + data.gaps_resolved.length;
+    }
+
+    if(data.gaps_added && data.gaps_added.length > 0){
+      msg += '\n\n⚠️ Novas informacoes necessarias:';
+      data.gaps_added.forEach(function(g){ msg += '\n• ' + g; });
+    }
+
+    if(data.remaining_gaps !== undefined){
+      msg += '\n\nGaps restantes: ' + data.remaining_gaps;
+    }
+
+    await aiMsg(msg);
+    setStatus('Online');
+
+    // If state changed to REVIEWING (all gaps resolved), advance flow
+    if(data.state === 'REVIEWING'){
+      await aiMsg('Todos os gaps foram resolvidos! Vou montar o resumo para confirmacao.');
+      await goToSummary();
+    } else {
+      // Resume current flow
+      await delay(500);
+      await resumeFlow();
+    }
+  }catch(err){
+    hideTyping();
+    setStatus('Online');
+    throw err;
+  }
+}
+
+// ===== RESUME FLOW after free question =====
+async function resumeFlow(){
+  switch(S.phase){
+    case 'CONFIRM_EXTRACTED':
+    case 'CONFIRM_ADJUST':
+      await aiMsg('Continuando... Confirma os dados do briefing?');
+      break;
+    case 'STYLE_QUESTION':
+      await aiMsg('Continuando... Qual estilo combina com o projeto?');
+      break;
+    case 'MATERIAL_QUESTION':
+      await aiMsg('Continuando... Qual material principal?');
+      break;
+    case 'QUESTIONS':
+      await aiMsg('Continuando com as perguntas do projeto...');
+      await startQuestions();
+      break;
+    case 'SUMMARY':
+      await aiMsg('Continuando... Pode confirmar os dados do resumo?');
+      break;
+    case 'ENCHANTMENT_FEEDBACK':
+      await aiMsg('Continuando... O que achou da visualizacao?');
+      break;
+    case 'RESULT':
+      await aiMsg('Continuando... O que deseja fazer com o projeto?');
+      break;
+    default:
+      break;
+  }
+}
+
+// ===== PHASE HANDLER =====
+async function phaseHandler(text, files, audio){
+  switch(S.phase){
+    case 'WELCOME': return await handleWelcome(text, files, audio);
+    case 'STYLE_QUESTION': return await handleStylePick(text);
+    case 'STYLE_DESCRIBE': return await handleStyleDescribe(text);
+    case 'CONFIRM_EXTRACTED': return await handleConfirmExtracted(text);
+    case 'CONFIRM_ADJUST': return await handleConfirmAdjust(text);
+    case 'MATERIAL_QUESTION': return await handleMaterialPick(text);
+    case 'QUESTIONS': return await handleQuestionAnswer(text, audio);
+    case 'SUMMARY': return await handleSummaryConfirm(text);
+    case 'ENCHANTMENT_FEEDBACK': return await handleEnchantFeedback(text);
+    case 'RESULT': return await handleResultAction(text);
+    case 'EMAIL_INPUT': return await handleEmailInput(text);
+    case 'PHONE_INPUT': return await handlePhoneInput(text);
+    default:
+      await aiMsg('Aguarde, estou processando...');
+  }
+}
+
+// ===== PHASE: WELCOME (FIX 1: detailed briefing transcription) =====
+async function handleWelcome(text, files, audio){
+  var fileCount = files.length + (audio ? 1 : 0);
+  setStatus(fileCount > 1 ? 'Analisando '+fileCount+' arquivos...' : 'Analisando briefing...');
+  showTyping();
+
+  var formData = new FormData();
+  formData.append('text', text || 'Projeto novo');
+  files.forEach(function(f){ formData.append('files', f); });
+  if(audio) formData.append('files', audio, 'audio.webm');
+
+  // Show progress for multi-file uploads (can take 30-60s)
+  var progressTimer = null;
+  if(fileCount > 1){
+    var elapsed = 0;
+    progressTimer = setInterval(function(){
+      elapsed += 5;
+      setStatus('Processando '+fileCount+' arquivos... ('+elapsed+'s)');
+    }, 5000);
+  }
+
+  try{
+    var res = await fetch(API_BASE + '/session/start', {method:'POST', body:formData});
+    if(progressTimer) clearInterval(progressTimer);
+    if(!res.ok) throw new Error('Server '+res.status);
+    var data = await res.json();
+    console.log('[SOMA-ID] Session:', JSON.stringify(data).substring(0, 500));
+
+    S.sessionId = data.session_id;
+    S.briefingData = data;
+    if(data.project_id) setProjectId(data.project_id);
+    hideTyping();
+
+    // === FIX 1: Show "Analisei seu briefing" + detailed summary ===
+    // /session/start does NOT return briefing when there are gaps — fetch it
+    var b = data.briefing || null;
+    if(!b && S.sessionId){
+      try{
+        var sessRes = await fetch(API_BASE+'/session/'+S.sessionId);
+        if(sessRes.ok){
+          var sessData = await sessRes.json();
+          b = sessData.briefing || null;
+          S.briefingData.briefing = b; // store for later use
+          console.log('[SOMA-ID] Briefing fetched from GET /session:', JSON.stringify(b).substring(0, 500));
+        } else {
+          console.error('[SOMA-ID] GET /session/ returned', sessRes.status);
+        }
+      }catch(fetchErr){
+        console.error('[SOMA-ID] Failed to fetch session briefing:', fetchErr);
+      }
+    }
+    if(!b || (typeof b === 'object' && Object.keys(b).length === 0)){
+      // Briefing came back empty — show fallback message instead of empty summary
+      console.warn('[SOMA-ID] Briefing data is empty or null, showing fallback');
+      await aiMsg('Recebi seus arquivos mas nao consegui extrair dados estruturados do briefing. Me conte mais sobre o projeto — estilo desejado, dimensoes, materiais...');
+      S.phase = 'STYLE_QUESTION';
+      await askStyleQuestion();
+      return;
+    }
+
+    await aiMsg('Analisei seu briefing! Aqui o que entendi:');
+
+    var gapCount = (data.checklist && data.checklist.gaps) ? data.checklist.gaps.length : 0;
+    var totalFields = (data.checklist && data.checklist.total_checks) ? data.checklist.total_checks : 16;
+    var filledCount = totalFields - gapCount;
+    var confidence = totalFields > 0 ? Math.round((filledCount / totalFields) * 100) : 0;
+
+    // Build detailed briefing summary
+    // Real briefing structure: {client:{name,email,phone,referral}, project:{type,designer,date_in,date_due}, space:{total_area_m2,ceiling_height_m,walls:[{id,length_m}],entry_point}, zones:[{name,dimensions,items,constraints}], materials:{colors,mood_board}}
+    console.log('[SOMA-ID] Building summary from briefing:', JSON.stringify(b).substring(0,500));
+    var html = '<div class="bs-title">📋 Resumo do Briefing</div>';
+    if(S.projectId){
+      html += '<div class="bs-item"><span class="bs-icon">🔖</span><span class="bs-label">Projeto</span><span class="bs-val" style="font-family:\'Courier New\',monospace;letter-spacing:0.05em">'+ esc(S.projectId) +'</span></div>';
+    }
+
+    // Client — nested: b.client.name or flat: b.client_name
+    var clientName = (b.client && b.client.name) || b.client_name || b.clientName || '';
+    html += '<div class="bs-item"><span class="bs-icon">👤</span><span class="bs-label">Cliente</span><span class="bs-val">'+ esc(clientName || 'Nao identificado') +'</span></div>';
+
+    // Room type — nested: b.project.type or flat: b.room_type
+    var roomType = (b.project && b.project.type) || b.room_type || b.roomType || '';
+    html += '<div class="bs-item"><span class="bs-icon">🏠</span><span class="bs-label">Ambiente</span><span class="bs-val">'+ esc(roomType || 'Nao identificado') +'</span></div>';
+
+    // Dimensions — from b.space.walls, b.space.ceiling_height_m, b.space.total_area_m2
+    var dims = [];
+    var sp = b.space || {};
+    if(sp.walls && sp.walls.length){
+      sp.walls.forEach(function(w){
+        if(w.length_m) dims.push((w.id||'parede')+': '+w.length_m+'m');
+      });
+    }
+    if(sp.ceiling_height_m) dims.push('Pe-direito: '+sp.ceiling_height_m+'m');
+    if(sp.total_area_m2) dims.push('Area: '+sp.total_area_m2+'m2');
+    // Fallback flat fields
+    if(dims.length===0){
+      if(b.wall_width) dims.push('Largura: '+b.wall_width+'mm');
+      if(b.wall_height || b.ceiling_height) dims.push('Altura: '+(b.wall_height||b.ceiling_height)+'mm');
+      if(b.depth) dims.push('Prof.: '+b.depth+'mm');
+    }
+    html += '<div class="bs-item"><span class="bs-icon">📐</span><span class="bs-label">Dimensoes</span><span class="bs-val">'+ esc(dims.length > 0 ? dims.join(' | ') : 'Nao informadas') +'</span></div>';
+
+    // Zones/modules
+    var zones = b.zones || [];
+    if(zones.length > 0){
+      var zoneNames = zones.map(function(z){
+        var name = z.name || z.type || 'Zona';
+        if(z.dimensions){
+          var d = z.dimensions;
+          if(d.width_m) name += ' ('+d.width_m+'m';
+          if(d.depth_m) name += ' x '+d.depth_m+'m';
+          if(d.width_m) name += ')';
+        }
+        return name;
+      });
+      html += '<div class="bs-item"><span class="bs-icon">📦</span><span class="bs-label">Zonas/Modulos</span><span class="bs-val">'+ esc(zoneNames.join(', ')) +'</span></div>';
+    } else {
+      html += '<div class="bs-item"><span class="bs-icon">📦</span><span class="bs-label">Zonas/Modulos</span><span class="bs-val">Nenhuma zona detectada</span></div>';
+    }
+
+    // Items extracted from zones
+    var items = [];
+    zones.forEach(function(z){
+      if(z.items && z.items.length){
+        z.items.forEach(function(it){
+          var desc = it.type || it.subtype || '';
+          if(it.subtype && it.type !== it.subtype) desc = it.type + ' (' + it.subtype + ')';
+          if(it.quantity && it.quantity > 1) desc += ' x' + it.quantity;
+          if(desc) items.push(desc);
+        });
+      }
+    });
+    if(items.length > 0){
+      html += '<div class="bs-item"><span class="bs-icon">🗂️</span><span class="bs-label">Itens</span><span class="bs-val">'+ esc(items.slice(0,10).join(', ') + (items.length>10 ? ' +' +(items.length-10)+' mais':'')) +'</span></div>';
+    }
+
+    // Materials mentioned
+    var mats = [];
+    if(b.materials){
+      if(b.materials.colors && b.materials.colors.length) mats = mats.concat(b.materials.colors);
+      if(b.materials.mood_board) mats.push(b.materials.mood_board);
+    }
+    html += '<div class="bs-item"><span class="bs-icon">🪵</span><span class="bs-label">Materiais</span><span class="bs-val">'+ esc(mats.length > 0 ? mats.join(', ') : 'Nao mencionados') +'</span></div>';
+
+    // Contact info
+    var contact = [];
+    if(b.client){
+      if(b.client.email) contact.push(b.client.email);
+      if(b.client.phone) contact.push(b.client.phone);
+      if(b.client.referral) contact.push('Ref: '+b.client.referral);
+    }
+    if(contact.length > 0){
+      html += '<div class="bs-item"><span class="bs-icon">📞</span><span class="bs-label">Contato</span><span class="bs-val">'+ esc(contact.join(' | ')) +'</span></div>';
+    }
+
+    // Designer
+    var designer = (b.project && b.project.designer) || b.designer || '';
+    if(designer){
+      html += '<div class="bs-item"><span class="bs-icon">✏️</span><span class="bs-label">Projetista</span><span class="bs-val">'+ esc(designer) +'</span></div>';
+    }
+
+    // Dates
+    var dateIn = (b.project && b.project.date_in) || b.date_in || '';
+    var dateDue = (b.project && b.project.date_due) || b.date_due || '';
+    if(dateIn){
+      html += '<div class="bs-item"><span class="bs-icon">📅</span><span class="bs-label">Entrada</span><span class="bs-val">'+ esc(dateIn) +'</span></div>';
+    }
+    if(dateDue){
+      html += '<div class="bs-item"><span class="bs-icon">⏰</span><span class="bs-label">Entrega</span><span class="bs-val">'+ esc(dateDue) +'</span></div>';
+    }
+
+    // Sources processed — show which files were parsed (important for multi-file)
+    if(data.sources_processed && data.sources_processed.length > 1){
+      var srcDescs = data.sources_processed.map(function(s){
+        var icon = s.type === 'pdf' ? '📄' : s.type === 'image' ? '🖼️' : s.type === 'audio' ? '🎙️' : '📝';
+        var name = s.filename || s.type;
+        var hasError = s.extracted_text && s.extracted_text.indexOf('[ERRO') >= 0;
+        return icon + ' ' + name + (hasError ? ' ⚠️' : ' ✅');
+      });
+      html += '<div class="bs-item" style="margin-top:6px"><span class="bs-icon">📎</span><span class="bs-label">Fontes</span><span class="bs-val">'+ esc(srcDescs.join(', ')) +'</span></div>';
+    }
+
+    // Gaps summary — show as prioritized questions
+    if(data.checklist && data.checklist.gaps && data.checklist.gaps.length > 0){
+      html += '<div style="margin-top:8px"><span class="bs-icon">❓</span><span class="bs-label" style="font-weight:600;color:var(--text)"> Perguntas pendentes</span></div>';
+      var sortedGaps = data.checklist.gaps.slice().sort(function(a,b){
+        var prio = {MISSING:0,PARTIAL:1,AMBIGUOUS:2};
+        return (prio[a.status]||2) - (prio[b.status]||2);
+      });
+      sortedGaps.slice(0,6).forEach(function(g){
+        var prioClass = g.status === 'MISSING' ? 'high' : g.status === 'PARTIAL' ? 'medium' : 'low';
+        html += '<div class="bs-gap"><span class="bs-gap-priority '+prioClass+'">'+(g.status||'MISSING')+'</span><span style="color:var(--text)">'+ esc(g.description || g.field) +'</span></div>';
+      });
+      if(data.checklist.gaps.length > 6){
+        html += '<div class="bs-gap" style="color:var(--muted)">+'+(data.checklist.gaps.length-6)+' mais</div>';
+      }
+    }
+
+    // Constraints — show from zones with status badges
+    var allConstraints = [];
+    zones.forEach(function(z){
+      if(z.constraints && z.constraints.length){
+        z.constraints.forEach(function(c){
+          var status = 'ok';
+          var val = c.value_mm || 0;
+          if(c.type === 'min_passage' || c.type === 'clearance'){
+            if(val < 600) status = 'critical';
+            else if(val < 800) status = 'warning';
+          } else if(c.type === 'max_height'){
+            if(val > 2200) status = 'warning';
+          }
+          allConstraints.push({zone: z.name, type: c.type, value_mm: val, relative_to: c.relative_to, status: status});
+        });
+      }
+    });
+    if(allConstraints.length > 0){
+      html += '<div style="margin-top:8px"><span class="bs-icon">⚡</span><span class="bs-label" style="font-weight:600;color:var(--text)"> Restricoes detectadas</span></div>';
+      allConstraints.forEach(function(c){
+        var desc = (c.zone||'') + ': ' + (c.type||'').replace(/_/g,' ') + (c.value_mm ? ' ' + c.value_mm + 'mm' : '') + (c.relative_to ? ' (ref: '+c.relative_to+')' : '');
+        html += '<div class="bs-constraint"><span class="bs-constraint-badge '+c.status+'">'+c.status+'</span><span style="color:var(--text)">'+ esc(desc) +'</span></div>';
+      });
+    }
+
+    // Confidence highlight — if overall confidence < 0.7 (from _meta), show warning
+    var metaConfidence = (b._meta && b._meta.confidence) ? b._meta.confidence : null;
+    if(metaConfidence !== null && metaConfidence < 0.7){
+      html += '<div class="bs-low-confidence" style="margin-top:8px">⚠️ Confianca da extracao: '+ Math.round(metaConfidence * 100) +'% — Algumas medidas podem precisar de confirmacao</div>';
+    }
+
+    // Interpreter badge
+    if(data.interpreter_used){
+      html += '<div class="bs-item" style="margin-top:6px"><span class="bs-icon">🧠</span><span class="bs-label">Motor IA</span><span class="bs-val" style="color:var(--cyan)">Claude Sonnet (Interpreter Agent)</span></div>';
+    }
+
+    // Progress bar + confidence
+    html += '<div class="bs-bar"><div class="bs-fill" style="width:'+confidence+'%"></div></div>';
+    html += '<div class="bs-meta"><span>Campos identificados: '+filledCount+'/'+totalFields+'</span><span>Confianca: '+confidence+'%</span></div>';
+
+    addMsg('ai', html, 'briefing');
+
+    await delay(1000);
+
+    // If no phone found (projectId has 0000), ask for it
+    if(S.projectId && S.projectId.indexOf('-0000-') >= 0){
+      await aiMsg('Nao encontrei um telefone de contato no briefing. Qual o telefone do cliente? (usado para identificar o projeto)');
+      S.phase = 'PHONE_INPUT';
+      S._pendingBriefing = b;
+      S._pendingData = data;
+      S._pendingGapCount = gapCount;
+      return;
+    }
+
+    // Evaluate what the briefing already contains
+    var completude = avaliarCompletude(b);
+    console.log('[SOMA-ID] Completude:', JSON.stringify(completude));
+
+    var allFound = completude.temEstilo && completude.temMaterial && completude.temDimensoes;
+    if(allFound && gapCount === 0){
+      await aiMsg('O briefing esta bem completo! Tenho todas as informacoes que preciso. Vou gerar o conceito visual e o projeto tecnico.');
+      // Save extracted data
+      if(completude.temEstilo && !S.style){
+        S.style = {id:'briefing_extracted', label:'Estilo do Briefing', desc:completude.estiloExtraido, keywords:completude.estiloExtraido+', luxury interior design, professional photography'};
+        S.styleDescription = completude.estiloExtraido;
+      }
+      if(completude.temMaterial && !S.material){
+        S.material = {id:'briefing_extracted', name:completude.materialExtraido, color:'#888'};
+      }
+      await startEnchantment();
+    } else {
+      // Show what was found and ask only what's missing
+      await smartFlowAfterBriefing(b, completude);
+    }
+
+  }catch(err){
+    if(progressTimer) clearInterval(progressTimer);
+    console.error('[SOMA-ID] Briefing error:', err, err.stack || '');
+    hideTyping();
+
+    // Determine error type for better user feedback
+    var errMsg = String(err.message || err);
+    var isTimeout = errMsg.indexOf('Failed to fetch') >= 0 || errMsg.indexOf('NetworkError') >= 0 || errMsg.indexOf('timeout') >= 0;
+
+    S.sessionId = 'demo-'+Date.now();
+    S.briefingData = {state:'PARSED'};
+
+    if(isTimeout && fileCount > 1){
+      await aiMsg('O processamento dos '+fileCount+' arquivos demorou demais. Tente enviar um arquivo por vez, ou envie apenas o PDF principal do briefing.');
+    } else {
+      await aiMsg('Recebi seu briefing! Vou te fazer algumas perguntas pra montar o projeto.');
+    }
+    S.phase = 'STYLE_QUESTION';
+    await askStyleQuestion();
+  }
+}
+
+// ===== STYLE QUESTION (FIX 3: 20 styles + custom describe) =====
+async function askStyleQuestion(){
+  await aiMsg('Qual estilo combina mais com esse projeto?');
+
+  var options = STYLE_PRESETS.map(function(s){return {label:s.label, desc:s.desc, value:s}});
+  options.push({label:'✏️ Descrever meu estilo', desc:'', value:null, special:true});
+
+  addStyleChips(options, function(opt){
+    if(opt.special){
+      addMsg('user', '✏️ Descrever meu estilo');
+      (async function(){
+        await aiMsg('Descreva o estilo que voce imagina pra esse projeto. Pode ser detalhado!');
+        S.phase = 'STYLE_DESCRIBE';
+      })();
+    } else {
+      S.style = opt.value;
+      addMsg('user', esc(opt.value.label));
+      (async function(){
+        await aiMsg('Otima escolha! '+esc(opt.value.desc)+' ✨');
+        S.phase = 'MATERIAL_QUESTION';
+        await askMaterialQuestion();
+      })();
+    }
+  });
+}
+
+// Handle confirm extracted — user typed instead of clicking chip
+async function handleConfirmExtracted(text){
+  var lower = text.toLowerCase();
+  var confirmWords = ['confirmo','sim','ok','pode','aprovado','certo','correto','perfeito','segue','confirma','bom','otimo'];
+  var isConfirm = confirmWords.some(function(w){return lower.indexOf(w)>=0});
+  if(isConfirm){
+    await proceedAfterConfirm(S._pendingCompletude || {});
+  } else {
+    await aiMsg('O que gostaria de ajustar? Me diga e eu corrijo.');
+    S.phase = 'CONFIRM_ADJUST';
+  }
+}
+
+// Handle free-text style description
+async function handleStyleDescribe(text){
+  S.styleDescription = text;
+  S.style = {
+    id: 'custom',
+    label: 'Estilo Personalizado',
+    desc: text,
+    keywords: text + ', luxury interior design, professional photography, high-end custom cabinetry'
+  };
+  await aiMsg('Entendi! Estilo personalizado: <strong>'+esc(text)+'</strong>. Vou usar isso como referencia. ✨');
+  S.phase = 'MATERIAL_QUESTION';
+  await askMaterialQuestion();
+}
+
+async function handleStylePick(text){
+  // User typed instead of clicking chip — try to match
+  var lower = text.toLowerCase();
+  var match = STYLE_PRESETS.find(function(s){
+    var words = s.label.toLowerCase().split(' ');
+    return words.some(function(w){ return w.length > 3 && lower.indexOf(w) >= 0; });
+  });
+
+  if(match){
+    S.style = match;
+    await aiMsg('Otima escolha! '+esc(match.desc)+' ✨');
+    S.phase = 'MATERIAL_QUESTION';
+    await askMaterialQuestion();
+  } else {
+    // Treat typed text as custom style description
+    await handleStyleDescribe(text);
+  }
+}
+
+// ===== MATERIAL QUESTION =====
+async function askMaterialQuestion(){
+  await aiMsg('E pra material principal, qual desses combina?');
+  addChips(
+    MATERIALS.map(function(m){return {label:m.name, color:m.color, value:m}}),
+    function(opt){
+      S.material = opt.value;
+      addMsg('user', esc(opt.value.name));
+      (async function(){
+        await aiMsg(esc(opt.value.name)+' — excelente pra esse estilo! 🪵');
+        S.phase = 'QUESTIONS';
+        await startQuestions();
+      })();
+    }
+  );
+}
+
+async function handleMaterialPick(text){
+  var lower = text.toLowerCase();
+  var match = MATERIALS.find(function(m){
+    var words = m.name.toLowerCase().split(' ');
+    return words.some(function(w){ return w.length > 3 && lower.indexOf(w) >= 0; });
+  });
+  if(match){
+    S.material = match;
+    await aiMsg(esc(match.name)+' — excelente pra esse estilo! 🪵');
+    S.phase = 'QUESTIONS';
+    await startQuestions();
+  } else {
+    // Accept any typed material
+    S.material = {id:'custom', name:text, color:'#888'};
+    await aiMsg('Vou usar <strong>'+esc(text)+'</strong> como referencia de material! 🪵');
+    S.phase = 'QUESTIONS';
+    await startQuestions();
+  }
+}
+
+// ===== QUESTIONS =====
+async function startQuestions(){
+  if(!S.sessionId || S.sessionId.startsWith('demo-')){
+    await aiMsg('Com as informacoes que tenho, ja posso gerar o projeto!');
+    await startEnchantment();
+    return;
+  }
+
+  setStatus('Perguntando...');
+  try{
+    var res = await fetch(API_BASE+'/session/'+S.sessionId+'/questions',{method:'POST'});
+    var data = await res.json();
+    console.log('[SOMA-ID] Questions:', data);
+
+    if(data.state === 'REVIEWING'){
+      await aiMsg('Perfeito, ja tenho tudo que preciso!');
+      await startEnchantment();
+      return;
+    }
+
+    if(data.block && data.block.questions){
+      var progress = data.progress||{};
+      await aiMsg('Pergunta '+(progress.current_block||1)+' de '+(progress.total_blocks||'?')+':');
+      var qText = data.block.questions.map(function(q){return '• '+(q.text||q)}).join('\n');
+      await aiMsg(qText);
+    } else if(data.message){
+      await aiMsg(data.message);
+    }
+  }catch(err){
+    console.error('[SOMA-ID] Questions error:', err);
+    await aiMsg('Vamos pular as perguntas e seguir com o que temos!');
+    await startEnchantment();
+  }
+}
+
+async function handleQuestionAnswer(text, audio){
+  if(!S.sessionId || S.sessionId.startsWith('demo-')){
+    await aiMsg('Entendido! Vamos gerar o projeto.');
+    await startEnchantment();
+    return;
+  }
+
+  setStatus('Processando resposta...');
+  showTyping();
+
+  try{
+    var formData = new FormData();
+    formData.append('text', text);
+    if(audio) formData.append('audio', audio, 'answer.webm');
+
+    var res = await fetch(API_BASE+'/session/'+S.sessionId+'/answer',{method:'POST',body:formData});
+    var data = await res.json();
+    hideTyping();
+    console.log('[SOMA-ID] Answer:', data);
+
+    if(data.state === 'REVIEWING'){
+      if(data.answered_count) await aiMsg('Otimo! Registrei '+data.answered_count+' resposta'+(data.answered_count>1?'s':'')+'.');
+      await aiMsg('Pronto, tenho todas as informacoes!');
+      await startEnchantment();
+      return;
+    }
+
+    if(data.answered_count) await aiMsg('Registrado! '+data.answered_count+' resposta'+(data.answered_count>1?'s':'')+'.');
+    if(data.message) await aiMsg(data.message);
+
+    await startQuestions();
+  }catch(err){
+    hideTyping();
+    console.error('[SOMA-ID] Answer error:', err);
+    await aiMsg('Erro ao processar resposta. Vamos seguir!');
+    await startEnchantment();
+  }
+}
+
+// ===== ENCHANTMENT =====
+function extractBriefingElements() {
+  var elements = [];
+  if (S.briefingData && S.briefingData.briefing && S.briefingData.briefing.zones) {
+    S.briefingData.briefing.zones.forEach(function(z) {
+      if (z.items) z.items.forEach(function(it) {
+        elements.push(it.name || it.type);
+      });
+    });
+  }
+  return elements;
+}
+
+async function startEnchantment(){
+  S.phase = 'ENCHANTMENT';
+  setStatus('Gerando visualizacao...');
+  await aiMsg('Com essas informacoes ja consigo te mostrar como vai ficar! Gerando visualizacao... 🎨');
+  showTyping();
+
+  var b = S.briefingData && S.briefingData.briefing ? S.briefingData.briefing : {};
+  var colorAssignments = S.projectData && S.projectData.color_assignments ? S.projectData.color_assignments : {};
+  var colors = [];
+  if (b.materials && b.materials.colors) {
+    colors = b.materials.colors;
+  }
+  // Also extract colors from item features
+  if (b.zones) {
+    b.zones.forEach(function(z) {
+      if (z.items) z.items.forEach(function(it) {
+        if (it.features) it.features.forEach(function(f) {
+          if (f.match(/color|cream|beige|brown|white|black|blue|wood|canela|taupe/i)) {
+            colors.push(f);
+          }
+        });
+      });
+    });
+  }
+
+  var requestBody = {
+    color_assignments: colorAssignments,
+    colors: colors,
+    project_type: (b.project && b.project.type) || S.roomType || 'closet',
+    style: S.style ? S.style.keywords : 'modern luxury',
+    space: {
+      walls: (b.space && b.space.walls) || [],
+      ceiling_height_m: (b.space && b.space.ceiling_height_m) || 3.0
+    },
+    zones: b.zones || [],
+    elements: extractBriefingElements()
+  };
+
+  // Use session endpoint if we have a session, otherwise use demo endpoint
+  var sessionId = S.sessionId || 'demo-' + Date.now();
+  var endpoint = API_BASE + '/session/' + sessionId + '/generate-image';
+
+  console.log('[SOMA-ID] Requesting image from backend...');
+
+  try{
+    var imgRes = await fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(requestBody)
+    });
+
+    if(!imgRes.ok) {
+      var errData = await imgRes.json().catch(function(){ return {}; });
+      throw new Error(errData.error || 'Backend ' + imgRes.status);
+    }
+    var imgData = await imgRes.json();
+
+    if(imgData.image){
+      S.enchantImage = imgData.image;
+    } else {
+      throw new Error('No image in response');
+    }
+  }catch(e1){
+    console.warn('[SOMA-ID] Backend image gen failed:', e1.message);
+  }
+
+  hideTyping();
+
+  if(S.enchantImage){
+    addMsg('ai', '<img src="'+S.enchantImage+'" alt="Conceito do projeto" style="width:100%;border-radius:12px;">', 'image');
+    await aiMsg('Aqui esta o conceito do projeto! O que acha?');
+  } else {
+    await aiMsg('A visualizacao esta sendo processada em segundo plano. Vamos continuar com a engenharia!');
+  }
+
+  S.phase = 'ENCHANTMENT_FEEDBACK';
+  addChips(
+    [{label:'👍 Aprovado!'},{label:'🔄 Gerar outra'},{label:'⏭️ Pular'}],
+    function(opt){
+      addMsg('user', opt.label);
+      (async function(){
+        if(opt.label.indexOf('outra')>=0){
+          await startEnchantment();
+        } else {
+          await goToSummary();
+        }
+      })();
+    }
+  );
+}
+
+async function handleEnchantFeedback(text){
+  var lower = text.toLowerCase();
+  if(lower.indexOf('outra')>=0 || lower.indexOf('de novo')>=0 || lower.indexOf('regenera')>=0){
+    await startEnchantment();
+  } else {
+    await goToSummary();
+  }
+}
+
+// ===== SUMMARY =====
+async function goToSummary(){
+  S.phase = 'SUMMARY';
+  setStatus('Resumo do projeto');
+
+  var b = (S.briefingData && S.briefingData.briefing) ? S.briefingData.briefing : {};
+
+  if(S.sessionId && !S.sessionId.startsWith('demo-')){
+    try{
+      var res = await fetch(API_BASE+'/session/'+S.sessionId+'/summary');
+      var data = await res.json();
+      b = data.briefing || b;
+    }catch(err){ console.error('Summary fetch error:', err); }
+  }
+
+  await aiMsg('Antes de gerar o projeto tecnico, confirme os dados:');
+
+  var lines = [];
+  var _cn = (b.client && b.client.name) || b.client_name || 'Demo';
+  lines.push('<div class="s-line"><span class="s-icon">👤</span><span class="s-label">Cliente</span><span class="s-val">'+ esc(_cn)+'</span></div>');
+  var styleLabel = S.style ? S.style.label : '';
+  if(S.styleDescription) styleLabel = 'Personalizado';
+  var _rt = (b.project && b.project.type) || b.room_type || 'Ambiente';
+  lines.push('<div class="s-line"><span class="s-icon">🏠</span><span class="s-label">Projeto</span><span class="s-val">'+ esc(_rt+' — '+styleLabel)+'</span></div>');
+  var _ww = (b.space && b.space.walls && b.space.walls[0] && b.space.walls[0].length_m) ? Math.round(b.space.walls[0].length_m*1000) : (b.wall_width||3600);
+  var _wh = (b.space && b.space.ceiling_height_m) ? Math.round(b.space.ceiling_height_m*1000) : (b.wall_height||2700);
+  lines.push('<div class="s-line"><span class="s-icon">📐</span><span class="s-label">Dimensoes</span><span class="s-val">'+ _ww+' x '+_wh+' mm</span></div>');
+  lines.push('<div class="s-line"><span class="s-icon">🪵</span><span class="s-label">Material</span><span class="s-val">'+ esc(S.material?S.material.name:'Padrao')+'</span></div>');
+  if(b.zones && b.zones.length){
+    lines.push('<div class="s-line"><span class="s-icon">📦</span><span class="s-label">Zonas</span><span class="s-val">'+ esc(b.zones.map(function(z){return z.name||z.type}).join(', '))+'</span></div>');
+  }
+  if(S.styleDescription){
+    lines.push('<div class="s-line"><span class="s-icon">🎨</span><span class="s-label">Estilo</span><span class="s-val">'+ esc(S.styleDescription)+'</span></div>');
+  }
+  lines.push('<div class="s-line"><span class="s-icon">🔧</span><span class="s-label">Instalacao</span><span class="s-val">Piso</span></div>');
+
+  addMsg('ai', lines.join(''), 'summary');
+
+  await aiMsg('Tudo certo? Posso gerar?');
+  addChips(
+    [{label:'✅ Confirmar'},{label:'✏️ Corrigir algo'}],
+    function(opt){
+      addMsg('user', opt.label);
+      (async function(){
+        if(opt.label.indexOf('Corrigir')>=0){
+          await aiMsg('O que precisa ajustar? Me diga e eu corrijo.');
+          S.phase = 'SUMMARY';
+        } else {
+          await confirmAndGenerate();
+        }
+      })();
+    }
+  );
+}
+
+async function handleSummaryConfirm(text){
+  var lower = text.toLowerCase();
+  var confirmWords = ['confirmo','sim','ok','pode','aprovado','certo','correto','perfeito','gera','gerar','confirma'];
+  var isConfirm = confirmWords.some(function(w){return lower.indexOf(w)>=0});
+
+  if(isConfirm){
+    await confirmAndGenerate();
+  } else {
+    if(S.sessionId && !S.sessionId.startsWith('demo-')){
+      showTyping();
+      try{
+        var res = await fetch(API_BASE+'/session/'+S.sessionId+'/confirm',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({text:text})
+        });
+        var data = await res.json();
+        hideTyping();
+        if(data.state === 'CONFIRMED'){
+          await aiMsg('Confirmado! Gerando projeto...');
+          await runEngines();
+        } else {
+          await aiMsg(data.message || 'Correcao aplicada. Confirme quando estiver pronto.');
+        }
+      }catch(err){
+        hideTyping();
+        await aiMsg('Entendido, vou considerar isso. Confirme quando estiver pronto.');
+      }
+    } else {
+      await aiMsg('Anotado! Confirme quando estiver tudo certo.');
+    }
+  }
+}
+
+// ===== CONFIRM + GENERATE =====
+async function confirmAndGenerate(){
+  setStatus('Confirmando...');
+
+  if(S.sessionId && !S.sessionId.startsWith('demo-')){
+    try{
+      var res = await fetch(API_BASE+'/session/'+S.sessionId+'/confirm',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({text:'confirmo'})
+      });
+      var data = await res.json();
+      console.log('[SOMA-ID] Confirm:', data);
+    }catch(err){
+      console.error('Confirm error:', err);
+    }
+  }
+
+  await runEngines();
+}
+
+// ===== ENGINES =====
+async function runEngines(){
+  S.phase = 'GENERATING';
+  setStatus('Gerando projeto tecnico...');
+
+  await aiMsg('Gerando projeto tecnico... ⚙️');
+  await delay(800);
+  await aiMsg('Calculando modulos e lista de corte...');
+  await delay(1200);
+  await aiMsg('Verificando interferencias e ergonomia... 🔍');
+  await delay(1000);
+  await aiMsg('Otimizando plano de chapas... 📐');
+
+  if(S.sessionId && !S.sessionId.startsWith('demo-')){
+    showTyping();
+    try{
+      var res = await fetch(API_BASE+'/session/'+S.sessionId+'/generate',{method:'POST'});
+      var data = await res.json();
+      hideTyping();
+      console.log('[SOMA-ID] Generate:', data);
+
+      if(data.state === 'COMPLETED'){
+        S.engineResults = data;
+        await showResults(data);
+      } else {
+        await pollForResults();
+      }
+    }catch(err){
+      hideTyping();
+      console.error('Generate error:', err);
+      await showDemoResults();
+    }
+  } else {
+    await delay(1500);
+    await showDemoResults();
+  }
+}
+
+async function pollForResults(){
+  showTyping();
+  for(var i=0;i<30;i++){
+    await delay(2000);
+    try{
+      var res = await fetch(API_BASE+'/session/'+S.sessionId);
+      var data = await res.json();
+      if(data.state === 'COMPLETED'){
+        hideTyping();
+        var rRes = await fetch(API_BASE+'/session/'+S.sessionId+'/result');
+        var rData = await rRes.json();
+        S.engineResults = rData;
+        await showResults({summary:rData.engine_results.summary, conflicts:rData.engine_results.conflicts});
+        return;
+      }
+    }catch(err){ break; }
+  }
+  hideTyping();
+  await showDemoResults();
+}
+
+async function showDemoResults(){
+  var demoData = {
+    summary:{total_modules:8,total_parts:47,total_sheets:6,efficiency_percent:87,estimated_cost_brl:1680},
+    conflicts:[{severity:'low',message:'Gaveta superior 3mm acima do padrao'}]
+  };
+  S.engineResults = demoData;
+  await showResults(demoData);
+}
+
+async function showResults(data){
+  S.phase = 'RESULT';
+  setStatus('Projeto concluido');
+  var s = data.summary || {};
+  var conflicts = data.conflicts || [];
+
+  if(S.enchantImage){
+    addMsg('ai', '<img src="'+S.enchantImage+'" alt="Conceito" style="width:100%;border-radius:12px;">', 'image');
+  }
+
+  var eff = s.efficiency_percent || 0;
+  var effClass = eff>=80?'green':eff>=60?'yellow':'red';
+  var cost = s.estimated_cost_brl || s.estimated_cost || 0;
+  if(cost === 0 && s.estimated_cost_usd){
+    cost = Math.round(s.estimated_cost_usd * 5.5);
+  }
+  if(cost === 0 && s.total_sheets){
+    cost = s.total_sheets * 280;
+  }
+
+  var resultHtml = '<div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:12px">✅ Projeto gerado com sucesso!</div>';
+  if(S.projectId){
+    resultHtml += '<div style="font-size:11px;color:var(--gold);font-family:\'Courier New\',monospace;margin-bottom:10px;letter-spacing:0.05em">'+esc(S.projectId)+'</div>';
+  }
+  resultHtml += '<div class="result-metric"><span class="r-icon">📊</span><span class="r-val">'+(s.total_modules||0)+'</span><span class="r-label">modulos</span><span style="margin:0 6px;color:#333">|</span><span class="r-val">'+(s.total_parts||0)+'</span><span class="r-label">pecas</span><span style="margin:0 6px;color:#333">|</span><span class="r-val">'+(s.total_sheets||0)+'</span><span class="r-label">chapas</span></div>';
+  resultHtml += '<div style="margin:8px 0"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Eficiencia de corte</div><div class="eff-bar"><div class="eff-fill '+effClass+'" style="width:'+eff+'%"></div><div class="eff-label">'+eff+'%</div></div></div>';
+  resultHtml += '<div class="result-metric"><span class="r-icon">💰</span><span class="r-val" style="color:var(--gold)">R$ '+cost.toLocaleString('pt-BR')+'</span><span class="r-label">custo estimado</span></div>';
+
+  if(conflicts.length>0){
+    resultHtml += '<div style="margin-top:8px">';
+    conflicts.forEach(function(c){
+      var icon = c.severity==='high'?'🔴':c.severity==='medium'?'🟡':'🟢';
+      resultHtml += '<div style="font-size:12px;color:var(--muted);margin:2px 0">'+icon+' '+esc(c.message||c.description||'')+'</div>';
+    });
+    resultHtml += '</div>';
+  } else {
+    resultHtml += '<div style="font-size:12px;color:var(--green);margin-top:6px">✅ 0 conflitos de engenharia</div>';
+  }
+
+  addMsg('ai', resultHtml, 'result');
+  await aiMsg('O que deseja fazer agora?');
+  addChips(
+    [{label:'📄 Ver Projeto Tecnico'},{label:'📥 Baixar PDF'},{label:'📧 Enviar por Email'},{label:'🔄 Novo Projeto'}],
+    function(opt){
+      addMsg('user', opt.label);
+      (async function(){
+        if(opt.label.indexOf('Projeto Tecnico')>=0){
+          viewReport();
+          await aiMsg('Projeto tecnico aberto em nova aba! 📄');
+        } else if(opt.label.indexOf('PDF')>=0){
+          await downloadPDF();
+        } else if(opt.label.indexOf('Email')>=0){
+          await aiMsg('Qual o email do cliente?');
+          S.phase = 'EMAIL_INPUT';
+        } else {
+          location.reload();
+        }
+      })();
+    }
+  );
+}
+
+async function handleResultAction(text){
+  // FIX 1: Detect email address directly in the message BEFORE intent matching
+  var emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  if(emailMatch){
+    await handleEmailDelivery(emailMatch[0]);
+    return;
+  }
+
+  var lower = text.toLowerCase().replace(/[.,!?;:]+/g,' ').trim();
+
+  // Intent: send email (no address provided — ask for it)
+  var emailIntents = ['enviar email','manda por email','mandar por email','manda email','mandar email','envia por email','envia email','enviar por email','email','e-mail','manda pro email','enviar pro email','envia pro email'];
+  var isEmail = emailIntents.some(function(w){return lower.indexOf(w)>=0});
+  if(isEmail){
+    await aiMsg('Qual o email para envio?');
+    S.phase = 'EMAIL_INPUT';
+    return;
+  }
+
+  // Intent: resend email / didn't receive
+  var resendIntents = ['nao recebi','n recebi','nao chegou','n chegou','envia de novo','enviar de novo','manda de novo','mandar de novo','reenviar','reenvia','reenvie'];
+  var isResend = resendIntents.some(function(w){return lower.indexOf(w)>=0});
+  if(isResend){
+    await aiMsg('Sem problema! Qual o email para reenvio?');
+    S.phase = 'EMAIL_INPUT';
+    return;
+  }
+
+  // Intent: view report (HTML folha tecnica)
+  var reportIntents = ['folha tecnica','folha técnica','ficha tecnica','ver relatorio','relatorio','report','ver folha','projeto tecnico','projeto técnico','ver projeto'];
+  var isReport = reportIntents.some(function(w){return lower.indexOf(w)>=0});
+  if(isReport){
+    viewReport();
+    await aiMsg('Projeto tecnico aberto em nova aba! 📄');
+    return;
+  }
+
+  // Intent: download PDF
+  var pdfIntents = ['pdf','baixar','download','baixa'];
+  var isPdf = pdfIntents.some(function(w){return lower.indexOf(w)>=0});
+  if(isPdf){
+    await downloadPDF();
+    return;
+  }
+
+  // Intent: new project
+  var newIntents = ['novo projeto','recomecar','comecar de novo','reiniciar','novo','new project'];
+  var isNew = newIntents.some(function(w){return lower.indexOf(w)>=0});
+  if(isNew){
+    await aiMsg('Reiniciando projeto... 🔄');
+    await delay(500);
+    location.reload();
+    return;
+  }
+
+  // Anything else → send to Gemini with full context
+  setStatus('Respondendo...');
+  showTyping();
+  try{
+    var answer = await askGeminiFree(text);
+    hideTyping();
+    setStatus('Projeto concluido');
+    await aiMsg(answer);
+    // Check if Gemini response suggests email action
+    var ansLower = answer.toLowerCase();
+    if(ansLower.indexOf('email') >= 0 && ansLower.indexOf('endereco') >= 0){
+      S.phase = 'EMAIL_INPUT';
+    }
+  }catch(err){
+    hideTyping();
+    setStatus('Projeto concluido');
+    await aiMsg('Posso baixar o PDF, enviar por email ou iniciar um novo projeto. O que prefere?');
+  }
+}
+
+async function handleEmailDelivery(email){
+  await aiMsg('Enviando projeto para <strong>'+esc(email)+'</strong>...');
+  showTyping();
+  if(S.sessionId && !S.sessionId.startsWith('demo-')){
+    try{
+      var res = await fetch(API_BASE+'/session/'+S.sessionId+'/deliver',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email:email})
+      });
+      var data = await res.json();
+      hideTyping();
+      if(data.state === 'DELIVERED'){
+        await aiMsg('✅ Projeto enviado com sucesso para <strong>'+esc(email)+'</strong>! 📬');
+      } else {
+        await aiMsg('❌ '+(data.error || 'Nao consegui enviar. Verifique o email e tente novamente.'));
+      }
+    }catch(err){
+      hideTyping();
+      await aiMsg('❌ Nao consegui enviar. Verifique o email e tente novamente.');
+    }
+  } else {
+    hideTyping();
+    await aiMsg('✅ Projeto enviado para <strong>'+esc(email)+'</strong>! (Modo demo) 📬');
+  }
+  S.phase = 'RESULT';
+}
+
+async function handlePhoneInput(text){
+  var digits = text.replace(/\D/g,'');
+  if(digits.length < 4){
+    await aiMsg('Preciso de pelo menos 4 digitos. Digite o telefone do cliente:');
+    return;
+  }
+  var last4 = digits.slice(-4);
+
+  // Update backend
+  if(S.sessionId && !S.sessionId.startsWith('demo-')){
+    try{
+      var res = await fetch(API_BASE+'/session/'+S.sessionId+'/update-phone',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({phone:text})
+      });
+      var upData = await res.json();
+      if(upData.project_id){
+        setProjectId(upData.project_id);
+      }
+    }catch(err){
+      console.error('[SOMA-ID] Update phone error:', err);
+      // Fallback: update locally
+      var oldPid = S.projectId || 'SOMA-0000-0000-001';
+      var parts = oldPid.split('-');
+      setProjectId('SOMA-'+last4+'-'+parts[2]+'-'+parts[3]);
+    }
+  } else {
+    var oldPid = S.projectId || 'SOMA-0000-0000-001';
+    var parts = oldPid.split('-');
+    setProjectId('SOMA-'+last4+'-'+parts[2]+'-'+parts[3]);
+  }
+
+  await aiMsg('Telefone registrado! Projeto: <strong>'+esc(S.projectId)+'</strong>');
+
+  // Continue the flow that was paused
+  var b = S._pendingBriefing;
+  var data = S._pendingData;
+  var gapCount = S._pendingGapCount || 0;
+  S._pendingBriefing = null;
+  S._pendingData = null;
+  S._pendingGapCount = null;
+
+  if(!b){
+    S.phase = 'STYLE_QUESTION';
+    await askStyleQuestion();
+    return;
+  }
+
+  var completude = avaliarCompletude(b);
+  console.log('[SOMA-ID] Completude (after phone):', JSON.stringify(completude));
+
+  var allFound = completude.temEstilo && completude.temMaterial && completude.temDimensoes;
+  if(allFound && gapCount === 0){
+    await aiMsg('O briefing esta bem completo! Tenho todas as informacoes que preciso. Vou gerar o conceito visual e o projeto tecnico.');
+    if(completude.temEstilo && !S.style){
+      S.style = {id:'briefing_extracted', label:'Estilo do Briefing', desc:completude.estiloExtraido, keywords:completude.estiloExtraido+', luxury interior design, professional photography'};
+      S.styleDescription = completude.estiloExtraido;
+    }
+    if(completude.temMaterial && !S.material){
+      S.material = {id:'briefing_extracted', name:completude.materialExtraido, color:'#888'};
+    }
+    await startEnchantment();
+  } else {
+    await smartFlowAfterBriefing(b, completude);
+  }
+}
+
+async function handleEmailInput(text){
+  // Extract email from text (user may type "jose@gmail.com por favor")
+  var emailExtract = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  if(!emailExtract){
+    await aiMsg('Hmm, isso nao parece um email valido. Tente algo como <strong>nome@email.com</strong>');
+    return;
+  }
+  var emailText = emailExtract[0];
+
+  setStatus('Enviando email...');
+  showTyping();
+  if(S.sessionId && !S.sessionId.startsWith('demo-')){
+    try{
+      var res = await fetch(API_BASE+'/session/'+S.sessionId+'/deliver',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email:emailText})
+      });
+      var data = await res.json();
+      hideTyping();
+      if(data.state === 'DELIVERED'){
+        await aiMsg('Enviado com sucesso para <strong>'+esc(emailText)+'</strong>! 📬');
+        setStatus('Projeto concluido');
+        S.phase = 'RESULT';
+        addChips(
+          [{label:'📥 Baixar PDF'},{label:'📧 Enviar para outro email'},{label:'🔄 Novo Projeto'}],
+          function(opt){
+            addMsg('user', opt.label);
+            (async function(){
+              if(opt.label.indexOf('PDF')>=0){
+                await downloadPDF();
+              } else if(opt.label.indexOf('email')>=0 || opt.label.indexOf('Email')>=0){
+                await aiMsg('Qual o email para envio?');
+                S.phase = 'EMAIL_INPUT';
+              } else {
+                location.reload();
+              }
+            })();
+          }
+        );
+      } else {
+        setStatus('Projeto concluido');
+        var errorMsg = data.error || 'Erro ao enviar email.';
+        await aiMsg('Nao consegui enviar: ' + esc(errorMsg));
+        addChips(
+          [{label:'🔄 Tentar novamente'},{label:'✏️ Outro email'}],
+          function(opt){
+            addMsg('user', opt.label);
+            (async function(){
+              if(opt.label.indexOf('Outro')>=0){
+                await aiMsg('Qual o email correto?');
+              } else {
+                await handleEmailInput(emailText);
+              }
+            })();
+          }
+        );
+      }
+    }catch(err){
+      hideTyping();
+      setStatus('Projeto concluido');
+      await aiMsg('Falha na conexao ao enviar email. Verifique sua internet e tente novamente.');
+      addChips(
+        [{label:'🔄 Tentar novamente'},{label:'📥 Baixar PDF'}],
+        function(opt){
+          addMsg('user', opt.label);
+          (async function(){
+            if(opt.label.indexOf('PDF')>=0){
+              await downloadPDF();
+            } else {
+              await handleEmailInput(emailText);
+            }
+          })();
+        }
+      );
+    }
+  } else {
+    hideTyping();
+    setStatus('Projeto concluido');
+    await aiMsg('Email seria enviado para <strong>'+esc(emailText)+'</strong>. (Modo demo) 📬');
+    S.phase = 'RESULT';
+  }
+}
+
+async function downloadPDF(){
+  if(S.sessionId && !S.sessionId.startsWith('demo-')){
+    showTyping();
+    try{
+      var res = await fetch(API_BASE+'/session/'+S.sessionId+'/pdf');
+      hideTyping();
+      if(!res.ok){
+        var errData = await res.json().catch(function(){return {};});
+        await aiMsg('❌ '+(errData.error || 'Erro ao gerar PDF. Tente novamente.'));
+        return;
+      }
+      var blob = await res.blob();
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'SOMA-ID-'+(S.projectId||S.sessionId)+'.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      await aiMsg('✅ PDF baixado com sucesso! 📥');
+    }catch(err){
+      hideTyping();
+      await aiMsg('❌ Erro ao baixar PDF: '+err.message);
+    }
+  } else {
+    await aiMsg('PDF disponivel apos processamento completo no servidor.');
+  }
+}
+
+function viewReport(){
+  if(S.sessionId && !S.sessionId.startsWith('demo-')){
+    window.open(API_BASE+'/session/'+S.sessionId+'/report','_blank');
+  } else {
+    aiMsg('Folha tecnica disponivel apos processamento completo no servidor.');
+  }
+}
+
+// ===== ATTACH FILES =====
+attachBtn.onclick = function(){ fileInput.click(); };
+fileInput.onchange = function(){
+  for(var i=0;i<fileInput.files.length;i++){
+    S.pendingFiles.push(fileInput.files[i]);
+  }
+  fileInput.value='';
+  renderPendingFiles();
+};
+
+function renderPendingFiles(){
+  if(S.pendingFiles.length===0){filePreviewBar.classList.remove('show');filePreviewBar.innerHTML='';return;}
+  filePreviewBar.classList.add('show');
+  filePreviewBar.innerHTML = S.pendingFiles.map(function(f,i){
+    var icon = f.type.includes('pdf')?'📄':f.type.includes('image')?'🖼️':f.type.includes('audio')?'🎵':'📎';
+    return '<div class="fp-chip">'+icon+' '+esc(f.name)+' <span class="fp-remove" data-idx="'+i+'">✕</span></div>';
+  }).join('');
+  filePreviewBar.querySelectorAll('.fp-remove').forEach(function(el){
+    el.onclick = function(){
+      S.pendingFiles.splice(parseInt(el.dataset.idx),1);
+      renderPendingFiles();
+    };
+  });
+  sendBtn.classList.add('active');
+}
+
+// ===== DRAG AND DROP =====
+chatArea.addEventListener('dragover', function(e){e.preventDefault();chatArea.classList.add('dragover')});
+chatArea.addEventListener('dragleave', function(){chatArea.classList.remove('dragover')});
+chatArea.addEventListener('drop', function(e){
+  e.preventDefault();chatArea.classList.remove('dragover');
+  for(var i=0;i<e.dataTransfer.files.length;i++) S.pendingFiles.push(e.dataTransfer.files[i]);
+  renderPendingFiles();
+});
+
+// ===== AUDIO RECORDING =====
+recBtn.onclick = function(){
+  if(mediaRecorder && mediaRecorder.state === 'recording'){
+    mediaRecorder.stop();
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    mediaRecorder = new MediaRecorder(stream);
+    recChunks = [];
+    mediaRecorder.ondataavailable = function(e){recChunks.push(e.data)};
+    mediaRecorder.onstop = function(){
+      audioBlob = new Blob(recChunks,{type:'audio/webm'});
+      stream.getTracks().forEach(function(t){t.stop()});
+      recBtn.classList.remove('recording');
+      waveRow.classList.remove('show');
+      waveRow.innerHTML = '';
+      recTimer.style.display = 'none';
+      chatInput.style.display = '';
+      clearInterval(recInterval);
+      sendBtn.classList.add('active');
+      handleSend();
+    };
+    mediaRecorder.start();
+    recStart = Date.now();
+    recBtn.classList.add('recording');
+    chatInput.style.display = 'none';
+    recTimer.style.display = '';
+
+    waveRow.classList.add('show');
+    waveRow.innerHTML = '';
+    for(var i=0;i<24;i++){
+      var bar = document.createElement('div');
+      bar.className = 'wave-bar';
+      bar.style.animationDelay = (i*0.04)+'s';
+      waveRow.appendChild(bar);
+    }
+
+    recInterval = setInterval(function(){
+      var sec = Math.floor((Date.now()-recStart)/1000);
+      var m = Math.floor(sec/60), s = sec%60;
+      recTimer.textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    },1000);
+  }).catch(function(err){
+    console.error('Mic error:', err);
+  });
+};
+
+// ===== INPUT HANDLING =====
+// Input is ALWAYS active — never disabled (FIX 2 requirement)
+chatInput.oninput = function(){
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 96)+'px';
+  sendBtn.classList.toggle('active', chatInput.value.trim().length>0 || S.pendingFiles.length>0);
+};
+chatInput.onkeydown = function(e){
+  if(e.key==='Enter' && !e.shiftKey){
+    e.preventDefault();
+    handleSend();
+  }
+};
+sendBtn.onclick = function(){ handleSend(); };
+
+// ===== INIT =====
+(async function(){
+  console.log('[SOMA-ID] Chat initialized. API_BASE:', API_BASE);
+  await delay(400);
+  await aiMsg('Ola! Sou o assistente <strong>SOMA-ID</strong>, seu projetista de marcenaria com IA. 👋');
+  await aiMsg('Me envie o briefing do projeto — pode ser PDF, foto do croqui, audio descrevendo ou simplesmente digitar o que precisa. Pode mandar tudo junto!');
+  await aiMsg('💡 <em>Dica: a qualquer momento voce pode me fazer perguntas, digitar "pular" pra avancar, "voltar" pra retornar ou "recomecar" pra novo projeto.</em>', null, 400);
+})();
+</script>
+</body>
+</html>

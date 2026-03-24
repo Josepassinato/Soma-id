@@ -1,0 +1,179 @@
+{
+  "project": "Sabrina Parkland - Closet",
+  "generated_at": "2026-03-22",
+  "engine": "interferenceEngine (simulated — TypeScript engine not callable from CLI)",
+  "space": {
+    "total_width_mm": 5130,
+    "total_depth_mm": 3640,
+    "ceiling_height_mm": 3000
+  },
+
+  "checks": [
+    {
+      "id": "CHK-001",
+      "name": "Passagem Makeup vs Torre Oposta",
+      "type": "min_passage",
+      "zone": "Makeup Area",
+      "constraint_mm": 800,
+      "calculation": {
+        "makeup_depth_mm": 500,
+        "opposite_tower_depth_mm": 600,
+        "total_space_between_walls_mm": 1930,
+        "available_passage_mm": 830,
+        "formula": "1930 - 500 - 600 = 830mm"
+      },
+      "result": "PASS",
+      "severity": "CRITICAL",
+      "margin_mm": 30,
+      "notes": "Passagem de 830mm atende o minimo de 800mm. Margem apertada (30mm). Considerar reduzir profundidade da bancada para 450mm para ganhar 50mm de folga."
+    },
+    {
+      "id": "CHK-002",
+      "name": "Swing Porta Espelho Area Armas",
+      "type": "door_swing_clearance",
+      "zone": "Area Armas",
+      "constraint_mm": 500,
+      "calculation": {
+        "door_width_mm": 1324,
+        "door_swing_projection_mm": 1324,
+        "available_space_in_front_mm": 2440,
+        "formula": "Espaco disponivel em frente (distancia ate ilha ou parede oposta): ~2440mm. Swing de 1324mm: 2440 - 1324 = 1116mm livre"
+      },
+      "result": "PASS",
+      "severity": "CRITICAL",
+      "margin_mm": 1116,
+      "notes": "Porta espelho abre completamente sem obstrucao. Verificar que ilha central nao esta posicionada na frente da area de armas."
+    },
+    {
+      "id": "CHK-003",
+      "name": "Clearance Ilha Central — Lado Esquerdo",
+      "type": "min_clearance",
+      "zone": "Ilha Central",
+      "constraint_mm": 600,
+      "calculation": {
+        "ilha_width_mm": 1200,
+        "ilha_position_centered": true,
+        "space_total_width_mm": 3640,
+        "closet_her_depth_mm": 600,
+        "closet_his_depth_mm": 600,
+        "available_width_mm": 2440,
+        "ilha_centered_clearance_each_side_mm": 620,
+        "formula": "(3640 - 600 - 600 - 1200) / 2 = 620mm cada lado"
+      },
+      "result": "PASS",
+      "severity": "WARNING",
+      "margin_mm": 20,
+      "notes": "Clearance de 620mm em cada lado atende o minimo de 600mm, mas com margem muito apertada (20mm). Reduzir ilha para 1100mm largura ganharia 50mm por lado."
+    },
+    {
+      "id": "CHK-004",
+      "name": "Clearance Ilha Central — Frente/Fundo",
+      "type": "min_clearance",
+      "zone": "Ilha Central",
+      "constraint_mm": 600,
+      "calculation": {
+        "ilha_depth_mm": 600,
+        "space_total_depth_mm": 5130,
+        "closet_her_wall_used_mm": 3810,
+        "remaining_depth_mm": 1320,
+        "ilha_centered_clearance_front_mm": 360,
+        "formula": "Se ilha centralizada no espaco restante: (1320 - 600) / 2 = 360mm — INSUFICIENTE"
+      },
+      "result": "FAIL",
+      "severity": "CRITICAL",
+      "deficit_mm": -240,
+      "notes": "CONFLITO: Se ilha posicionada centralizada no eixo de profundidade, clearance de apenas 360mm (minimo 600mm). SOLUCAO: Posicionar ilha deslocada para frente, mais perto da entrada, ou reduzir profundidade da ilha para 450mm. Alternativa: reposicionar ilha no eixo longitudinal do Closet Her (paralela a parede de 3.64m) em vez de perpendicular."
+    },
+    {
+      "id": "CHK-005",
+      "name": "Altura Area de Malas",
+      "type": "max_reach_height",
+      "zone": "Closet Her — Luggage Area",
+      "constraint_mm": 2200,
+      "calculation": {
+        "shelf_base_height_mm": 2200,
+        "compartment_height_mm": 600,
+        "shelf_top_mm": 2800,
+        "ceiling_mm": 3000,
+        "formula": "Base da prateleira de malas a 2200mm do chao. Topo do compartimento a 2800mm. Espaco ate teto: 200mm (painel de fundo)"
+      },
+      "result": "PASS",
+      "severity": "WARNING",
+      "margin_mm": 0,
+      "notes": "Base da prateleira exatamente a 2200mm — no limite maximo. Cliente de estatura media (mulher ~1.65m) pode precisar de banco/degrau para acessar. Considerar instalar barra de puxar retrátil ou baixar para 2000mm."
+    },
+    {
+      "id": "CHK-006",
+      "name": "Gavetas Ilha vs Paredes Laterais",
+      "type": "drawer_pullout_clearance",
+      "zone": "Ilha Central",
+      "constraint_mm": 500,
+      "calculation": {
+        "drawer_depth_mm": 500,
+        "drawer_full_extension_mm": 500,
+        "clearance_to_wall_mm": 620,
+        "formula": "Gaveta aberta projeta 500mm. Espaco disponivel: 620mm. Livre: 120mm"
+      },
+      "result": "PASS",
+      "severity": "WARNING",
+      "margin_mm": 120,
+      "notes": "Gavetas abrem completamente sem encostar nas paredes laterais. Margem de 120mm suficiente para acesso confortavel."
+    },
+    {
+      "id": "CHK-007",
+      "name": "Modulos Closet Her — Largura Total vs Parede",
+      "type": "boundary_violation",
+      "zone": "Closet Her",
+      "constraint_mm": 3640,
+      "calculation": {
+        "shoe_rack_mm": 1500,
+        "boot_rack_mm": 1050,
+        "steamer_niche_mm": 300,
+        "remaining_mm": 790,
+        "total_if_side_by_side_mm": 2850,
+        "formula": "Sapateira (1500) + Botas (1050) + Steamer (300) = 2850mm. Parede: 3640mm. Sobra: 790mm para vitrines ou distribuicao"
+      },
+      "result": "PASS",
+      "severity": "INFO",
+      "margin_mm": 790,
+      "notes": "Componentes cabem na parede de 3640mm com 790mm sobrando. Vitrines (1050mm) podem ir na parede perpendicular."
+    },
+    {
+      "id": "CHK-008",
+      "name": "Closet His — Largura Total vs Parede",
+      "type": "boundary_violation",
+      "zone": "Closet His",
+      "constraint_mm": 4030,
+      "calculation": {
+        "module_1_mm": 800,
+        "module_2_mm": 800,
+        "module_3_mm": 1200,
+        "module_4_mm": 1230,
+        "total_mm": 4030,
+        "formula": "800 + 800 + 1200 + 1230 = 4030mm. Parede: 4030mm. Encaixa exato (0mm margem)"
+      },
+      "result": "PASS",
+      "severity": "WARNING",
+      "margin_mm": 0,
+      "notes": "Encaixa exatamente na parede — zero margem. Na pratica, paredes nunca sao perfeitamente retas. RECOMENDACAO: reduzir ultimo modulo em 10-20mm para absorver irregularidades da parede."
+    }
+  ],
+
+  "summary": {
+    "total_checks": 8,
+    "passed": 7,
+    "failed": 1,
+    "critical_failures": 1,
+    "warnings": 4,
+    "overall_status": "REQUIRES_ADJUSTMENT",
+    "blocking_issues": [
+      "CHK-004: Clearance insuficiente frente/fundo da ilha central (360mm, minimo 600mm)"
+    ],
+    "recommendations": [
+      "Reposicionar ilha central no eixo longitudinal OU reduzir profundidade para 450mm",
+      "Reduzir ultimo modulo Closet His em 15mm (absorver irregularidades parede)",
+      "Considerar baixar area de malas para 2000mm (conforto de acesso)",
+      "Avaliar reducao da bancada makeup para 450mm profundidade (ganhar margem de passagem)"
+    ]
+  }
+}

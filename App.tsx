@@ -266,7 +266,9 @@ const App: React.FC = () => {
         });
         return () => subscription.unsubscribe();
     } else {
+        // Supabase not configured — skip landing, go straight to auth page
         setIsLoading(false);
+        setShowHotPage(false);
     }
   }, []);
 

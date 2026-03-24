@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMA ID — Closet Sabrina Parkland — Plano de Corte (Nesting) — Folha 7/8</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .sheet {
+    background: #ffffff;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    width: 594mm;
+    height: 420mm;
+    overflow: hidden;
+  }
+  svg {
+    display: block;
+  }
+  @media print {
+    body { background: none; margin: 0; padding: 0; }
+    .sheet { box-shadow: none; margin: 0; }
+  }
+  @page {
+    size: A2 landscape;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5940 4200" width="594mm" height="420mm">
+<defs>
+  <!-- Cross-hatch pattern for waste areas -->
+  <pattern id="waste-hatch" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(45)">
+    <rect width="20" height="20" fill="#f0f0f0"/>
+    <line x1="0" y1="0" x2="0" y2="20" stroke="#d0d0d0" stroke-width="1.5"/>
+  </pattern>
+  <!-- Grain direction arrow marker -->
+  <marker id="grain-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#888888"/>
+  </marker>
+  <!-- Kerf line style -->
+  <style>
+    .kerf { stroke: #cc0000; stroke-width: 2; stroke-dasharray: 8,4; fill: none; }
+    .piece-outline { stroke: #333333; stroke-width: 4; }
+    .sheet-outline { stroke: #000000; stroke-width: 8; fill: #ffffff; }
+    .waste-area { fill: url(#waste-hatch); stroke: #cccccc; stroke-width: 1; }
+    .piece-label { font-family: Arial, Helvetica, sans-serif; font-size: 22px; font-weight: bold; fill: #222222; text-anchor: middle; }
+    .piece-dim { font-family: Arial, Helvetica, sans-serif; font-size: 16px; fill: #555555; text-anchor: middle; }
+    .sheet-title { font-family: Arial, Helvetica, sans-serif; font-size: 28px; font-weight: bold; fill: #111111; }
+    .sheet-subtitle { font-family: Arial, Helvetica, sans-serif; font-size: 22px; fill: #444444; }
+    .yield-text { font-family: Arial, Helvetica, sans-serif; font-size: 24px; font-weight: bold; }
+    .grain-line { stroke: #888888; stroke-width: 2; fill: none; marker-end: url(#grain-arrow); }
+    .section-title { font-family: Arial, Helvetica, sans-serif; font-size: 36px; font-weight: bold; fill: #111111; }
+    .table-header { font-family: Arial, Helvetica, sans-serif; font-size: 22px; font-weight: bold; fill: #ffffff; }
+    .table-cell { font-family: Arial, Helvetica, sans-serif; font-size: 20px; fill: #222222; }
+    .title-block-text { font-family: Arial, Helvetica, sans-serif; fill: #222222; }
+  </style>
+</defs>
+
+<!-- ============================================================ -->
+<!-- BACKGROUND -->
+<!-- ============================================================ -->
+<rect x="0" y="0" width="5940" height="4200" fill="#ffffff"/>
+
+<!-- ============================================================ -->
+<!-- DRAWING BORDER -->
+<!-- ============================================================ -->
+<rect x="40" y="40" width="5860" height="4120" fill="none" stroke="#000000" stroke-width="6"/>
+<rect x="60" y="60" width="5820" height="4080" fill="none" stroke="#000000" stroke-width="2"/>
+
+<!-- ============================================================ -->
+<!-- TITLE: PLANO DE CORTE -->
+<!-- ============================================================ -->
+<text x="2970" y="130" class="section-title" text-anchor="middle" font-size="42">PLANO DE CORTE (NESTING) — CLOSET SABRINA PARKLAND</text>
+<line x1="800" y1="150" x2="5140" y2="150" stroke="#333333" stroke-width="2"/>
+<text x="2970" y="185" class="sheet-subtitle" text-anchor="middle" font-size="20">Serra: kerf 4mm | Chapas: 2750 x 1850 mm | Algoritmo: First Fit Decreasing</text>
+
+<!-- ============================================================ -->
+<!-- CHAPA 01 - MDP 18mm Lana -->
+<!-- ============================================================ -->
+<g transform="translate(120, 230)">
+  <text x="0" y="-10" class="sheet-title" font-size="26">CHAPA 01 — MDP 18mm Lana</text>
+  <!-- Sheet outline: scale 1:3.2 → 2750/3.2=859, 1850/3.2=578 -->
+  <rect x="0" y="0" width="859" height="578" class="sheet-outline"/>
+
+  <!-- Piece: HS-L01 Side panel 600x2400 → laid as 2400x600 → 750x188 at scale -->
+  <rect x="4" y="4" width="746" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="96" x2="700" y2="96" class="grain-line"/>
+  <text x="377" y="90" class="piece-label">HS-L01</text>
+  <text x="377" y="115" class="piece-dim">2400 x 600</text>
+  <!-- kerf -->
+  <line x1="4" y1="189" x2="750" y2="189" class="kerf"/>
+
+  <!-- Piece: HS-L02 Side panel 600x2400 -->
+  <rect x="4" y="192" width="746" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="284" x2="700" y2="284" class="grain-line"/>
+  <text x="377" y="278" class="piece-label">HS-L02</text>
+  <text x="377" y="303" class="piece-dim">2400 x 600</text>
+  <!-- kerf -->
+  <line x1="4" y1="377" x2="750" y2="377" class="kerf"/>
+
+  <!-- Piece: CH-S01 Shoe shelf 1500x300 → 469x94 at scale -->
+  <rect x="4" y="380" width="465" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="236" y="425" class="piece-label">CH-S01</text>
+  <text x="236" y="448" class="piece-dim">1500 x 300</text>
+  <!-- kerf -->
+  <line x1="470" y1="380" x2="470" y2="470" class="kerf"/>
+
+  <!-- Piece: CH-S02 Shoe shelf 1500x300 -->
+  <rect x="473" y="380" width="382" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="664" y="425" class="piece-label">CH-S02*</text>
+  <text x="664" y="448" class="piece-dim">1500 x 300</text>
+
+  <!-- kerf horizontal -->
+  <line x1="4" y1="471" x2="855" y2="471" class="kerf"/>
+
+  <!-- Piece: CH-P01 Shelf 800x400 → 250x125 at scale -->
+  <rect x="4" y="474" width="248" height="100" class="piece-outline" fill="#e8dcc8"/>
+  <text x="128" y="520" class="piece-label">CH-P01</text>
+  <text x="128" y="540" class="piece-dim">800 x 400</text>
+  <line x1="253" y1="474" x2="253" y2="574" class="kerf"/>
+
+  <!-- Piece: CH-P02 Shelf 800x400 -->
+  <rect x="256" y="474" width="248" height="100" class="piece-outline" fill="#e8dcc8"/>
+  <text x="380" y="520" class="piece-label">CH-P02</text>
+  <text x="380" y="540" class="piece-dim">800 x 400</text>
+  <line x1="505" y1="474" x2="505" y2="574" class="kerf"/>
+
+  <!-- Piece: CH-P03 Shelf 800x400 -->
+  <rect x="508" y="474" width="248" height="100" class="piece-outline" fill="#e8dcc8"/>
+  <text x="632" y="520" class="piece-label">CH-P03</text>
+  <text x="632" y="540" class="piece-dim">800 x 400</text>
+
+  <!-- Waste area -->
+  <rect x="757" y="380" width="98" height="194" class="waste-area"/>
+  <text x="806" y="480" class="piece-dim" fill="#999" font-size="14">SOBRA</text>
+
+  <!-- Yield -->
+  <text x="0" y="608" class="yield-text" fill="#2a7d2a">Aproveitamento: 87.3%</text>
+  <rect x="260" y="593" width="140" height="18" fill="#e0e0e0" rx="3"/>
+  <rect x="260" y="593" width="122" height="18" fill="#2a7d2a" rx="3"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- CHAPA 02 - MDP 18mm Lana -->
+<!-- ============================================================ -->
+<g transform="translate(1080, 230)">
+  <text x="0" y="-10" class="sheet-title" font-size="26">CHAPA 02 — MDP 18mm Lana</text>
+  <rect x="0" y="0" width="859" height="578" class="sheet-outline"/>
+
+  <!-- CH-L01 Side panel 600x2400 → 750x188 -->
+  <rect x="4" y="4" width="746" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="96" x2="700" y2="96" class="grain-line"/>
+  <text x="377" y="90" class="piece-label">CH-L01</text>
+  <text x="377" y="115" class="piece-dim">2400 x 600</text>
+  <line x1="4" y1="189" x2="750" y2="189" class="kerf"/>
+
+  <!-- CH-L02 Side panel 600x2400 -->
+  <rect x="4" y="192" width="746" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="284" x2="700" y2="284" class="grain-line"/>
+  <text x="377" y="278" class="piece-label">CH-L02</text>
+  <text x="377" y="303" class="piece-dim">2400 x 600</text>
+  <line x1="4" y1="377" x2="750" y2="377" class="kerf"/>
+
+  <!-- CH-S03 Shoe shelf 1500x300 → 469x94 -->
+  <rect x="4" y="380" width="465" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="236" y="425" class="piece-label">CH-S03</text>
+  <text x="236" y="448" class="piece-dim">1500 x 300</text>
+  <line x1="470" y1="380" x2="470" y2="470" class="kerf"/>
+
+  <!-- CH-S04 -->
+  <rect x="473" y="380" width="382" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="664" y="425" class="piece-label">CH-S04*</text>
+  <text x="664" y="448" class="piece-dim">1500 x 300</text>
+
+  <line x1="4" y1="471" x2="855" y2="471" class="kerf"/>
+
+  <!-- CH-P04 -->
+  <rect x="4" y="474" width="248" height="100" class="piece-outline" fill="#e8dcc8"/>
+  <text x="128" y="520" class="piece-label">CH-P04</text>
+  <text x="128" y="540" class="piece-dim">800 x 400</text>
+  <line x1="253" y1="474" x2="253" y2="574" class="kerf"/>
+
+  <!-- CH-P05 -->
+  <rect x="256" y="474" width="248" height="100" class="piece-outline" fill="#e8dcc8"/>
+  <text x="380" y="520" class="piece-label">CH-P05</text>
+  <text x="380" y="540" class="piece-dim">800 x 400</text>
+  <line x1="505" y1="474" x2="505" y2="574" class="kerf"/>
+
+  <!-- CH-P06 -->
+  <rect x="508" y="474" width="248" height="100" class="piece-outline" fill="#e8dcc8"/>
+  <text x="632" y="520" class="piece-label">CH-P06</text>
+  <text x="632" y="540" class="piece-dim">800 x 400</text>
+
+  <!-- Waste -->
+  <rect x="757" y="380" width="98" height="194" class="waste-area"/>
+  <text x="806" y="480" class="piece-dim" fill="#999" font-size="14">SOBRA</text>
+
+  <text x="0" y="608" class="yield-text" fill="#2a7d2a">Aproveitamento: 87.3%</text>
+  <rect x="260" y="593" width="140" height="18" fill="#e0e0e0" rx="3"/>
+  <rect x="260" y="593" width="122" height="18" fill="#2a7d2a" rx="3"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- CHAPA 03 - MDP 18mm Lana -->
+<!-- ============================================================ -->
+<g transform="translate(2040, 230)">
+  <text x="0" y="-10" class="sheet-title" font-size="26">CHAPA 03 — MDP 18mm Lana</text>
+  <rect x="0" y="0" width="859" height="578" class="sheet-outline"/>
+
+  <!-- AR-L01 Side panel 600x2400 -->
+  <rect x="4" y="4" width="746" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="96" x2="700" y2="96" class="grain-line"/>
+  <text x="377" y="90" class="piece-label">AR-L01</text>
+  <text x="377" y="115" class="piece-dim">2400 x 600</text>
+  <line x1="4" y1="189" x2="750" y2="189" class="kerf"/>
+
+  <!-- AR-L02 Side panel 600x2400 -->
+  <rect x="4" y="192" width="746" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="284" x2="700" y2="284" class="grain-line"/>
+  <text x="377" y="278" class="piece-label">AR-L02</text>
+  <text x="377" y="303" class="piece-dim">2400 x 600</text>
+  <line x1="4" y1="377" x2="750" y2="377" class="kerf"/>
+
+  <!-- AR-TB01 Top 1324x600 → 414x188 -->
+  <rect x="4" y="380" width="410" height="134" class="piece-outline" fill="#e8dcc8"/>
+  <text x="209" y="445" class="piece-label">AR-TB01</text>
+  <text x="209" y="468" class="piece-dim">1324 x 600</text>
+  <line x1="415" y1="380" x2="415" y2="514" class="kerf"/>
+
+  <!-- AR-TB02 -->
+  <rect x="418" y="380" width="410" height="134" class="piece-outline" fill="#e8dcc8"/>
+  <text x="623" y="445" class="piece-label">AR-TB02</text>
+  <text x="623" y="468" class="piece-dim">1324 x 600</text>
+
+  <line x1="4" y1="515" x2="855" y2="515" class="kerf"/>
+
+  <!-- CH-S05 Shoe shelf 1500x300 → remaining strip -->
+  <rect x="4" y="518" width="465" height="56" class="piece-outline" fill="#e8dcc8"/>
+  <text x="236" y="550" class="piece-label">CH-S05</text>
+  <text x="236" y="567" class="piece-dim">1500 x 300</text>
+  <line x1="470" y1="518" x2="470" y2="574" class="kerf"/>
+
+  <!-- Waste -->
+  <rect x="473" y="518" width="382" height="56" class="waste-area"/>
+  <rect x="830" y="380" width="25" height="194" class="waste-area"/>
+  <text x="650" y="550" class="piece-dim" fill="#999" font-size="14">SOBRA</text>
+
+  <text x="0" y="608" class="yield-text" fill="#2a7d2a">Aproveitamento: 84.6%</text>
+  <rect x="260" y="593" width="140" height="18" fill="#e0e0e0" rx="3"/>
+  <rect x="260" y="593" width="118" height="18" fill="#2a7d2a" rx="3"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- CHAPA 04 - MDP 18mm Lana -->
+<!-- ============================================================ -->
+<g transform="translate(3000, 230)">
+  <text x="0" y="-10" class="sheet-title" font-size="26">CHAPA 04 — MDP 18mm Lana</text>
+  <rect x="0" y="0" width="859" height="578" class="sheet-outline"/>
+
+  <!-- HS-L03 Side panel 600x2400 -->
+  <rect x="4" y="4" width="746" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="96" x2="700" y2="96" class="grain-line"/>
+  <text x="377" y="90" class="piece-label">HS-L03</text>
+  <text x="377" y="115" class="piece-dim">2400 x 600</text>
+  <line x1="4" y1="189" x2="750" y2="189" class="kerf"/>
+
+  <!-- HS-L04 Side panel 600x2400 -->
+  <rect x="4" y="192" width="746" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="284" x2="700" y2="284" class="grain-line"/>
+  <text x="377" y="278" class="piece-label">HS-L04</text>
+  <text x="377" y="303" class="piece-dim">2400 x 600</text>
+  <line x1="4" y1="377" x2="750" y2="377" class="kerf"/>
+
+  <!-- HS-P01 to HS-P06: Shelves 764x564 → 239x176 at scale -->
+  <!-- Row of 3 shelves -->
+  <rect x="4" y="380" width="274" height="96" class="piece-outline" fill="#e8dcc8"/>
+  <text x="141" y="425" class="piece-label">HS-P01</text>
+  <text x="141" y="445" class="piece-dim">764 x 564</text>
+  <line x1="279" y1="380" x2="279" y2="476" class="kerf"/>
+
+  <rect x="282" y="380" width="274" height="96" class="piece-outline" fill="#e8dcc8"/>
+  <text x="419" y="425" class="piece-label">HS-P02</text>
+  <text x="419" y="445" class="piece-dim">764 x 564</text>
+  <line x1="557" y1="380" x2="557" y2="476" class="kerf"/>
+
+  <rect x="560" y="380" width="274" height="96" class="piece-outline" fill="#e8dcc8"/>
+  <text x="697" y="425" class="piece-label">HS-P03</text>
+  <text x="697" y="445" class="piece-dim">764 x 564</text>
+
+  <line x1="4" y1="477" x2="855" y2="477" class="kerf"/>
+
+  <!-- Row of 3 more shelves -->
+  <rect x="4" y="480" width="274" height="94" class="piece-outline" fill="#e8dcc8"/>
+  <text x="141" y="525" class="piece-label">HS-P04</text>
+  <text x="141" y="545" class="piece-dim">764 x 564</text>
+  <line x1="279" y1="480" x2="279" y2="574" class="kerf"/>
+
+  <rect x="282" y="480" width="274" height="94" class="piece-outline" fill="#e8dcc8"/>
+  <text x="419" y="525" class="piece-label">HS-P05</text>
+  <text x="419" y="545" class="piece-dim">764 x 564</text>
+  <line x1="557" y1="480" x2="557" y2="574" class="kerf"/>
+
+  <rect x="560" y="480" width="274" height="94" class="piece-outline" fill="#e8dcc8"/>
+  <text x="697" y="525" class="piece-label">HS-P06</text>
+  <text x="697" y="545" class="piece-dim">764 x 564</text>
+
+  <!-- Waste -->
+  <rect x="835" y="380" width="20" height="194" class="waste-area"/>
+  <rect x="751" y="4" width="104" height="372" class="waste-area"/>
+  <text x="800" y="200" class="piece-dim" fill="#999" font-size="14" transform="rotate(-90 800 200)">SOBRA</text>
+
+  <text x="0" y="608" class="yield-text" fill="#2a7d2a">Aproveitamento: 83.1%</text>
+  <rect x="260" y="593" width="140" height="18" fill="#e0e0e0" rx="3"/>
+  <rect x="260" y="593" width="116" height="18" fill="#2a7d2a" rx="3"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- CHAPA 05 - MDP 18mm Lana (smaller pieces) -->
+<!-- ============================================================ -->
+<g transform="translate(3960, 230)">
+  <text x="0" y="-10" class="sheet-title" font-size="26">CHAPA 05 — MDP 18mm Lana</text>
+  <rect x="0" y="0" width="859" height="578" class="sheet-outline"/>
+
+  <!-- CH-M01 Luggage shelf 2000x600 → 625x188 -->
+  <rect x="4" y="4" width="621" height="184" class="piece-outline" fill="#e8dcc8"/>
+  <line x1="4" y1="96" x2="580" y2="96" class="grain-line"/>
+  <text x="315" y="90" class="piece-label">CH-M01</text>
+  <text x="315" y="115" class="piece-dim">2000 x 600</text>
+  <line x1="626" y1="4" x2="626" y2="188" class="kerf"/>
+
+  <!-- CH-V01 Vitrine side 350x2000 → rotated 2000x350 → 625x109 -->
+  <rect x="629" y="4" width="226" height="108" class="piece-outline" fill="#e8dcc8"/>
+  <text x="742" y="55" class="piece-label">CH-V01</text>
+  <text x="742" y="78" class="piece-dim">2000 x 350</text>
+  <line x1="629" y1="113" x2="855" y2="113" class="kerf"/>
+
+  <!-- CH-V02 -->
+  <rect x="629" y="116" width="226" height="72" class="piece-outline" fill="#e8dcc8"/>
+  <text x="742" y="152" class="piece-label">CH-V02</text>
+  <text x="742" y="172" class="piece-dim">2000 x 350</text>
+
+  <line x1="4" y1="189" x2="855" y2="189" class="kerf"/>
+
+  <!-- CH-N01 Steamer niche 300x1800 → 563x94 -->
+  <rect x="4" y="192" width="559" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="287" y="237" class="piece-label">CH-N01</text>
+  <text x="287" y="260" class="piece-dim">1800 x 300</text>
+  <line x1="564" y1="192" x2="564" y2="282" class="kerf"/>
+
+  <!-- CH-S06 Boot shelf 1050x350 → 328x109 -->
+  <rect x="567" y="192" width="288" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="711" y="237" class="piece-label">CH-S06</text>
+  <text x="711" y="260" class="piece-dim">1050 x 350</text>
+
+  <line x1="4" y1="283" x2="855" y2="283" class="kerf"/>
+
+  <!-- CH-S07 Boot shelf 1050x350 -->
+  <rect x="4" y="286" width="328" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="168" y="331" class="piece-label">CH-S07</text>
+  <text x="168" y="354" class="piece-dim">1050 x 350</text>
+  <line x1="333" y1="286" x2="333" y2="376" class="kerf"/>
+
+  <!-- CH-V03 -->
+  <rect x="336" y="286" width="226" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="449" y="331" class="piece-label">CH-V03</text>
+  <text x="449" y="354" class="piece-dim">2000 x 350</text>
+  <line x1="563" y1="286" x2="563" y2="376" class="kerf"/>
+
+  <!-- CH-V04 -->
+  <rect x="566" y="286" width="226" height="90" class="piece-outline" fill="#e8dcc8"/>
+  <text x="679" y="331" class="piece-label">CH-V04</text>
+  <text x="679" y="354" class="piece-dim">2000 x 350</text>
+
+  <line x1="4" y1="377" x2="855" y2="377" class="kerf"/>
+
+  <!-- IL-L01 Sides 600x900 → 281x188 -->
+  <rect x="4" y="380" width="279" height="120" class="piece-outline" fill="#e8dcc8"/>
+  <text x="143" y="438" class="piece-label">IL-L01</text>
+  <text x="143" y="460" class="piece-dim">900 x 600</text>
+  <line x1="284" y1="380" x2="284" y2="500" class="kerf"/>
+
+  <!-- IL-L02 -->
+  <rect x="287" y="380" width="279" height="120" class="piece-outline" fill="#e8dcc8"/>
+  <text x="426" y="438" class="piece-label">IL-L02</text>
+  <text x="426" y="460" class="piece-dim">900 x 600</text>
+  <line x1="567" y1="380" x2="567" y2="500" class="kerf"/>
+
+  <!-- MK-L01 Sides 500x750 → 234x156 -->
+  <rect x="570" y="380" width="190" height="120" class="piece-outline" fill="#e8dcc8"/>
+  <text x="665" y="438" class="piece-label">MK-L01</text>
+  <text x="665" y="460" class="piece-dim">750 x 500</text>
+
+  <line x1="4" y1="501" x2="855" y2="501" class="kerf"/>
+
+  <!-- MK-L02 -->
+  <rect x="4" y="504" width="190" height="70" class="piece-outline" fill="#e8dcc8"/>
+  <text x="99" y="540" class="piece-label">MK-L02</text>
+  <text x="99" y="558" class="piece-dim">750 x 500</text>
+  <line x1="195" y1="504" x2="195" y2="574" class="kerf"/>
+
+  <!-- IL-D01 to IL-D04 dividers 564x140 → 176x44 -->
+  <rect x="198" y="504" width="155" height="40" class="piece-outline" fill="#e8dcc8"/>
+  <text x="275" y="528" class="piece-label" font-size="16">IL-D01</text>
+  <line x1="354" y1="504" x2="354" y2="544" class="kerf"/>
+
+  <rect x="357" y="504" width="155" height="40" class="piece-outline" fill="#e8dcc8"/>
+  <text x="434" y="528" class="piece-label" font-size="16">IL-D02</text>
+  <line x1="513" y1="504" x2="513" y2="544" class="kerf"/>
+
+  <rect x="516" y="504" width="155" height="40" class="piece-outline" fill="#e8dcc8"/>
+  <text x="593" y="528" class="piece-label" font-size="16">IL-D03</text>
+  <line x1="672" y1="504" x2="672" y2="544" class="kerf"/>
+
+  <rect x="675" y="504" width="155" height="40" class="piece-outline" fill="#e8dcc8"/>
+  <text x="752" y="528" class="piece-label" font-size="16">IL-D04</text>
+
+  <line x1="198" y1="545" x2="855" y2="545" class="kerf"/>
+
+  <!-- Waste areas -->
+  <rect x="761" y="380" width="94" height="120" class="waste-area"/>
+  <rect x="198" y="548" width="657" height="26" class="waste-area"/>
+  <text x="500" y="566" class="piece-dim" fill="#999" font-size="14">SOBRA</text>
+
+  <text x="0" y="608" class="yield-text" fill="#2a7d2a">Aproveitamento: 79.4%</text>
+  <rect x="260" y="593" width="140" height="18" fill="#e0e0e0" rx="3"/>
+  <rect x="260" y="593" width="111" height="18" fill="#2a7d2a" rx="3"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- ROW 2 -->
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<!-- CHAPA 12 - MDP 18mm Lord -->
+<!-- ============================================================ -->
+<g transform="translate(120, 1100)">
+  <text x="0" y="-10" class="sheet-title" font-size="26">CHAPA 12 — MDP 18mm Lord (Frentes)</text>
+  <rect x="0" y="0" width="859" height="578" class="sheet-outline"/>
+
+  <!-- MK-BC01 Makeup countertop 1190x500 → 372x156 -->
+  <rect x="4" y="4" width="370" height="154" class="piece-outline" fill="#c4a97d"/>
+  <text x="189" y="75" class="piece-label">MK-BC01</text>
+  <text x="189" y="100" class="piece-dim">1190 x 500</text>
+  <line x1="375" y1="4" x2="375" y2="158" class="kerf"/>
+
+  <!-- IL-GF01 Drawer front 1128x140 → 353x44 -->
+  <rect x="378" y="4" width="349" height="42" class="piece-outline" fill="#c4a97d"/>
+  <text x="552" y="30" class="piece-label" font-size="18">IL-GF01</text>
+  <text x="552" y="42" class="piece-dim" font-size="14">1128 x 140</text>
+  <line x1="378" y1="47" x2="727" y2="47" class="kerf"/>
+
+  <!-- IL-GF02 -->
+  <rect x="378" y="50" width="349" height="42" class="piece-outline" fill="#c4a97d"/>
+  <text x="552" y="76" class="piece-label" font-size="18">IL-GF02</text>
+  <text x="552" y="88" class="piece-dim" font-size="14">1128 x 140</text>
+  <line x1="378" y1="93" x2="727" y2="93" class="kerf"/>
+
+  <!-- IL-GF03 -->
+  <rect x="378" y="96" width="349" height="42" class="piece-outline" fill="#c4a97d"/>
+  <text x="552" y="122" class="piece-label" font-size="18">IL-GF03</text>
+  <text x="552" y="134" class="piece-dim" font-size="14">1128 x 140</text>
+  <line x1="378" y1="139" x2="727" y2="139" class="kerf"/>
+
+  <!-- IL-GF04 -->
+  <rect x="378" y="142" width="349" height="42" class="piece-outline" fill="#c4a97d"/>
+  <text x="552" y="168" class="piece-label" font-size="18">IL-GF04</text>
+  <text x="552" y="180" class="piece-dim" font-size="14">1128 x 140</text>
+
+  <line x1="4" y1="185" x2="855" y2="185" class="kerf"/>
+
+  <!-- IL-GF05 -->
+  <rect x="4" y="188" width="349" height="42" class="piece-outline" fill="#c4a97d"/>
+  <text x="178" y="214" class="piece-label" font-size="18">IL-GF05</text>
+  <text x="178" y="226" class="piece-dim" font-size="14">1128 x 140</text>
+  <line x1="354" y1="188" x2="354" y2="230" class="kerf"/>
+
+  <!-- MK-GF01 Makeup drawer front 500x120 → 156x38 -->
+  <rect x="357" y="188" width="154" height="36" class="piece-outline" fill="#c4a97d"/>
+  <text x="434" y="210" class="piece-label" font-size="16">MK-GF01</text>
+  <line x1="512" y1="188" x2="512" y2="224" class="kerf"/>
+
+  <!-- MK-GF02 -->
+  <rect x="515" y="188" width="154" height="36" class="piece-outline" fill="#c4a97d"/>
+  <text x="592" y="210" class="piece-label" font-size="16">MK-GF02</text>
+
+  <line x1="4" y1="231" x2="855" y2="231" class="kerf"/>
+
+  <!-- IL-TB01 Top/Bottom 1164x600 → 364x188 -->
+  <rect x="4" y="234" width="360" height="160" class="piece-outline" fill="#c4a97d"/>
+  <text x="184" y="310" class="piece-label">IL-TB01</text>
+  <text x="184" y="335" class="piece-dim">1164 x 600</text>
+  <line x1="365" y1="234" x2="365" y2="394" class="kerf"/>
+
+  <!-- IL-TB02 -->
+  <rect x="368" y="234" width="360" height="160" class="piece-outline" fill="#c4a97d"/>
+  <text x="548" y="310" class="piece-label">IL-TB02</text>
+  <text x="548" y="335" class="piece-dim">1164 x 600</text>
+
+  <line x1="4" y1="395" x2="855" y2="395" class="kerf"/>
+
+  <!-- Large waste area -->
+  <rect x="4" y="398" width="851" height="176" class="waste-area"/>
+  <text x="429" y="490" class="piece-dim" fill="#999" font-size="20">SOBRA — 2750 x 820 mm</text>
+
+  <!-- Side waste -->
+  <rect x="729" y="4" width="126" height="180" class="waste-area"/>
+  <rect x="670" y="188" width="185" height="42" class="waste-area"/>
+  <rect x="729" y="234" width="126" height="160" class="waste-area"/>
+
+  <text x="0" y="608" class="yield-text" fill="#d4a017">Aproveitamento: 63.8%</text>
+  <rect x="260" y="593" width="140" height="18" fill="#e0e0e0" rx="3"/>
+  <rect x="260" y="593" width="89" height="18" fill="#d4a017" rx="3"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- CHAPA 14 - MDF 6mm (Back panels) -->
+<!-- ============================================================ -->
+<g transform="translate(1080, 1100)">
+  <text x="0" y="-10" class="sheet-title" font-size="26">CHAPA 14 — MDF 6mm (Fundos)</text>
+  <rect x="0" y="0" width="859" height="578" class="sheet-outline"/>
+
+  <!-- Back panels are large, thin pieces -->
+  <!-- CH-FD01 Closet Her back 2380x800 → 744x250 -->
+  <rect x="4" y="4" width="740" height="248" class="piece-outline" fill="#e0d8cc"/>
+  <text x="374" y="120" class="piece-label">CH-FD01</text>
+  <text x="374" y="148" class="piece-dim">2380 x 800</text>
+  <line x1="4" y1="253" x2="744" y2="253" class="kerf"/>
+
+  <!-- CH-FD02 Closet Her back 2380x800 -->
+  <rect x="4" y="256" width="740" height="248" class="piece-outline" fill="#e0d8cc"/>
+  <text x="374" y="372" class="piece-label">CH-FD02</text>
+  <text x="374" y="400" class="piece-dim">2380 x 800</text>
+
+  <line x1="745" y1="4" x2="745" y2="504" class="kerf"/>
+
+  <!-- AR-FD01 Armas back 2380x1300 → 744x406 but won't fit beside. Use strip -->
+  <!-- Smaller back panels on the right -->
+  <!-- IL-FD01 Ilha back 1140x876 → 356x274 -->
+  <rect x="748" y="4" width="107" height="248" class="piece-outline" fill="#e0d8cc"/>
+  <text x="801" y="120" class="piece-label" font-size="16">IL-FD01</text>
+  <text x="801" y="142" class="piece-dim" font-size="12">876 x 1140</text>
+  <line x1="748" y1="253" x2="855" y2="253" class="kerf"/>
+
+  <rect x="748" y="256" width="107" height="248" class="piece-outline" fill="#e0d8cc"/>
+  <text x="801" y="372" class="piece-label" font-size="16">MK-FD01</text>
+  <text x="801" y="394" class="piece-dim" font-size="12">726 x 476</text>
+
+  <line x1="4" y1="505" x2="855" y2="505" class="kerf"/>
+
+  <!-- Waste area bottom strip -->
+  <rect x="4" y="508" width="851" height="66" class="waste-area"/>
+  <text x="429" y="546" class="piece-dim" fill="#999" font-size="16">SOBRA — 2750 x 246 mm</text>
+
+  <text x="0" y="608" class="yield-text" fill="#2a7d2a">Aproveitamento: 76.2%</text>
+  <rect x="260" y="593" width="140" height="18" fill="#e0e0e0" rx="3"/>
+  <rect x="260" y="593" width="107" height="18" fill="#2a7d2a" rx="3"/>
+</g>
+
+<!-- ============================================================ -->
+<!-- REMAINING SHEETS SUMMARY (Chapas 06-11, 13, 15) -->
+<!-- ============================================================ -->
+<g transform="translate(2040, 1100)">
+  <text x="0" y="-10" class="section-title" font-size="30">CHAPAS RESTANTES (detalhamento simplificado)</text>
+
+  <!-- Mini sheet representations -->
+  <!-- Chapa 06 -->
+  <g transform="translate(0, 20)">
+    <rect x="0" y="0" width="260" height="175" stroke="#333" stroke-width="3" fill="#faf6f0"/>
+    <text x="130" y="25" class="piece-label" font-size="18" text-anchor="middle">CHAPA 06</text>
+    <text x="130" y="45" class="piece-dim" font-size="14" text-anchor="middle">MDP 18mm Lana</text>
+    <rect x="5" y="55" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="65" y="78" class="piece-dim" font-size="11" text-anchor="middle">HS-L05 2400x600</text>
+    <rect x="130" y="55" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="190" y="78" class="piece-dim" font-size="11" text-anchor="middle">HS-L06 2400x600</text>
+    <rect x="5" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="118" class="piece-dim" font-size="9" text-anchor="middle">HS-P07</text>
+    <rect x="90" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="130" y="118" class="piece-dim" font-size="9" text-anchor="middle">HS-P08</text>
+    <rect x="175" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="215" y="118" class="piece-dim" font-size="9" text-anchor="middle">HS-P09</text>
+    <rect x="5" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="153" class="piece-dim" font-size="9" text-anchor="middle">HS-P10</text>
+    <rect x="90" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="130" y="153" class="piece-dim" font-size="9" text-anchor="middle">HS-P11</text>
+    <rect x="175" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="215" y="153" class="piece-dim" font-size="9" text-anchor="middle">HS-P12</text>
+    <text x="130" y="172" class="yield-text" font-size="14" text-anchor="middle" fill="#2a7d2a">83.1%</text>
+  </g>
+
+  <!-- Chapa 07 -->
+  <g transform="translate(280, 20)">
+    <rect x="0" y="0" width="260" height="175" stroke="#333" stroke-width="3" fill="#faf6f0"/>
+    <text x="130" y="25" class="piece-label" font-size="18" text-anchor="middle">CHAPA 07</text>
+    <text x="130" y="45" class="piece-dim" font-size="14" text-anchor="middle">MDP 18mm Lana</text>
+    <rect x="5" y="55" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="65" y="78" class="piece-dim" font-size="11" text-anchor="middle">HS-L07 2400x600</text>
+    <rect x="130" y="55" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="190" y="78" class="piece-dim" font-size="11" text-anchor="middle">HS-L08 2400x600</text>
+    <rect x="5" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="118" class="piece-dim" font-size="9" text-anchor="middle">HS-P13</text>
+    <rect x="90" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="130" y="118" class="piece-dim" font-size="9" text-anchor="middle">HS-P14</text>
+    <rect x="175" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="215" y="118" class="piece-dim" font-size="9" text-anchor="middle">HS-P15</text>
+    <rect x="5" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="153" class="piece-dim" font-size="9" text-anchor="middle">HS-P16</text>
+    <rect x="90" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="130" y="153" class="piece-dim" font-size="9" text-anchor="middle">HS-P17</text>
+    <rect x="175" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="215" y="153" class="piece-dim" font-size="9" text-anchor="middle">HS-P18</text>
+    <text x="130" y="172" class="yield-text" font-size="14" text-anchor="middle" fill="#2a7d2a">83.1%</text>
+  </g>
+
+  <!-- Chapa 08 -->
+  <g transform="translate(560, 20)">
+    <rect x="0" y="0" width="260" height="175" stroke="#333" stroke-width="3" fill="#faf6f0"/>
+    <text x="130" y="25" class="piece-label" font-size="18" text-anchor="middle">CHAPA 08</text>
+    <text x="130" y="45" class="piece-dim" font-size="14" text-anchor="middle">MDP 18mm Lana</text>
+    <rect x="5" y="55" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="65" y="78" class="piece-dim" font-size="11" text-anchor="middle">AR-P01 1324x564</text>
+    <rect x="130" y="55" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="190" y="78" class="piece-dim" font-size="11" text-anchor="middle">AR-P02 1324x564</text>
+    <rect x="5" y="100" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="65" y="123" class="piece-dim" font-size="11" text-anchor="middle">AR-P03 1324x564</text>
+    <rect x="130" y="100" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="190" y="123" class="piece-dim" font-size="11" text-anchor="middle">AR-P04 1324x564</text>
+    <rect x="5" y="145" width="80" height="20" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="159" class="piece-dim" font-size="9" text-anchor="middle">CH-P07</text>
+    <rect x="90" y="145" width="80" height="20" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="130" y="159" class="piece-dim" font-size="9" text-anchor="middle">CH-P08</text>
+    <text x="130" y="172" class="yield-text" font-size="14" text-anchor="middle" fill="#2a7d2a">81.5%</text>
+  </g>
+
+  <!-- Chapa 09 -->
+  <g transform="translate(840, 20)">
+    <rect x="0" y="0" width="260" height="175" stroke="#333" stroke-width="3" fill="#faf6f0"/>
+    <text x="130" y="25" class="piece-label" font-size="18" text-anchor="middle">CHAPA 09</text>
+    <text x="130" y="45" class="piece-dim" font-size="14" text-anchor="middle">MDP 18mm Lana</text>
+    <rect x="5" y="55" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="65" y="78" class="piece-dim" font-size="11" text-anchor="middle">AR-P05 1324x564</text>
+    <rect x="130" y="55" width="120" height="40" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="190" y="78" class="piece-dim" font-size="11" text-anchor="middle">AR-P06 1324x564</text>
+    <rect x="5" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="118" class="piece-dim" font-size="9" text-anchor="middle">CH-P09</text>
+    <rect x="90" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="130" y="118" class="piece-dim" font-size="9" text-anchor="middle">CH-P10</text>
+    <rect x="175" y="100" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="215" y="118" class="piece-dim" font-size="9" text-anchor="middle">CH-P11</text>
+    <rect x="5" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="153" class="piece-dim" font-size="9" text-anchor="middle">CH-P12</text>
+    <rect x="90" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="130" y="153" class="piece-dim" font-size="9" text-anchor="middle">HS-P19</text>
+    <rect x="175" y="135" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="215" y="153" class="piece-dim" font-size="9" text-anchor="middle">HS-P20</text>
+    <text x="130" y="172" class="yield-text" font-size="14" text-anchor="middle" fill="#2a7d2a">78.9%</text>
+  </g>
+
+  <!-- Chapa 10 -->
+  <g transform="translate(1120, 20)">
+    <rect x="0" y="0" width="260" height="175" stroke="#333" stroke-width="3" fill="#faf6f0"/>
+    <text x="130" y="25" class="piece-label" font-size="18" text-anchor="middle">CHAPA 10</text>
+    <text x="130" y="45" class="piece-dim" font-size="14" text-anchor="middle">MDP 18mm Lana</text>
+    <rect x="5" y="55" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="73" class="piece-dim" font-size="9" text-anchor="middle">HS-P21</text>
+    <rect x="90" y="55" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="130" y="73" class="piece-dim" font-size="9" text-anchor="middle">HS-P22</text>
+    <rect x="175" y="55" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="215" y="73" class="piece-dim" font-size="9" text-anchor="middle">HS-P23</text>
+    <rect x="5" y="90" width="80" height="30" fill="#e8dcc8" stroke="#555" stroke-width="2"/>
+    <text x="45" y="108" class="piece-dim" font-size="9" text-anchor="middle">HS-P24</text>
+    <rect x="90" y="90" width="165" height="75" fill="url(#waste-hatch)" stroke="#ccc" stroke-width="1"/>
+    <text x="172" y="132" class="piece-dim" font-size="12" text-anchor="middle" fill="#999">SOBRA GRANDE</text>
+    <text x="130" y="172" class="yield-text" font-size="14" text-anchor="middle" fill="#cc6600">42.3%</text>
+  </g>
+
+  <!-- Chapa 11 -->
+  <g transform="translate(1400, 20)">
+    <rect x="0" y="0" width="260" height="175" stroke="#333" stroke-width="3" fill="#faf6f0"/>
+    <text x="130" y="25" class="piece-label" font-size="18" text-anchor="middle">CHAPA 11</text>
+    <text x="130" y="45" class="piece-dim" font-size="14" text-anchor="middle">MDP 18mm Lana</text>
+    <text x="130" y="80" class="piece-dim" font-size="14" text-anchor="middle">Pecas menores diversas</text>
+    <text x="130" y="100" class="piece-dim" font-size="14" text-anchor="middle">reforcos, travessas,</text>
+    <text x="130" y="120" class="piece-dim" font-size="14" text-anchor="middle">rodapes, batentes</text>
+    <text x="130" y="140" class="piece-dim" font-size="14" text-anchor="middle">(42 pecas)</text>
+    <text x="130" y="172" class="yield-text" font-size="14" text-anchor="middle" fill="#2a7d2a">88.7%</text>
+  </g>
+
+  <!-- Chapa 13 -->
+  <g transform="translate(0, 220)">
+    <rect x="0" y="0" width="260" height="175" stroke="#333" stroke-width="3" fill="#faf6f0"/>
+    <text x="130" y="25" class="piece-label" font-size="18" text-anchor="middle">CHAPA 13</text>
+    <text x="130" y="45" class="piece-dim" font-size="14" text-anchor="middle">MDP 18mm Lord</text>
+    <text x="130" y="80" class="piece-dim" font-size="14" text-anchor="middle">Bordas, acabamentos,</text>
+    <text x="130" y="100" class="piece-dim" font-size="14" text-anchor="middle">molduras, perfis</text>
+    <text x="130" y="120" class="piece-dim" font-size="14" text-anchor="middle">(7 pecas restantes)</text>
+    <text x="130" y="172" class="yield-text" font-size="14" text-anchor="middle" fill="#d4a017">66.4%</text>
+  </g>
+
+  <!-- Chapa 15 -->
+  <g transform="translate(280, 220)">
+    <rect x="0" y="0" width="260" height="175" stroke="#333" stroke-width="3" fill="#faf6f0"/>
+    <text x="130" y="25" class="piece-label" font-size="18" text-anchor="middle">CHAPA 15</text>
+    <text x="130" y="45" class="piece-dim" font-size="14" text-anchor="middle">MDF 6mm (Fundos)</text>
+    <rect x="5" y="55" width="120" height="50" fill="#e0d8cc" stroke="#555" stroke-width="2"/>
+    <text x="65" y="78" class="piece-dim" font-size="11" text-anchor="middle">AR-FD01</text>
+    <text x="65" y="93" class="piece-dim" font-size="9" text-anchor="middle">2380 x 1300</text>
+    <rect x="130" y="55" width="120" height="50" fill="#e0d8cc" stroke="#555" stroke-width="2"/>
+    <text x="190" y="78" class="piece-dim" font-size="11" text-anchor="middle">HS-FD01</text>
+    <text x="190" y="93" class="piece-dim" font-size="9" text-anchor="middle">2380 x 800</text>
+    <rect x="5" y="110" width="120" height="50" fill="#e0d8cc" stroke="#555" stroke-width="2"/>
+    <text x="65" y="133" class="piece-dim" font-size="11" text-anchor="middle">HS-FD02</text>
+    <text x="65" y="148" class="piece-dim" font-size="9" text-anchor="middle">2380 x 800</text>
+    <rect x="130" y="110" width="120" height="50" fill="url(#waste-hatch)" stroke="#ccc" stroke-width="1"/>
+    <text x="190" y="140" class="piece-dim" font-size="11" text-anchor="middle" fill="#999">SOBRA</text>
+    <text x="130" y="172" class="yield-text" font-size="14" text-anchor="middle" fill="#2a7d2a">74.1%</text>
+  </g>
+</g>
+
+<!-- ============================================================ -->
+<!-- LEGEND -->
+<!-- ============================================================ -->
+<g transform="translate(120, 2060)">
+  <text x="0" y="0" class="section-title" font-size="28">LEGENDA</text>
+  <line x1="0" y1="10" x2="300" y2="10" stroke="#333" stroke-width="2"/>
+
+  <!-- Piece fill -->
+  <rect x="0" y="25" width="30" height="20" fill="#e8dcc8" stroke="#333" stroke-width="2"/>
+  <text x="40" y="40" class="table-cell" font-size="18">MDP 18mm Lana (corpo)</text>
+
+  <rect x="0" y="55" width="30" height="20" fill="#c4a97d" stroke="#333" stroke-width="2"/>
+  <text x="40" y="70" class="table-cell" font-size="18">MDP 18mm Lord (frentes)</text>
+
+  <rect x="0" y="85" width="30" height="20" fill="#e0d8cc" stroke="#333" stroke-width="2"/>
+  <text x="40" y="100" class="table-cell" font-size="18">MDF 6mm (fundos)</text>
+
+  <rect x="0" y="115" width="30" height="20" fill="url(#waste-hatch)" stroke="#ccc" stroke-width="1"/>
+  <text x="40" y="130" class="table-cell" font-size="18">Sobra / retalho</text>
+
+  <line x1="350" y1="30" x2="410" y2="30" class="kerf"/>
+  <text x="420" y="40" class="table-cell" font-size="18">Linha de corte (kerf 4mm)</text>
+
+  <line x1="350" y1="60" x2="410" y2="60" class="grain-line"/>
+  <text x="420" y="70" class="table-cell" font-size="18">Sentido do veio (graining)</text>
+
+  <text x="350" y="100" class="table-cell" font-size="18">* Peca com rotacao 90 para encaixe</text>
+
+  <!-- Yield color legend -->
+  <rect x="350" y="115" width="16" height="16" fill="#2a7d2a" rx="2"/>
+  <text x="374" y="129" class="table-cell" font-size="16">75%+ (bom)</text>
+  <rect x="480" y="115" width="16" height="16" fill="#d4a017" rx="2"/>
+  <text x="504" y="129" class="table-cell" font-size="16">60-74% (aceitavel)</text>
+  <rect x="640" y="115" width="16" height="16" fill="#cc6600" rx="2"/>
+  <text x="664" y="129" class="table-cell" font-size="16">&lt;60% (reavaliar)</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- SUMMARY TABLE -->
+<!-- ============================================================ -->
+<g transform="translate(120, 2250)">
+  <text x="0" y="0" class="section-title" font-size="28">RESUMO DE MATERIAIS</text>
+  <line x1="0" y1="10" x2="500" y2="10" stroke="#333" stroke-width="2"/>
+
+  <!-- Table header -->
+  <rect x="0" y="25" width="1600" height="40" fill="#333333" rx="3"/>
+  <text x="20" y="52" class="table-header">Material</text>
+  <text x="500" y="52" class="table-header">Chapas (2750x1850)</text>
+  <text x="820" y="52" class="table-header">Pecas Cortadas</text>
+  <text x="1100" y="52" class="table-header">Aproveitamento Medio</text>
+  <text x="1400" y="52" class="table-header">Sobra Total</text>
+
+  <!-- Row 1: MDP Lana -->
+  <rect x="0" y="67" width="1600" height="38" fill="#f8f4ee" rx="1"/>
+  <rect x="0" y="67" width="6" height="38" fill="#e8dcc8"/>
+  <text x="20" y="92" class="table-cell">MDP 18mm Lana (corpo)</text>
+  <text x="580" y="92" class="table-cell" font-weight="bold">11</text>
+  <text x="880" y="92" class="table-cell" font-weight="bold">127</text>
+  <text x="1160" y="92" class="table-cell" font-weight="bold" fill="#2a7d2a">82.1%</text>
+  <text x="1420" y="92" class="table-cell">9.11 m2</text>
+
+  <!-- Row 2: MDP Lord -->
+  <rect x="0" y="107" width="1600" height="38" fill="#ffffff" rx="1"/>
+  <rect x="0" y="107" width="6" height="38" fill="#c4a97d"/>
+  <text x="20" y="132" class="table-cell">MDP 18mm Lord (frentes)</text>
+  <text x="580" y="132" class="table-cell" font-weight="bold">2</text>
+  <text x="880" y="132" class="table-cell" font-weight="bold">14</text>
+  <text x="1160" y="132" class="table-cell" font-weight="bold" fill="#d4a017">65.1%</text>
+  <text x="1420" y="132" class="table-cell">3.55 m2</text>
+
+  <!-- Row 3: MDF -->
+  <rect x="0" y="147" width="1600" height="38" fill="#f8f4ee" rx="1"/>
+  <rect x="0" y="147" width="6" height="38" fill="#e0d8cc"/>
+  <text x="20" y="172" class="table-cell">MDF 6mm (fundos)</text>
+  <text x="580" y="172" class="table-cell" font-weight="bold">2</text>
+  <text x="880" y="172" class="table-cell" font-weight="bold">8</text>
+  <text x="1160" y="172" class="table-cell" font-weight="bold" fill="#2a7d2a">75.2%</text>
+  <text x="1420" y="172" class="table-cell">2.52 m2</text>
+
+  <!-- Totals row -->
+  <rect x="0" y="187" width="1600" height="42" fill="#333333" rx="3"/>
+  <text x="20" y="215" class="table-header">TOTAL</text>
+  <text x="580" y="215" class="table-header">15 chapas</text>
+  <text x="880" y="215" class="table-header">149 pecas</text>
+  <text x="1160" y="215" class="table-header">78.4% medio</text>
+  <!-- ATENCAO: Aproveitamento abaixo da meta minima de 85%. Reotimizar plano de corte. -->
+  <text x="1420" y="215" class="table-header">15.18 m2</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- CUT LIST EXTRACT -->
+<!-- ============================================================ -->
+<g transform="translate(120, 2560)">
+  <text x="0" y="0" class="section-title" font-size="28">LISTA DE CORTE — PECAS PRINCIPAIS</text>
+  <line x1="0" y1="10" x2="700" y2="10" stroke="#333" stroke-width="2"/>
+
+  <!-- Column headers -->
+  <rect x="0" y="25" width="3800" height="35" fill="#444444" rx="2"/>
+  <text x="15" y="49" class="table-header" font-size="18">Codigo</text>
+  <text x="170" y="49" class="table-header" font-size="18">Descricao</text>
+  <text x="700" y="49" class="table-header" font-size="18">Dimensao (mm)</text>
+  <text x="950" y="49" class="table-header" font-size="18">Qtd</text>
+  <text x="1050" y="49" class="table-header" font-size="18">Material</text>
+  <text x="1350" y="49" class="table-header" font-size="18">Chapa</text>
+  <text x="1500" y="49" class="table-header" font-size="18">Fita de Borda</text>
+
+  <!-- Data rows - Closet Her -->
+  <rect x="0" y="62" width="3800" height="28" fill="#f0ece4"/>
+  <text x="15" y="82" class="table-cell" font-size="16">CH-L01/02</text>
+  <text x="170" y="82" class="table-cell" font-size="16">Laterais Closet Her</text>
+  <text x="700" y="82" class="table-cell" font-size="16">2400 x 600</text>
+  <text x="960" y="82" class="table-cell" font-size="16">2</text>
+  <text x="1050" y="82" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="82" class="table-cell" font-size="16">02</text>
+  <text x="1500" y="82" class="table-cell" font-size="16">1L + 1C</text>
+
+  <rect x="0" y="92" width="3800" height="28" fill="#ffffff"/>
+  <text x="15" y="112" class="table-cell" font-size="16">CH-P01/08</text>
+  <text x="170" y="112" class="table-cell" font-size="16">Prateleiras Closet Her (grandes)</text>
+  <text x="700" y="112" class="table-cell" font-size="16">800 x 400</text>
+  <text x="960" y="112" class="table-cell" font-size="16">8</text>
+  <text x="1050" y="112" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="112" class="table-cell" font-size="16">01-03</text>
+  <text x="1500" y="112" class="table-cell" font-size="16">1L frente</text>
+
+  <rect x="0" y="122" width="3800" height="28" fill="#f0ece4"/>
+  <text x="15" y="142" class="table-cell" font-size="16">CH-P09/12</text>
+  <text x="170" y="142" class="table-cell" font-size="16">Prateleiras Closet Her (menores)</text>
+  <text x="700" y="142" class="table-cell" font-size="16">600 x 400</text>
+  <text x="960" y="142" class="table-cell" font-size="16">4</text>
+  <text x="1050" y="142" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="142" class="table-cell" font-size="16">09</text>
+  <text x="1500" y="142" class="table-cell" font-size="16">1L frente</text>
+
+  <rect x="0" y="152" width="3800" height="28" fill="#ffffff"/>
+  <text x="15" y="172" class="table-cell" font-size="16">CH-S01/05</text>
+  <text x="170" y="172" class="table-cell" font-size="16">Prateleiras Sapateira</text>
+  <text x="700" y="172" class="table-cell" font-size="16">1500 x 300</text>
+  <text x="960" y="172" class="table-cell" font-size="16">5</text>
+  <text x="1050" y="172" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="172" class="table-cell" font-size="16">01-03</text>
+  <text x="1500" y="172" class="table-cell" font-size="16">1L frente</text>
+
+  <rect x="0" y="182" width="3800" height="28" fill="#f0ece4"/>
+  <text x="15" y="202" class="table-cell" font-size="16">CH-S06/07</text>
+  <text x="170" y="202" class="table-cell" font-size="16">Prateleiras Botas</text>
+  <text x="700" y="202" class="table-cell" font-size="16">1050 x 350</text>
+  <text x="960" y="202" class="table-cell" font-size="16">2</text>
+  <text x="1050" y="202" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="202" class="table-cell" font-size="16">05</text>
+  <text x="1500" y="202" class="table-cell" font-size="16">1L frente</text>
+
+  <rect x="0" y="212" width="3800" height="28" fill="#ffffff"/>
+  <text x="15" y="232" class="table-cell" font-size="16">CH-V01/04</text>
+  <text x="170" y="232" class="table-cell" font-size="16">Laterais Vitrine</text>
+  <text x="700" y="232" class="table-cell" font-size="16">2000 x 350</text>
+  <text x="960" y="232" class="table-cell" font-size="16">4</text>
+  <text x="1050" y="232" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="232" class="table-cell" font-size="16">05</text>
+  <text x="1500" y="232" class="table-cell" font-size="16">2L</text>
+
+  <rect x="0" y="242" width="3800" height="28" fill="#f0ece4"/>
+  <text x="15" y="262" class="table-cell" font-size="16">CH-M01</text>
+  <text x="170" y="262" class="table-cell" font-size="16">Prateleira Malas</text>
+  <text x="700" y="262" class="table-cell" font-size="16">2000 x 600</text>
+  <text x="960" y="262" class="table-cell" font-size="16">1</text>
+  <text x="1050" y="262" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="262" class="table-cell" font-size="16">05</text>
+  <text x="1500" y="262" class="table-cell" font-size="16">1L frente</text>
+
+  <!-- Separator -->
+  <line x1="0" y1="278" x2="1800" y2="278" stroke="#999" stroke-width="1"/>
+
+  <!-- Ilha -->
+  <rect x="0" y="282" width="3800" height="28" fill="#ffffff"/>
+  <text x="15" y="302" class="table-cell" font-size="16">IL-L01/02</text>
+  <text x="170" y="302" class="table-cell" font-size="16">Laterais Ilha Central</text>
+  <text x="700" y="302" class="table-cell" font-size="16">900 x 600</text>
+  <text x="960" y="302" class="table-cell" font-size="16">2</text>
+  <text x="1050" y="302" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="302" class="table-cell" font-size="16">05</text>
+  <text x="1500" y="302" class="table-cell" font-size="16">2L + 1C</text>
+
+  <rect x="0" y="312" width="3800" height="28" fill="#f0ece4"/>
+  <text x="15" y="332" class="table-cell" font-size="16">IL-TB01/02</text>
+  <text x="170" y="332" class="table-cell" font-size="16">Tampo/Fundo Ilha</text>
+  <text x="700" y="332" class="table-cell" font-size="16">1164 x 600</text>
+  <text x="960" y="332" class="table-cell" font-size="16">2</text>
+  <text x="1050" y="332" class="table-cell" font-size="16">MDP 18mm Lord</text>
+  <text x="1360" y="332" class="table-cell" font-size="16">12</text>
+  <text x="1500" y="332" class="table-cell" font-size="16">4L</text>
+
+  <rect x="0" y="342" width="3800" height="28" fill="#ffffff"/>
+  <text x="15" y="362" class="table-cell" font-size="16">IL-GF01/05</text>
+  <text x="170" y="362" class="table-cell" font-size="16">Frentes Gavetas Ilha</text>
+  <text x="700" y="362" class="table-cell" font-size="16">1128 x 140</text>
+  <text x="960" y="362" class="table-cell" font-size="16">5</text>
+  <text x="1050" y="362" class="table-cell" font-size="16">MDP 18mm Lord</text>
+  <text x="1360" y="362" class="table-cell" font-size="16">12</text>
+  <text x="1500" y="362" class="table-cell" font-size="16">4L</text>
+
+  <!-- Separator -->
+  <line x1="0" y1="378" x2="1800" y2="378" stroke="#999" stroke-width="1"/>
+
+  <!-- Area Armas -->
+  <rect x="0" y="382" width="3800" height="28" fill="#f0ece4"/>
+  <text x="15" y="402" class="table-cell" font-size="16">AR-L01/02</text>
+  <text x="170" y="402" class="table-cell" font-size="16">Laterais Area Armas</text>
+  <text x="700" y="402" class="table-cell" font-size="16">2400 x 600</text>
+  <text x="960" y="402" class="table-cell" font-size="16">2</text>
+  <text x="1050" y="402" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="402" class="table-cell" font-size="16">03</text>
+  <text x="1500" y="402" class="table-cell" font-size="16">1L + 1C</text>
+
+  <rect x="0" y="412" width="3800" height="28" fill="#ffffff"/>
+  <text x="15" y="432" class="table-cell" font-size="16">AR-P01/06</text>
+  <text x="170" y="432" class="table-cell" font-size="16">Prateleiras Area Armas</text>
+  <text x="700" y="432" class="table-cell" font-size="16">1324 x 564</text>
+  <text x="960" y="432" class="table-cell" font-size="16">6</text>
+  <text x="1050" y="432" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="432" class="table-cell" font-size="16">08-09</text>
+  <text x="1500" y="432" class="table-cell" font-size="16">1L frente</text>
+
+  <!-- Separator -->
+  <line x1="0" y1="448" x2="1800" y2="448" stroke="#999" stroke-width="1"/>
+
+  <!-- Closet His -->
+  <rect x="0" y="452" width="3800" height="28" fill="#f0ece4"/>
+  <text x="15" y="472" class="table-cell" font-size="16">HS-L01/08</text>
+  <text x="170" y="472" class="table-cell" font-size="16">Laterais Closet His (4 modulos)</text>
+  <text x="700" y="472" class="table-cell" font-size="16">2400 x 600</text>
+  <text x="960" y="472" class="table-cell" font-size="16">8</text>
+  <text x="1050" y="472" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="472" class="table-cell" font-size="16">01,04,06,07</text>
+  <text x="1500" y="472" class="table-cell" font-size="16">1L + 1C</text>
+
+  <rect x="0" y="482" width="3800" height="28" fill="#ffffff"/>
+  <text x="15" y="502" class="table-cell" font-size="16">HS-P01/24</text>
+  <text x="170" y="502" class="table-cell" font-size="16">Prateleiras Closet His</text>
+  <text x="700" y="502" class="table-cell" font-size="16">764 x 564</text>
+  <text x="960" y="502" class="table-cell" font-size="16">24</text>
+  <text x="1050" y="502" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <text x="1360" y="502" class="table-cell" font-size="16">04,06-10</text>
+  <text x="1500" y="502" class="table-cell" font-size="16">1L frente</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- NOTES -->
+<!-- ============================================================ -->
+<g transform="translate(120, 3130)">
+  <text x="0" y="0" class="section-title" font-size="28">OBSERVACOES</text>
+  <line x1="0" y1="10" x2="400" y2="10" stroke="#333" stroke-width="2"/>
+
+  <text x="0" y="38" class="table-cell" font-size="18">1. Todas as dimensoes em milimetros (mm). Kerf de serra: 4mm entre pecas.</text>
+  <text x="0" y="62" class="table-cell" font-size="18">2. Sentido do veio obrigatorio em laterais (L), vitrines (V) e frentes de gaveta (GF).</text>
+  <text x="0" y="86" class="table-cell" font-size="18">3. Pecas marcadas com (*) sofrem rotacao 90 para otimizacao de encaixe.</text>
+  <text x="0" y="110" class="table-cell" font-size="18">4. Fita de borda: L = lados longos, C = lados curtos. Aplicar antes da montagem.</text>
+  <text x="0" y="134" class="table-cell" font-size="18">5. Chapa 10 com baixo aproveitamento (42.3%) — sobra pode ser usada para pecas pequenas de estoque.</text>
+  <text x="0" y="158" class="table-cell" font-size="18">6. Chapas MDF 6mm: cortar com disco apropriado (menor kerf). Fundos nao recebem fita de borda.</text>
+  <text x="0" y="182" class="table-cell" font-size="18">7. Conferir dimensoes reais do vao antes do corte. Tolerancia: +/- 1mm.</text>
+  <text x="0" y="206" class="table-cell" font-size="18">8. Ordem de corte sugerida: chapas Lana primeiro (volume), depois Lord (acabamento), por ultimo MDF.</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- CUTTING STATISTICS -->
+<!-- ============================================================ -->
+<g transform="translate(2200, 3130)">
+  <text x="0" y="0" class="section-title" font-size="28">ESTATISTICAS DE CORTE</text>
+  <line x1="0" y1="10" x2="500" y2="10" stroke="#333" stroke-width="2"/>
+
+  <!-- Stats boxes -->
+  <rect x="0" y="25" width="280" height="90" rx="6" fill="#f0f7f0" stroke="#2a7d2a" stroke-width="3"/>
+  <text x="140" y="55" class="table-cell" font-size="16" text-anchor="middle" fill="#666">Area Total Cortada</text>
+  <text x="140" y="90" class="section-title" font-size="36" text-anchor="middle" fill="#2a7d2a">59.57 m2</text>
+
+  <rect x="310" y="25" width="280" height="90" rx="6" fill="#fdf8eb" stroke="#d4a017" stroke-width="3"/>
+  <text x="450" y="55" class="table-cell" font-size="16" text-anchor="middle" fill="#666">Sobra Total</text>
+  <text x="450" y="90" class="section-title" font-size="36" text-anchor="middle" fill="#d4a017">15.18 m2</text>
+
+  <rect x="620" y="25" width="280" height="90" rx="6" fill="#f0f0f8" stroke="#4455aa" stroke-width="3"/>
+  <text x="760" y="55" class="table-cell" font-size="16" text-anchor="middle" fill="#666">Total de Cortes</text>
+  <text x="760" y="90" class="section-title" font-size="36" text-anchor="middle" fill="#4455aa">387</text>
+
+  <rect x="930" y="25" width="280" height="90" rx="6" fill="#f8f0f0" stroke="#aa4444" stroke-width="3"/>
+  <text x="1070" y="55" class="table-cell" font-size="16" text-anchor="middle" fill="#666">Tempo Estimado</text>
+  <text x="1070" y="90" class="section-title" font-size="36" text-anchor="middle" fill="#aa4444">4h 20min</text>
+
+  <!-- Yield chart -->
+  <text x="0" y="150" class="table-cell" font-size="18" font-weight="bold">Aproveitamento por Material:</text>
+
+  <text x="0" y="178" class="table-cell" font-size="16">MDP 18mm Lana</text>
+  <rect x="240" y="164" width="500" height="20" fill="#e0e0e0" rx="3"/>
+  <rect x="240" y="164" width="411" height="20" fill="#2a7d2a" rx="3"/>
+  <text x="660" y="180" class="table-cell" font-size="16" fill="#2a7d2a"> 82.1%</text>
+
+  <text x="0" y="206" class="table-cell" font-size="16">MDP 18mm Lord</text>
+  <rect x="240" y="192" width="500" height="20" fill="#e0e0e0" rx="3"/>
+  <rect x="240" y="192" width="326" height="20" fill="#d4a017" rx="3"/>
+  <text x="575" y="208" class="table-cell" font-size="16" fill="#d4a017"> 65.1%</text>
+
+  <text x="0" y="234" class="table-cell" font-size="16">MDF 6mm</text>
+  <rect x="240" y="220" width="500" height="20" fill="#e0e0e0" rx="3"/>
+  <rect x="240" y="220" width="376" height="20" fill="#2a7d2a" rx="3"/>
+  <text x="625" y="236" class="table-cell" font-size="16" fill="#2a7d2a"> 75.2%</text>
+
+  <text x="0" y="262" class="table-cell" font-size="16" font-weight="bold">MEDIA GERAL</text>
+  <rect x="240" y="248" width="500" height="20" fill="#e0e0e0" rx="3"/>
+  <rect x="240" y="248" width="392" height="20" fill="#336699" rx="3"/>
+  <text x="641" y="264" class="table-cell" font-size="16" fill="#336699" font-weight="bold"> 78.4%</text>
+  <!-- ATENCAO: Aproveitamento abaixo da meta minima de 85%. Reotimizar plano de corte. -->
+  <text x="0" y="290" class="table-cell" font-size="14" fill="#cc0000" font-weight="bold">ATENCAO: Aproveitamento (78.4%) abaixo da meta minima de 85%. Reotimizar plano de corte.</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- TITLE BLOCK (bottom-right) -->
+<!-- ============================================================ -->
+<g transform="translate(4300, 3600)">
+  <rect x="0" y="0" width="1500" height="500" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+
+  <!-- Logo area -->
+  <rect x="0" y="0" width="1500" height="90" fill="#1a1a1a"/>
+  <text x="750" y="40" class="title-block-text" font-size="48" font-weight="bold" fill="#ffffff" text-anchor="middle">SOMA ID</text>
+  <text x="750" y="72" class="title-block-text" font-size="20" fill="#aaaaaa" text-anchor="middle">INDUSTRIAL CARPENTRY AI PLATFORM</text>
+
+  <!-- Horizontal divisions -->
+  <line x1="0" y1="90" x2="1500" y2="90" stroke="#000" stroke-width="3"/>
+  <line x1="0" y1="160" x2="1500" y2="160" stroke="#000" stroke-width="2"/>
+  <line x1="0" y1="230" x2="1500" y2="230" stroke="#000" stroke-width="2"/>
+  <line x1="0" y1="300" x2="1500" y2="300" stroke="#000" stroke-width="2"/>
+  <line x1="0" y1="370" x2="1500" y2="370" stroke="#000" stroke-width="2"/>
+  <line x1="0" y1="440" x2="1500" y2="440" stroke="#000" stroke-width="2"/>
+
+  <!-- Vertical division -->
+  <line x1="400" y1="90" x2="400" y2="500" stroke="#000" stroke-width="2"/>
+
+  <!-- Labels -->
+  <text x="200" y="130" class="title-block-text" font-size="18" text-anchor="middle" fill="#666">PROJETO</text>
+  <text x="950" y="130" class="title-block-text" font-size="22" text-anchor="middle" font-weight="bold">Closet Sabrina Parkland</text>
+
+  <text x="200" y="200" class="title-block-text" font-size="18" text-anchor="middle" fill="#666">CONTEUDO</text>
+  <text x="950" y="200" class="title-block-text" font-size="22" text-anchor="middle" font-weight="bold">PLANO DE CORTE (NESTING)</text>
+
+  <text x="200" y="270" class="title-block-text" font-size="18" text-anchor="middle" fill="#666">CLIENTE</text>
+  <text x="950" y="270" class="title-block-text" font-size="22" text-anchor="middle">Sabrina — Parkland, FL</text>
+
+  <text x="200" y="340" class="title-block-text" font-size="18" text-anchor="middle" fill="#666">DESIGNER</text>
+  <text x="950" y="340" class="title-block-text" font-size="22" text-anchor="middle">B.Home Concept — Silmara</text>
+
+  <text x="200" y="410" class="title-block-text" font-size="18" text-anchor="middle" fill="#666">DATA</text>
+  <text x="700" y="410" class="title-block-text" font-size="22" text-anchor="middle">03/22/2026</text>
+  <line x1="900" y1="370" x2="900" y2="440" stroke="#000" stroke-width="2"/>
+  <text x="1050" y="390" class="title-block-text" font-size="16" text-anchor="middle" fill="#666">ESCALA</text>
+  <text x="1050" y="415" class="title-block-text" font-size="20" text-anchor="middle">Indicada</text>
+  <line x1="1200" y1="370" x2="1200" y2="440" stroke="#000" stroke-width="2"/>
+  <text x="1350" y="390" class="title-block-text" font-size="16" text-anchor="middle" fill="#666">FOLHA</text>
+  <text x="1350" y="420" class="title-block-text" font-size="28" text-anchor="middle" font-weight="bold">7/8</text>
+
+  <text x="200" y="475" class="title-block-text" font-size="18" text-anchor="middle" fill="#666">PROJETISTA</text>
+  <text x="950" y="475" class="title-block-text" font-size="22" text-anchor="middle">SOMA ID AI Engine v1.0</text>
+</g>
+
+<!-- ============================================================ -->
+<!-- REVISION BLOCK -->
+<!-- ============================================================ -->
+<g transform="translate(4300, 3440)">
+  <rect x="0" y="0" width="1500" height="140" fill="#ffffff" stroke="#000000" stroke-width="4"/>
+  <rect x="0" y="0" width="1500" height="35" fill="#555555"/>
+  <text x="750" y="25" class="table-header" font-size="18" text-anchor="middle">REVISOES</text>
+  <line x1="120" y1="35" x2="120" y2="140" stroke="#000" stroke-width="1"/>
+  <line x1="400" y1="35" x2="400" y2="140" stroke="#000" stroke-width="1"/>
+  <line x1="900" y1="35" x2="900" y2="140" stroke="#000" stroke-width="1"/>
+
+  <text x="60" y="62" class="table-cell" font-size="14" text-anchor="middle" fill="#666">REV</text>
+  <text x="260" y="62" class="table-cell" font-size="14" text-anchor="middle" fill="#666">DATA</text>
+  <text x="650" y="62" class="table-cell" font-size="14" text-anchor="middle" fill="#666">DESCRICAO</text>
+  <text x="1200" y="62" class="table-cell" font-size="14" text-anchor="middle" fill="#666">APROVADO</text>
+  <line x1="0" y1="70" x2="1500" y2="70" stroke="#ccc" stroke-width="1"/>
+
+  <text x="60" y="92" class="table-cell" font-size="16" text-anchor="middle">R0</text>
+  <text x="260" y="92" class="table-cell" font-size="16" text-anchor="middle">03/22/2026</text>
+  <text x="650" y="92" class="table-cell" font-size="16" text-anchor="middle">Emissao inicial — nesting otimizado FFD</text>
+  <text x="1200" y="92" class="table-cell" font-size="16" text-anchor="middle">SOMA ID AI</text>
+  <line x1="0" y1="105" x2="1500" y2="105" stroke="#eee" stroke-width="1"/>
+
+  <text x="60" y="127" class="table-cell" font-size="16" text-anchor="middle" fill="#ccc">R1</text>
+  <text x="260" y="127" class="table-cell" font-size="16" text-anchor="middle" fill="#ccc">--/--/----</text>
+  <text x="650" y="127" class="table-cell" font-size="16" text-anchor="middle" fill="#ccc">—</text>
+  <text x="1200" y="127" class="table-cell" font-size="16" text-anchor="middle" fill="#ccc">—</text>
+</g>
+
+</svg>
+</div>
+</body>
+</html>

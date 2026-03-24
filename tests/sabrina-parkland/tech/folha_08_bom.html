@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMA ID — Closet Sabrina Parkland — Lista de Materiais (BOM) — Folha 8/8</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  }
+  .sheet {
+    background: #ffffff;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    width: 420mm;
+    min-height: 594mm;
+    padding: 12mm 14mm 14mm 14mm;
+    position: relative;
+  }
+  @media print {
+    body { background: none; margin: 0; padding: 0; }
+    .sheet { box-shadow: none; margin: 0; padding: 10mm 12mm 12mm 12mm; width: 100%; min-height: auto; }
+  }
+  @page {
+    size: A3 portrait;
+    margin: 0;
+  }
+
+  /* === BORDERS === */
+  .border-outer {
+    border: 2px solid #000;
+    padding: 2mm;
+  }
+  .border-inner {
+    border: 0.5px solid #000;
+    padding: 6mm 8mm 8mm 8mm;
+  }
+
+  /* === HEADER === */
+  .doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6mm;
+    padding-bottom: 3mm;
+    border-bottom: 2px solid #1a1a1a;
+  }
+  .doc-header-left h1 {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+  }
+  .doc-header-left h2 {
+    font-size: 11pt;
+    font-weight: 400;
+    color: #444;
+    margin-top: 1mm;
+  }
+  .doc-header-right {
+    text-align: right;
+    font-size: 8.5pt;
+    color: #555;
+    line-height: 1.6;
+  }
+  .doc-header-right strong {
+    color: #1a1a1a;
+  }
+
+  /* === TABLE === */
+  .bom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    margin-bottom: 5mm;
+  }
+  .bom-table th,
+  .bom-table td {
+    border: 0.5px solid #999;
+    padding: 1.8mm 2.5mm;
+    text-align: left;
+    vertical-align: middle;
+  }
+  .bom-table th {
+    background: #2c3e50;
+    color: #fff;
+    font-weight: 600;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .bom-table th.num,
+  .bom-table td.num {
+    text-align: center;
+  }
+  .bom-table th.price,
+  .bom-table td.price {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Group header rows */
+  .group-header td {
+    background: #34495e;
+    color: #fff;
+    font-weight: 700;
+    font-size: 8pt;
+    letter-spacing: 0.4px;
+    border-color: #2c3e50;
+    padding: 2.2mm 3mm;
+  }
+
+  /* Alternating rows */
+  .bom-table tbody tr.data-row:nth-child(even) {
+    background: #f7f8fa;
+  }
+  .bom-table tbody tr.data-row:nth-child(odd) {
+    background: #ffffff;
+  }
+  .bom-table tbody tr.data-row:hover {
+    background: #edf2f7;
+  }
+
+  /* Subtotal rows */
+  .subtotal-row td {
+    background: #e8ecf1;
+    font-weight: 700;
+    font-size: 8pt;
+    border-top: 1.5px solid #7f8c8d;
+    color: #2c3e50;
+  }
+
+  /* Grand total */
+  .grand-total td {
+    background: #2c3e50;
+    color: #fff;
+    font-weight: 800;
+    font-size: 9pt;
+    border: 1.5px solid #1a252f;
+    padding: 3mm 3mm;
+  }
+
+  /* === SUMMARY BOXES === */
+  .summary-section {
+    display: flex;
+    gap: 6mm;
+    margin-top: 5mm;
+    margin-bottom: 5mm;
+  }
+  .summary-box {
+    flex: 1;
+    border: 1px solid #bdc3c7;
+    padding: 4mm;
+    background: #fdfdfd;
+  }
+  .summary-box h3 {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #2c3e50;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1.5mm;
+    margin-bottom: 2mm;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .summary-box table {
+    width: 100%;
+    font-size: 8pt;
+    border-collapse: collapse;
+  }
+  .summary-box table td {
+    padding: 0.8mm 0;
+    border: none;
+  }
+  .summary-box table td:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-box table tr.total-line td {
+    border-top: 1px solid #2c3e50;
+    font-weight: 800;
+    padding-top: 1.5mm;
+    font-size: 9pt;
+    color: #2c3e50;
+  }
+
+  /* === NOTES === */
+  .notes-section {
+    margin-top: 4mm;
+    padding: 3mm 4mm;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    font-size: 7.5pt;
+    color: #555;
+    line-height: 1.7;
+  }
+  .notes-section h3 {
+    font-size: 8pt;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1.5mm;
+    text-transform: uppercase;
+  }
+  .notes-section ol {
+    padding-left: 5mm;
+  }
+  .notes-section li {
+    margin-bottom: 0.5mm;
+  }
+
+  /* === TITLE BLOCK (BOTTOM) === */
+  .title-block {
+    margin-top: 6mm;
+    border: 2px solid #1a1a1a;
+    display: flex;
+  }
+  .title-block-logo {
+    width: 35mm;
+    background: #1a1a1a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14pt;
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding: 3mm;
+  }
+  .title-block-info {
+    flex: 1;
+    display: flex;
+  }
+  .title-block-cell {
+    flex: 1;
+    padding: 2.5mm 3mm;
+    border-left: 1px solid #1a1a1a;
+    font-size: 7.5pt;
+    line-height: 1.5;
+  }
+  .title-block-cell .label {
+    font-size: 6.5pt;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .title-block-cell .value {
+    font-weight: 700;
+    color: #1a1a1a;
+    font-size: 8pt;
+  }
+  .title-block-cell.wide {
+    flex: 2;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+<div class="border-outer">
+<div class="border-inner">
+
+<!-- HEADER -->
+<div class="doc-header">
+  <div class="doc-header-left">
+    <h1>LISTA DE MATERIAIS COMPLETA (BOM)</h1>
+    <h2>Closet Sabrina Parkland &mdash; Bill of Materials</h2>
+  </div>
+  <div class="doc-header-right">
+    <strong>SOMA ID</strong><br>
+    Projeto: Sabrina Parkland<br>
+    Escala: N/A &nbsp;|&nbsp; Folha: 8/8<br>
+    Data: 03/22/2026
+  </div>
+</div>
+
+<!-- BOM TABLE -->
+<table class="bom-table">
+<thead>
+  <tr>
+    <th class="num" style="width:6%;">Item</th>
+    <th style="width:7%;">Codigo</th>
+    <th style="width:22%;">Descricao</th>
+    <th style="width:13%;">Material</th>
+    <th style="width:14%;">Dimensoes (mm)</th>
+    <th class="num" style="width:10%;">Qtd</th>
+    <th class="price" style="width:12%;">Preco Unit.</th>
+    <th class="price" style="width:12%;">Preco Total</th>
+  </tr>
+</thead>
+<tbody>
+
+<!-- GROUP 1 -->
+<tr class="group-header"><td colspan="8">GRUPO 1 &mdash; CHAPAS E PAINEIS</td></tr>
+<tr class="data-row">
+  <td class="num">1</td>
+  <td>MP-01</td>
+  <td>Corpo (laterais, prateleiras, divisores)</td>
+  <td>MDP 18mm Lana</td>
+  <td>2750 x 1850 chapa</td>
+  <td class="num">11 chapas (127 pcs)</td>
+  <td class="price">$ 85.00</td>
+  <td class="price">$ 935.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">2</td>
+  <td>MP-02</td>
+  <td>Frentes (gavetas, bancada, detalhes)</td>
+  <td>MDP 18mm Lord</td>
+  <td>2750 x 1850 chapa</td>
+  <td class="num">2 chapas (14 pcs)</td>
+  <td class="price">$ 92.00</td>
+  <td class="price">$ 184.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">3</td>
+  <td>MP-03</td>
+  <td>Paineis de fundo</td>
+  <td>MDF 6mm</td>
+  <td>2750 x 1850 chapa</td>
+  <td class="num">2 chapas (8 pcs)</td>
+  <td class="price">$ 35.00</td>
+  <td class="price">$ 70.00</td>
+</tr>
+<tr class="subtotal-row">
+  <td colspan="6"></td>
+  <td class="price">Subtotal Chapas</td>
+  <td class="price">$ 1,189.00</td>
+</tr>
+
+<!-- GROUP 2 -->
+<tr class="group-header"><td colspan="8">GRUPO 2 &mdash; VIDROS</td></tr>
+<tr class="data-row">
+  <td class="num">4</td>
+  <td>VD-01</td>
+  <td>Prateleiras vitrines bolsas</td>
+  <td>Vidro temperado 6mm</td>
+  <td>1050x350 (x15) + 1200x600 (x1)</td>
+  <td class="num">16 pecas</td>
+  <td class="price">$ 45.00/m&sup2;</td>
+  <td class="price">$ 282.15</td>
+</tr>
+<tr class="data-row">
+  <td class="num">5</td>
+  <td>VD-02</td>
+  <td>Porta area armas + espelho makeup</td>
+  <td>Espelho 4mm</td>
+  <td>1324x2364 + 800x1000</td>
+  <td class="num">2 pecas</td>
+  <td class="price">$ 55.00/m&sup2;</td>
+  <td class="price">$ 216.15</td>
+</tr>
+<tr class="subtotal-row">
+  <td colspan="6"></td>
+  <td class="price">Subtotal Vidros</td>
+  <td class="price">$ 498.30</td>
+</tr>
+
+<!-- GROUP 3 -->
+<tr class="group-header"><td colspan="8">GRUPO 3 &mdash; FERRAGENS &mdash; FIXACAO</td></tr>
+<tr class="data-row">
+  <td class="num">6</td>
+  <td>FG-01</td>
+  <td>Barras cabide cromadas 25mm</td>
+  <td>Aco cromado</td>
+  <td>&Oslash;25mm</td>
+  <td class="num">6.7 m</td>
+  <td class="price">$ 8.00/m</td>
+  <td class="price">$ 53.60</td>
+</tr>
+<tr class="data-row">
+  <td class="num">7</td>
+  <td>FG-02</td>
+  <td>Suportes barra (flanges)</td>
+  <td>Aco cromado</td>
+  <td>&mdash;</td>
+  <td class="num">10 un</td>
+  <td class="price">$ 3.50</td>
+  <td class="price">$ 35.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">8</td>
+  <td>FG-07</td>
+  <td>Suportes de prateleira (shelf pins)</td>
+  <td>Metal zincado</td>
+  <td>&mdash;</td>
+  <td class="num">200 un</td>
+  <td class="price">$ 0.15</td>
+  <td class="price">$ 30.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">9</td>
+  <td>FG-08</td>
+  <td>Pes regulaveis 100mm</td>
+  <td>Plastico/metal</td>
+  <td>&Oslash;50mm H=100mm</td>
+  <td class="num">24 un</td>
+  <td class="price">$ 2.50</td>
+  <td class="price">$ 60.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">10</td>
+  <td>FG-09</td>
+  <td>Kit Minifix + Cavilhas</td>
+  <td>Zamac/madeira</td>
+  <td>&mdash;</td>
+  <td class="num">3 kits</td>
+  <td class="price">$ 45.00</td>
+  <td class="price">$ 135.00</td>
+</tr>
+
+<!-- GROUP 4 -->
+<tr class="group-header"><td colspan="8">GRUPO 4 &mdash; FERRAGENS &mdash; MOVIMENTO</td></tr>
+<tr class="data-row">
+  <td class="num">11</td>
+  <td>FG-03</td>
+  <td>Corredicas telescopicas 500mm soft-close</td>
+  <td>Aco</td>
+  <td>500mm</td>
+  <td class="num">5 pares</td>
+  <td class="price">$ 18.00/par</td>
+  <td class="price">$ 90.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">12</td>
+  <td>FG-04</td>
+  <td>Corredicas telescopicas 450mm soft-close</td>
+  <td>Aco</td>
+  <td>450mm</td>
+  <td class="num">2 pares</td>
+  <td class="price">$ 16.00/par</td>
+  <td class="price">$ 32.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">13</td>
+  <td>FG-05</td>
+  <td>Dobradicas conceito 110&deg; soft-close</td>
+  <td>Aco niquelado</td>
+  <td>110&deg;</td>
+  <td class="num">4 un</td>
+  <td class="price">$ 12.00</td>
+  <td class="price">$ 48.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">14</td>
+  <td>FG-06</td>
+  <td>Puxadores embutidos</td>
+  <td>Zamac escovado</td>
+  <td>&mdash;</td>
+  <td class="num">7 un</td>
+  <td class="price">$ 8.00</td>
+  <td class="price">$ 56.00</td>
+</tr>
+<tr class="subtotal-row">
+  <td colspan="6"></td>
+  <td class="price">Subtotal Ferragens</td>
+  <td class="price">$ 539.60</td>
+</tr>
+
+<!-- GROUP 5 -->
+<tr class="group-header"><td colspan="8">GRUPO 5 &mdash; ACABAMENTOS</td></tr>
+<tr class="data-row">
+  <td class="num">15</td>
+  <td>AC-01</td>
+  <td>Fita de borda Lana 22mm</td>
+  <td>PVC</td>
+  <td>22mm largura</td>
+  <td class="num">180 m</td>
+  <td class="price">$ 0.45/m</td>
+  <td class="price">$ 81.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">16</td>
+  <td>AC-02</td>
+  <td>Fita de borda Lord 22mm</td>
+  <td>PVC</td>
+  <td>22mm largura</td>
+  <td class="num">25 m</td>
+  <td class="price">$ 0.50/m</td>
+  <td class="price">$ 12.50</td>
+</tr>
+<tr class="data-row">
+  <td class="num">17</td>
+  <td>AC-03</td>
+  <td>Veludo cinza divisores ilha</td>
+  <td>Tecido</td>
+  <td>&mdash;</td>
+  <td class="num">0.66 m&sup2;</td>
+  <td class="price">$ 25.00/m&sup2;</td>
+  <td class="price">$ 16.50</td>
+</tr>
+<tr class="subtotal-row">
+  <td colspan="6"></td>
+  <td class="price">Subtotal Acabamentos</td>
+  <td class="price">$ 110.00</td>
+</tr>
+
+<!-- GROUP 6 -->
+<tr class="group-header"><td colspan="8">GRUPO 6 &mdash; LED / ELETRICA</td></tr>
+<tr class="data-row">
+  <td class="num">18</td>
+  <td>EL-01</td>
+  <td>Sensor magnetico porta (reed)</td>
+  <td>&mdash;</td>
+  <td>&mdash;</td>
+  <td class="num">1 un</td>
+  <td class="price">$ 12.00</td>
+  <td class="price">$ 12.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">19</td>
+  <td>EL-02</td>
+  <td>Driver LED 12V 60W</td>
+  <td>&mdash;</td>
+  <td>&mdash;</td>
+  <td class="num">1 un</td>
+  <td class="price">$ 25.00</td>
+  <td class="price">$ 25.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">20</td>
+  <td>EL-03</td>
+  <td>Driver LED 12V 100W</td>
+  <td>&mdash;</td>
+  <td>&mdash;</td>
+  <td class="num">1 un</td>
+  <td class="price">$ 35.00</td>
+  <td class="price">$ 35.00</td>
+</tr>
+<tr class="data-row">
+  <td class="num">21</td>
+  <td>EL-04</td>
+  <td>Fita LED 3000K branco quente</td>
+  <td>&mdash;</td>
+  <td>&mdash;</td>
+  <td class="num">25.29 m</td>
+  <td class="price">$ 4.50/m</td>
+  <td class="price">$ 113.81</td>
+</tr>
+<tr class="subtotal-row">
+  <td colspan="6"></td>
+  <td class="price">Subtotal LED/Eletrica</td>
+  <td class="price">$ 185.81</td>
+</tr>
+
+<!-- GRAND TOTAL -->
+<tr class="grand-total">
+  <td colspan="6" style="text-align:right; padding-right:4mm;">TOTAL GERAL MATERIAIS</td>
+  <td class="price"></td>
+  <td class="price" style="font-size:10pt;">$ 3,157.21</td>
+</tr>
+
+</tbody>
+</table>
+
+<!-- SUMMARY BOXES -->
+<div class="summary-section">
+
+  <!-- COST BREAKDOWN -->
+  <div class="summary-box">
+    <h3>Resumo de Custos</h3>
+    <table>
+      <tr><td>Chapas e Paineis (Grupo 1)</td><td>$ 1,189.00</td></tr>
+      <tr><td>Vidros (Grupo 2)</td><td>$ 498.30</td></tr>
+      <tr><td>Ferragens &mdash; Fixacao (Grupo 3)</td><td>$ 313.60</td></tr>
+      <tr><td>Ferragens &mdash; Movimento (Grupo 4)</td><td>$ 226.00</td></tr>
+      <tr><td>Acabamentos (Grupo 5)</td><td>$ 110.00</td></tr>
+      <tr><td>LED / Eletrica (Grupo 6)</td><td>$ 185.81</td></tr>
+      <tr class="total-line"><td>TOTAL GERAL</td><td>$ 3,157.21</td></tr>
+    </table>
+  </div>
+
+  <!-- COST CATEGORIES -->
+  <div class="summary-box">
+    <h3>Categorias de Custo</h3>
+    <table>
+      <tr><td>Custo Materiais (chapas + vidros)</td><td>$ 1,687.30</td></tr>
+      <tr><td>Custo Ferragens (fixacao + movimento)</td><td>$ 539.60</td></tr>
+      <tr><td>Custo Consumiveis (acabamentos + eletrica)</td><td>$ 295.81</td></tr>
+      <tr class="total-line"><td>TOTAL</td><td>$ 3,157.21</td></tr>
+    </table>
+  </div>
+
+  <!-- WEIGHT ESTIMATE -->
+  <div class="summary-box">
+    <h3>Peso Estimado</h3>
+    <table>
+      <tr><td>MDP 18mm (13 chapas x ~45 kg)</td><td>~585 kg</td></tr>
+      <tr><td>MDF 6mm (2 chapas x ~18 kg)</td><td>~36 kg</td></tr>
+      <tr><td>Vidro / Espelho</td><td>~80 kg</td></tr>
+      <tr><td>Ferragens</td><td>~15 kg</td></tr>
+      <tr class="total-line"><td>PESO TOTAL ESTIMADO</td><td>~716 kg</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<!-- NOTES -->
+<div class="notes-section">
+  <h3>Observacoes</h3>
+  <ol>
+    <li>Precos baseados em valores tipicos de South Florida wholesale.</li>
+    <li>NAO inclui mao de obra, transporte e instalacao.</li>
+    <li>Vidro temperado cortado sob medida &mdash; preco pode variar &plusmn;15%.</li>
+    <li>Espelho porta armas: peca unica grande (1324 x 2364 mm) &mdash; verificar disponibilidade com fornecedor.</li>
+    <li>Todos os precos em USD (dolares americanos).</li>
+  </ol>
+</div>
+
+<!-- TITLE BLOCK -->
+<div class="title-block">
+  <div class="title-block-logo">SOMA ID</div>
+  <div class="title-block-info">
+    <div class="title-block-cell wide">
+      <div class="label">Projeto</div>
+      <div class="value">Closet Sabrina Parkland</div>
+      <div style="font-size:7pt; color:#666; margin-top:0.5mm;">LISTA DE MATERIAIS COMPLETA (BOM)</div>
+    </div>
+    <div class="title-block-cell">
+      <div class="label">Data</div>
+      <div class="value">03/22/2026</div>
+    </div>
+    <div class="title-block-cell">
+      <div class="label">Folha</div>
+      <div class="value">8 / 8</div>
+    </div>
+    <div class="title-block-cell">
+      <div class="label">Projetista</div>
+      <div class="value">SOMA ID AI Engine</div>
+    </div>
+    <div class="title-block-cell">
+      <div class="label">Itens</div>
+      <div class="value">21 itens &bull; 6 grupos</div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</div>
+</body>
+</html>
