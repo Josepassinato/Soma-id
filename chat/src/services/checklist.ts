@@ -167,10 +167,15 @@ const CHECKLIST: CheckRule[] = [
     required: false,
     check: (b) => {
       if (!b.zones || b.zones.length === 0) return "MISSING";
-      const withDims = b.zones.filter(
+      // Freestanding zones (islands) and minor zones don't need explicit dimensions
+      const zonesNeedingDims = b.zones.filter(
+        (z) => z.wall !== "freestanding" && !z.name.toLowerCase().includes("master bath")
+      );
+      if (zonesNeedingDims.length === 0) return "COMPLETE";
+      const withDims = zonesNeedingDims.filter(
         (z) => z.dimensions && (z.dimensions.width_m > 0 || z.dimensions.depth_m > 0)
       );
-      if (withDims.length === b.zones.length) return "COMPLETE";
+      if (withDims.length === zonesNeedingDims.length) return "COMPLETE";
       if (withDims.length > 0) return "PARTIAL";
       return "MISSING";
     },

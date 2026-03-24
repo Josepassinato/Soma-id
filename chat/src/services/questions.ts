@@ -34,8 +34,9 @@ REGRAS OBRIGATORIAS:
 3. Perguntas devem ser em portugues brasileiro, tom profissional mas acessivel
 4. Perguntas devem ser ESPECIFICAS — nao genericas. Use os dados ja conhecidos como contexto
 5. Se uma lacuna pode ser inferida de outros dados, sugira o valor e pergunte confirmacao
-6. Nunca pergunte algo que ja foi respondido no briefing
+6. CRITICO: Analise os DADOS JA CONHECIDOS abaixo com cuidado. Se um campo JA TEM valor preenchido (ex: walls com length_m > 0, zones com dimensions preenchidas, entry_point com width_m > 0), NAO pergunte sobre ele mesmo que apareca na lista de lacunas. A lista de lacunas pode estar desatualizada.
 7. IGNORE lacunas de campos comerciais/CRM — so gere perguntas para lacunas tecnicas
+8. Se o campo gaps_from_interpreter esta vazio ou tem poucos itens, significa que o interpreter ja extraiu quase tudo — retorne array vazio [] se nao houver lacunas REAIS
 
 DADOS JA CONHECIDOS DO BRIEFING:
 {BRIEFING_CONTEXT}
@@ -69,25 +70,28 @@ export async function generateQuestions(
 
   const model = getModel();
 
+  // Send FULL briefing context so Gemini can see what's already known
+  // (not just counts — actual values, dimensions, items)
   const briefingContext = JSON.stringify(
     {
       client: briefing.client,
       project: briefing.project,
-      space: {
-        area: briefing.space?.total_area_m2,
-        ceiling: briefing.space?.ceiling_height_m,
-        walls_count: briefing.space?.walls?.length,
-      },
+      space: briefing.space,
       zones: briefing.zones?.map((z) => ({
         name: z.name,
-        items_count: z.items?.length,
-        has_dimensions: !!z.dimensions,
+        wall: z.wall,
+        position: z.position,
+        dimensions: z.dimensions,
+        priority_rule: z.priority_rule,
+        items: z.items,
+        constraints: z.constraints,
       })),
       materials: briefing.materials,
+      gaps_from_interpreter: briefing.gaps,
     },
     null,
     2
-  );
+  ).substring(0, 6000); // Cap at 6000 chars to avoid token overflow
 
   const gapsText = technicalGaps
     .map((g) => `- [${g.id}] ${g.description} (status: ${g.status}, campo: ${g.field})`)
