@@ -427,15 +427,38 @@ export default async function conversationRoutes(app: FastifyInstance) {
         const resolvedGaps = oldGaps.filter((id) => !newGapIds.includes(id));
         const addedGaps = newChecklist.gaps.filter((g) => !oldGaps.includes(g.id));
 
-        // Update session
+        // Update session with merged briefing and new gaps
         updateSession(session.id, {
           briefing: mergeResult.data,
           gaps: newChecklist.gaps,
         });
 
-        // If gaps were resolved and we're in QUESTIONING/PARSED, regenerate questions
-        if (newChecklist.gaps.length === 0 && (session.state === "PARSED" || session.state === "QUESTIONING")) {
-          updateSession(session.id, { state: "REVIEWING" });
+        // After merge, ALWAYS regenerate question blocks based on updated gaps
+        if (session.state === "PARSED" || session.state === "QUESTIONING") {
+          if (newChecklist.gaps.length === 0) {
+            // All gaps resolved — skip to review
+            updateSession(session.id, {
+              state: "REVIEWING",
+              question_blocks: [],
+              questions_total: 0,
+              questions_answered: 0,
+              current_block: 0,
+            });
+          } else {
+            // Gaps remain — regenerate questions from scratch based on UPDATED briefing + gaps
+            const newQuestions = await generateQuestions(mergeResult.data, newChecklist.gaps);
+            const newBlocks = buildQuestionBlocks(newQuestions);
+            updateSession(session.id, {
+              state: "PARSED",
+              question_blocks: newBlocks,
+              questions_total: newQuestions.length,
+              questions_answered: 0,
+              current_block: 0,
+            });
+            console.log(
+              `[ADD-DOCS] Regenerated ${newQuestions.length} questions for ${newChecklist.gaps.length} remaining gaps (resolved: ${resolvedGaps.length})`
+            );
+          }
         }
 
         return reply.send({
@@ -446,6 +469,7 @@ export default async function conversationRoutes(app: FastifyInstance) {
           gaps_resolved: resolvedGaps,
           gaps_added: addedGaps.map((g) => g.description),
           remaining_gaps: newChecklist.gaps.length,
+          questions_regenerated: true,
           model_used: mergeResult.model_used,
         });
       } catch (err) {

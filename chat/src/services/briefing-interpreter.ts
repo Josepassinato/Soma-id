@@ -59,16 +59,27 @@ export interface MergeBriefingResult {
 
 const SYSTEM_PROMPT_TEMPLATE = `Você é o BRIEFING INTERPRETER do SOMA-ID, um sistema de marcenaria industrial de alto padrão.
 
-Sua ÚNICA função é receber documentos brutos de briefing de marcenaria e devolver um JSON estruturado perfeito.
+Sua ÚNICA função é receber documentos brutos de briefing de marcenaria e devolver um JSON canônico consolidado perfeito.
 
-CAPACIDADES:
+## CAPACIDADES
 1. OCR de croquis manuscritos — texto pode estar rotacionado, de lado, de cabeça para baixo, em cursivo. Examine em TODAS as orientações.
 2. Extração de PDFs — identifique cliente, projetista, empresa, zonas, requisitos, materiais, cores.
 3. Análise de fotos do espaço — identifique dimensões aproximadas, portas, janelas, pontos de luz, ar-condicionado.
 4. Compreensão de áudio transcrito — extraia requisitos mencionados verbalmente pelo designer/cliente.
 5. Matching de materiais — cruze cores/materiais mencionados com o catálogo real disponível.
 
-REGRAS DE EXTRAÇÃO:
+## CROSS-REFERENCING ENTRE DOCUMENTOS (CRÍTICO)
+Você receberá MÚLTIPLOS documentos (capa, briefing funcional, croqui, fotos, áudio).
+Cada documento contribui informações diferentes. Sua tarefa é CRUZAR:
+- CAPA/COVER → dados do cliente, projetista, datas, empresa
+- BRIEFING FUNCIONAL → zonas, itens, quantidades, requisitos, materiais, prioridades
+- CROQUI/PLANTA → dimensões das paredes, pé-direito, posição da porta, posição das zonas no espaço
+- FOTOS → validação visual do espaço, features existentes (AC, tomadas, janelas)
+- ÁUDIO → requisitos verbais adicionais
+
+REGRA DE OURO: se a CAPA diz o nome do cliente, o BRIEFING diz os itens, e o CROQUI diz as dimensões — COMBINE tudo num único JSON coerente. NÃO trate cada documento isoladamente.
+
+## REGRAS DE EXTRAÇÃO
 - Extraia TUDO que encontrar, mesmo que parcial. É melhor ter dados com baixa confiança do que perder informação.
 - Números manuscritos: "3,64" e "3.64" são a mesma medida (3.64 metros). Aceite ambos formatos.
 - Quando uma medida aparece junto a uma parede em um croqui, é o comprimento daquela parede em metros.
@@ -77,14 +88,21 @@ REGRAS DE EXTRAÇÃO:
 - Itens típicos: prateleiras, nichos, sapateira, vitrines, gavetas, cabideiros, espelhos.
 - Quantidades aparecem como: "30 pares de sapatos", "06 pares de botas", "15 bolsas", "2 grandes e 2 pequenas malas".
 
-REGRAS CRÍTICAS DE DIMENSÕES DE ZONAS:
+## REGRAS CRÍTICAS DE DIMENSÕES DE ZONAS
 - zone.dimensions.width_m e zone.dimensions.depth_m referem-se ao ESPAÇO FÍSICO da zona (área do cômodo/setor), NÃO à profundidade dos módulos/armários.
 - Exemplo: "Closet Her 3,64m x 3,81m" → zone.dimensions = { width_m: 3.64, depth_m: 3.81 }
 - A profundidade dos MÓDULOS (armários) é sempre 550-600mm — isso NÃO é a zone depth.
 - Se o croqui mostra uma zona com paredes de 3,64m e 3,81m, essas são as dimensões da ZONA.
 - NUNCA use 0.6 (600mm = profundidade de módulo) como depth_m de uma zona. Zonas são tipicamente > 1.5m em ambas dimensões.
 
-REGRAS ERGONÔMICAS (use para validar e completar dados):
+## POSICIONAMENTO DAS ZONAS (wall assignment)
+Cada zona deve ser associada à parede onde será instalada:
+- "wall": "north" | "south" | "east" | "west" | "freestanding" | "north+east" etc.
+- Se o croqui mostra a zona numa parede específica, use essa parede.
+- Ilha Central é sempre "freestanding" (no centro do ambiente).
+- Se a posição não é clara, infira pela lógica: zonas maiores nas paredes mais longas.
+
+## REGRAS ERGONÔMICAS (use para validar e completar dados)
 - Profundidade padrão closet: 550-600mm
 - Cabideiro vestidos longos: 1300-1700mm do piso
 - Cabideiro camisas/blazers: 1050-1100mm livre
@@ -97,86 +115,126 @@ REGRAS ERGONÔMICAS (use para validar e completar dados):
 - Circulação mínima: 600mm (apertado), 800-1000mm (confortável)
 - Clearance ilha central: mínimo 600mm em todos os lados
 
-CATÁLOGO DE MATERIAIS DISPONÍVEIS:
+## CATÁLOGO DE MATERIAIS DISPONÍVEIS
 {{CATALOG}}
 
-REGRAS DE MATCHING DE MATERIAIS:
+## REGRAS DE MATCHING DE MATERIAIS
 - Quando o briefing mencionar uma cor/material (ex: "Lana", "Lord", "Freijó"), procure no catálogo acima.
 - Use o nome EXATO do catálogo no campo materials.colors.
-- Se o material não existir no catálogo, inclua mesmo assim mas adicione em missing_fields.
+- Se o material não existir no catálogo, inclua mesmo assim mas adicione em gaps.
+- Se dois materiais são mencionados (ex: "Lord + Lana"), inclua ambos em colors com role assignment.
 
-OUTPUT OBRIGATÓRIO — JSON válido neste schema exato:
+## OUTPUT OBRIGATÓRIO — JSON válido neste schema exato:
 {
   "client": {
     "name": "string — nome do cliente",
     "email": "string — email do cliente",
-    "phone": "string — telefone do cliente",
+    "phone": "string — telefone do cliente (null se não encontrado)",
     "referral": "string — quem indicou (empresa/designer)"
   },
   "project": {
     "type": "string — tipo: closet, kitchen, bathroom, commercial",
+    "scope": "string — descrição curta do escopo (ex: 'Walk-in Closet Her+His + Makeup + Armas')",
     "designer": "string — nome do projetista/designer",
     "date_in": "string — data de entrada YYYY-MM-DD",
-    "date_due": "string — data de entrega YYYY-MM-DD"
+    "date_due": "string — data de entrega YYYY-MM-DD (null se não informado)"
   },
   "space": {
-    "total_area_m2": "number — área total em m²",
+    "total_area_m2": "number — área total em m² (calcule se paredes forem dadas)",
     "ceiling_height_m": "number — pé-direito em metros",
     "walls": [
       {
-        "id": "string — identificador: north, south, east, west, A, B, C...",
+        "id": "string — north, south, east, west",
+        "label": "string — nome descritivo da parede",
         "length_m": "number — comprimento em metros",
-        "features": ["string — door, window, ac_vent, electrical_panel, etc"]
+        "features": ["string — door, window, ac_vent, electrical_panel, etc"],
+        "segments": [
+          {
+            "length_m": "number",
+            "function": "string — o que ocupa este segmento"
+          }
+        ]
       }
     ],
     "entry_point": {
       "wall": "string — parede onde está a entrada",
-      "width_m": "number — largura da porta/abertura em metros"
+      "width_m": "number — largura da porta/abertura em metros",
+      "position": "string — left, center, right, ou medida em metros do canto"
     }
   },
   "zones": [
     {
       "name": "string — nome da zona",
+      "wall": "string — north, south, east, west, freestanding, north+east",
+      "position": "string — descrição de onde fica (ex: 'ao lado da Area Armas')",
       "dimensions": { "width_m": "number", "depth_m": "number" },
+      "priority_rule": "string — ex: 'Cabides > Dobradas' quando mencionado",
       "items": [
         {
-          "type": "string — hanging_bar, shelf, shoe_rack, vitrine, drawers, vanity, island, luggage_area, gun_cases_storage, etc",
+          "type": "string — hanging_bar, shelf, shoe_rack, vitrine, drawers, vanity, island, luggage_area, gun_cases_storage, niche, jewelry_display, etc",
           "subtype": "string — long_garments, shirts, shoes, boots, bags, jewelry, etc",
           "quantity": "number — quantidade quando especificada",
-          "features": ["string — glass_shelves, LED, soft_close, velvet_dividers, mirror, sensor, etc"],
+          "features": ["string — glass_shelves, LED, soft_close, velvet_dividers, mirror, sensor, open_no_door, etc"],
           "sizes": ["string — tamanhos quando mencionados"],
           "categories": ["string — categorias de gavetas: lingerie, pijamas, etc"],
           "access": "string — frequent, occasional, rare",
-          "priority": "string — high, medium, low"
+          "priority": "string — high, medium, low",
+          "notes": "string — observações adicionais do cliente"
         }
       ],
       "constraints": [
         {
           "type": "string — min_passage, max_height, clearance, etc",
           "value_mm": "number — valor em milímetros",
-          "relative_to": "string — referência"
+          "relative_to": "string — referência",
+          "notes": "string — texto original do cliente"
         }
       ]
     }
   ],
   "materials": {
     "colors": ["string — nomes de cores/materiais do catálogo"],
+    "color_assignments": {
+      "body": "string — cor/material do corpo dos módulos",
+      "doors": "string — cor/material das portas (null se igual ao body)",
+      "accent": "string — cor de destaque (null se não especificado)"
+    },
+    "manufacturer": "string — fabricante mencionado",
+    "thickness_mm": "number — espessura padrão das chapas (18mm padrão)",
     "mood_board": "string — estilo geral: elegant_neutral, modern_dark, rustic_wood, etc"
   },
+  "gaps": [
+    {
+      "field": "string — caminho do campo que falta (ex: 'project.date_due', 'zones[3].dimensions')",
+      "description": "string — descrição humana do que falta",
+      "priority": "string — HIGH, MEDIUM, LOW",
+      "category": "string — technical, commercial, dimensional"
+    }
+  ],
   "_meta": {
-    "sources": ["string — pdf, image, audio, text"],
+    "sources": ["string — nomes dos arquivos processados"],
     "confidence": "number 0-1 — confiança geral na extração",
-    "missing_fields": ["string — campos que não foram encontrados nos documentos"],
+    "cross_reference_notes": ["string — notas sobre como dados de diferentes fontes foram cruzados"],
+    "missing_fields": ["string — campos que não foram encontrados em NENHUM documento"],
     "timestamp": "string — ISO timestamp"
   }
 }
 
-INSTRUÇÕES FINAIS:
+## IDENTIFICAÇÃO DE GAPS (CRÍTICO)
+Os gaps devem ser GENUÍNOS — campos que realmente NÃO foram encontrados em NENHUM dos documentos fornecidos.
+- NÃO liste como gap algo que você acabou de extrair de outro documento.
+- NÃO liste campos comerciais (telefone, email) como gaps de prioridade HIGH — eles são LOW.
+- Gaps de prioridade HIGH: dimensões que faltam para calcular módulos, posição da porta, pé-direito.
+- Gaps de prioridade MEDIUM: confirmações de medidas ambíguas, materiais não especificados.
+- Gaps de prioridade LOW: dados comerciais, data de entrega, telefone do cliente.
+- Gaps category "technical": afetam o cálculo de engenharia. "commercial": dados de CRM. "dimensional": medidas físicas.
+
+## INSTRUÇÕES FINAIS
 - Responda APENAS com o JSON. Nenhum texto antes ou depois.
-- Se um campo não foi encontrado, use string vazia "" para strings, 0 para números, [] para arrays.
+- Se um campo não foi encontrado, use null para strings, 0 para números, [] para arrays.
 - O campo confidence deve refletir: 1.0 = tudo claro e explícito, 0.5 = muita inferência, 0.0 = dados insuficientes.
-- missing_fields deve listar TODOS os campos que você não encontrou nos documentos de input.
-- Quando houver contradição entre fontes (PDF diz uma coisa, áudio diz outra), priorize: 1° croqui/planta, 2° PDF texto, 3° áudio, 4° texto livre.`;
+- Quando houver contradição entre fontes, priorize: 1° croqui/planta, 2° PDF texto, 3° áudio, 4° texto livre.
+- CRUZE informações entre documentos antes de declarar algo como missing/gap.`;
 
 // --------------- Build catalog string ---------------
 
@@ -347,18 +405,21 @@ export async function interpretBriefing(
     if (input.audioTranscripts.length > 0) sources.push("audio");
     if (input.userText?.trim()) sources.push("text");
 
+    // Extract interpreter-generated gaps (structured with priority)
+    const interpreterGaps = (parsed.gaps as ParsedBriefing["gaps"]) || [];
+
     const briefing: ParsedBriefing = {
       client: (parsed.client as ParsedBriefing["client"]) || {
         name: "",
         email: "",
-        phone: "",
+        phone: null,
         referral: "",
       },
       project: (parsed.project as ParsedBriefing["project"]) || {
         type: "",
         designer: "",
         date_in: "",
-        date_due: "",
+        date_due: null,
       },
       space: (parsed.space as ParsedBriefing["space"]) || {
         total_area_m2: 0,
@@ -371,10 +432,12 @@ export async function interpretBriefing(
         colors: [],
         mood_board: "",
       },
+      gaps: interpreterGaps,
       _meta: {
         sources,
         confidence: (meta.confidence as number) || 0,
         missing_fields: (meta.missing_fields as string[]) || [],
+        cross_reference_notes: (meta.cross_reference_notes as string[]) || [],
         raw_text: input.pdfTexts.map((p) => p.text).join("\n").substring(0, 2000),
         timestamp: new Date().toISOString(),
       },
@@ -414,7 +477,7 @@ Você recebe:
 
 Sua função é ATUALIZAR o briefing existente incorporando as novas informações.
 
-REGRAS DE MERGE:
+## REGRAS DE MERGE
 - Se o novo documento contém MEDIDAS que faltavam → adicione nas zonas/paredes correspondentes
 - Se o novo documento contém CORES/MATERIAIS não mencionados antes → adicione em materials
 - Se o novo documento contém NOVAS ZONAS ou ITENS → adicione nas zonas
@@ -422,11 +485,24 @@ REGRAS DE MERGE:
 - Se o novo documento é um CROQUI com medidas → extraia todas as medidas e cruze com as zonas existentes
 - Se o novo documento são FOTOS do espaço → analise e adicione observações em _meta
 - Quando um campo já tem valor e o novo documento tem valor diferente, use o NOVO
-- Quando um campo está vazio/zero e o novo documento tem valor, PREENCHA
+- Quando um campo está vazio/zero/null e o novo documento tem valor, PREENCHA
 
-RETORNE um JSON com DOIS campos:
-1. "briefing" — o briefing COMPLETO ATUALIZADO (não só o delta — retorne o JSON inteiro com as novas informações incorporadas)
-2. "changes" — array de strings descrevendo o que mudou, em português. Ex: ["Adicionada medida 3.5m na parede norte", "Novo material: Lord (Unicolor)", "Nova zona: Ilha Central"]
+## ATUALIZAÇÃO DE GAPS (CRÍTICO)
+O briefing existente tem um array "gaps" com campos que faltavam.
+Após o merge, REVISE os gaps:
+- Se o novo documento RESOLVEU um gap (forneceu a informação que faltava) → REMOVA esse gap
+- Se o novo documento criou uma nova dúvida → ADICIONE como novo gap
+- Gaps resolvidos NÃO devem permanecer no array
+- Gaps de prioridade HIGH são os que afetam cálculos de engenharia
+
+## REGRAS CRÍTICAS DE DIMENSÕES DE ZONAS
+- zone.dimensions.width_m e zone.dimensions.depth_m referem-se ao ESPAÇO FÍSICO da zona, NÃO à profundidade dos módulos.
+- NUNCA use 0.6 (600mm = profundidade de módulo) como depth_m de uma zona.
+
+## RETORNE um JSON com TRÊS campos:
+1. "briefing" — o briefing COMPLETO ATUALIZADO (retorne o JSON inteiro com as novas informações incorporadas, incluindo array "gaps" atualizado)
+2. "changes" — array de strings descrevendo o que mudou. Ex: ["Adicionada medida 3.5m na parede norte", "Resolvido gap: dimensões da Ilha Central"]
+3. "gaps_resolved" — array de strings com os campos dos gaps que foram resolvidos pelo novo documento
 
 Responda APENAS com o JSON. Nenhum texto antes ou depois.`;
 
@@ -491,7 +567,7 @@ export async function mergeBriefing(
 
   parts.push({
     type: "text",
-    text: 'Analise os novos documentos e retorne o JSON com "briefing" (completo atualizado) e "changes" (lista do que mudou). Apenas JSON.',
+    text: 'Analise os novos documentos e retorne o JSON com "briefing" (completo atualizado, incluindo array "gaps" atualizado), "changes" (lista do que mudou), e "gaps_resolved" (gaps que foram resolvidos). Apenas JSON.',
   });
 
   const client = new Anthropic({ apiKey });
@@ -545,6 +621,7 @@ export async function mergeBriefing(
     // Extract updated briefing and changes
     const updatedRaw = (parsed.briefing || parsed) as Record<string, unknown>;
     const changes = (parsed.changes as string[]) || [];
+    const gapsResolved = (parsed.gaps_resolved as string[]) || [];
 
     // Map to ParsedBriefing structure (same as interpretBriefing)
     const meta = (updatedRaw._meta as Record<string, unknown>) || {};
@@ -555,23 +632,28 @@ export async function mergeBriefing(
     if (newDocuments.audioTranscripts.length > 0 && !newSources.includes("audio_supplement")) newSources.push("audio_supplement");
     if (newDocuments.userText?.trim() && !newSources.includes("text_supplement")) newSources.push("text_supplement");
 
+    // Extract updated gaps from merged briefing
+    const updatedGaps = (updatedRaw.gaps as ParsedBriefing["gaps"]) || [];
+
     const briefing: ParsedBriefing = {
       client: (updatedRaw.client as ParsedBriefing["client"]) || existingBriefing.client,
       project: (updatedRaw.project as ParsedBriefing["project"]) || existingBriefing.project,
       space: (updatedRaw.space as ParsedBriefing["space"]) || existingBriefing.space,
       zones: (updatedRaw.zones as ParsedBriefing["zones"]) || existingBriefing.zones,
       materials: (updatedRaw.materials as ParsedBriefing["materials"]) || existingBriefing.materials,
+      gaps: updatedGaps,
       _meta: {
         sources: newSources,
         confidence: (meta.confidence as number) || existingBriefing._meta?.confidence || 0,
         missing_fields: (meta.missing_fields as string[]) || [],
+        cross_reference_notes: (meta.cross_reference_notes as string[]) || [],
         raw_text: existingBriefing._meta?.raw_text || "",
         timestamp: new Date().toISOString(),
       },
     };
 
     console.log(
-      `[BRIEFING-MERGE] Success — changes: ${changes.length}, zones: ${briefing.zones.length}, confidence: ${briefing._meta.confidence}`
+      `[BRIEFING-MERGE] Success — changes: ${changes.length}, zones: ${briefing.zones.length}, gaps_resolved: ${gapsResolved.length}, confidence: ${briefing._meta.confidence}`
     );
 
     return {

@@ -264,25 +264,51 @@ export function validateChecklist(briefing: ParsedBriefing): ChecklistResult {
     } else {
       missing++;
       summary[rule.category].missing++;
-      if (rule.required) {
+      gaps.push({
+        id: rule.id,
+        category: rule.category,
+        field: rule.field,
+        status: "MISSING",
+        description: rule.description,
+      });
+    }
+  }
+
+  // If the interpreter provided structured gaps, merge them in
+  // Interpreter gaps are more specific (e.g., "zones[3].dimensions")
+  // and include priority/category information
+  if (briefing.gaps && briefing.gaps.length > 0) {
+    const existingGapFields = new Set(gaps.map((g) => g.field));
+
+    for (const ig of briefing.gaps) {
+      // Skip commercial/low-priority gaps that don't affect engineering
+      if (ig.category === "commercial" && ig.priority === "LOW") continue;
+
+      // Check if a similar gap already exists from checklist rules
+      const alreadyCovered = gaps.some(
+        (g) => ig.field.startsWith(g.field) || g.field.startsWith(ig.field)
+      );
+
+      if (!alreadyCovered) {
+        const categoryMap: Record<string, GapItem["category"]> = {
+          technical: "zones",
+          dimensional: "space",
+          commercial: "project",
+        };
+
         gaps.push({
-          id: rule.id,
-          category: rule.category,
-          field: rule.field,
-          status: "MISSING",
-          description: rule.description,
-        });
-      } else {
-        gaps.push({
-          id: rule.id,
-          category: rule.category,
-          field: rule.field,
-          status: "MISSING",
-          description: rule.description,
+          id: `interp_${ig.field.replace(/[.\[\]]/g, "_")}`,
+          category: categoryMap[ig.category] || "zones",
+          field: ig.field,
+          status: ig.priority === "HIGH" ? "MISSING" : "PARTIAL",
+          description: ig.description,
         });
       }
     }
   }
+
+  // Filter: only required gaps prevent is_complete
+  const requiredGapIds = new Set(CHECKLIST.filter((r) => r.required).map((r) => r.id));
 
   return {
     total_checks: CHECKLIST.length,
@@ -290,7 +316,7 @@ export function validateChecklist(briefing: ParsedBriefing): ChecklistResult {
     partial,
     missing,
     gaps,
-    is_complete: gaps.filter((g) => CHECKLIST.find((r) => r.id === g.id)?.required).length === 0,
+    is_complete: gaps.filter((g) => requiredGapIds.has(g.id)).length === 0,
     summary,
   };
 }
