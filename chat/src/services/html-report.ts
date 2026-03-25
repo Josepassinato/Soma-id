@@ -2724,8 +2724,9 @@ ${SHEET_COMPOSITION_CSS}
     <div class="metric purple"><div class="val">${s.hardware_items}</div><div class="lbl">Ferragens</div></div>
   </div>
   <div class="cost-box">
-    <div class="amount">R$ ${fmtCost(costBrl)}</div>
-    <div class="desc">Custo estimado de materiais (USD ${fmtCost(s.estimated_cost_usd)})</div>
+    <div class="amount">${results.pricing ? results.pricing.currency : "USD"} ${fmtCost(s.estimated_cost_usd)}</div>
+    <div class="desc">${results.pricing ? `Preco comercial (${results.pricing.pricingProfileName})` : "Estimativa"}</div>
+    ${results.pricing ? `<div style="font-size:10px;color:#888;margin-top:4px">Custo tecnico: ${results.pricing.currency} ${fmtCost(results.pricing.technicalCost.subtotal)} | Markup: ${(results.pricing.commercialPrice.markupApplied * 100).toFixed(0)}% | Instalacao: ${results.pricing.currency} ${fmtCost(results.pricing.commercialPrice.installationCharge)}</div>` : ""}
   </div>
 
   <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:#333">Lista Completa de Pecas</h3>

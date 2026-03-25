@@ -18,6 +18,7 @@ import { applyTraceability, validateTraceability } from "./traceability.js";
 import { validateFabrication, type FabricationValidationSummary } from "./fabrication-validator.js";
 import { getActiveCatalog, lookupMaterial, buildCatalogUsageSummary, type CatalogDiagnostic } from "./factory-catalog.js";
 import type { CatalogUsageSummary } from "../types.js";
+import { calculatePricing, type PricingResult } from "./pricing-engine.js";
 
 // ============================================================
 // Engine input/output types (mirrored from soma-id/types.ts)
@@ -196,6 +197,8 @@ export interface EngineResults {
   fabricationValidation?: FabricationValidationSummary;
   // P1.1 — Catalog usage tracking
   catalogUsage?: CatalogUsageSummary;
+  // P1.3 — Store pricing
+  pricing?: PricingResult;
   summary: {
     total_modules: number;
     total_parts: number;
@@ -1461,11 +1464,11 @@ export function runEnginePipeline(
   const nesting = runNestingEngine(blueprint);
   console.log(`[ENGINE] Nesting: ${nesting.totalSheets} sheets, ${nesting.globalEfficiency}% efficiency`);
 
-  // Estimated cost (rough: ~$85/sheet + hardware USD, R$280/sheet BRL)
-  const sheetCostUsd = nesting.totalSheets * 85;
-  const hardwareCostUsd = blueprint.hardwareMap.length * 15;
-  const estimatedCostUsd = sheetCostUsd + hardwareCostUsd;
-  const estimatedCostBrl = nesting.totalSheets * 280 + blueprint.hardwareMap.length * 45;
+  // P1.3 — Pricing engine (replaces inline estimate)
+  const pricingResult = calculatePricing(wallLayouts, nesting, blueprint.hardwareMap);
+  const estimatedCostUsd = pricingResult.commercialPrice.finalPrice;
+  const estimatedCostBrl = Math.round(estimatedCostUsd * 5.5);
+  console.log(`[ENGINE] Pricing: ${pricingResult.currency} ${estimatedCostUsd} (tech: ${pricingResult.technicalCost.subtotal}, markup: ${pricingResult.commercialPrice.markupApplied * 100}%) — profile: ${pricingResult.pricingProfileId}`);
 
   // Step 5: Fabrication validation (P0.8)
   const roomDepthMm = (briefing.space?.walls?.length >= 2)
@@ -1485,6 +1488,7 @@ export function runEnginePipeline(
     conflicts,
     fabricationValidation: fabValidation,
     catalogUsage,
+    pricing: pricingResult,
     summary: {
       total_modules: totalModules,
       total_parts: nesting.totalParts,

@@ -714,6 +714,57 @@ test("all templates have valid dimension rules", () => {
 });
 
 // ================================================================
+// P1.3: PRICING ENGINE TESTS
+// ================================================================
+console.log("\n=== Pricing engine ===");
+
+test("pipeline includes pricing result", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_price_closet");
+  assert(results.pricing, "Should have pricing result");
+  assert(results.pricing.pricingProfileId, "Should have profile ID");
+  assert(results.pricing.currency, "Should have currency");
+});
+
+test("pricing has technical cost breakdown", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_price_tech");
+  const tc = results.pricing.technicalCost;
+  assert(tc.materialsCost > 0, "Materials cost should be > 0");
+  assert(tc.subtotal > 0, "Subtotal should be > 0");
+  assert(tc.details.length > 0, "Should have detail line items");
+});
+
+test("pricing has commercial price breakdown", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_price_comm");
+  const cp = results.pricing.commercialPrice;
+  assert(cp.finalPrice > 0, "Final price should be > 0");
+  assert(cp.finalPrice > cp.technicalSubtotal, "Commercial > technical (markup applied)");
+  assert(cp.markupApplied > 0, "Markup should be applied");
+});
+
+test("pricing has per-module breakdown", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_price_permod");
+  assert(results.pricing.perModuleBreakdown.length > 0, "Should have per-module costs");
+  for (const pm of results.pricing.perModuleBreakdown) {
+    assert(pm.moduleName, "Module cost should have name");
+    assert(pm.traceId, "Module cost should have traceId");
+    assert(pm.cost > 0, "Module cost should be > 0");
+  }
+});
+
+test("report shows pricing info", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_price_report");
+  const html = generateHtmlReport(fx.briefing, results, "test_price_report");
+  assert(html.includes("Preco comercial"), "Report should show commercial price");
+  assert(html.includes("Custo tecnico"), "Report should show technical cost");
+  assert(html.includes("Markup"), "Report should show markup");
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
