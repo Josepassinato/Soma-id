@@ -13,6 +13,7 @@ import { normalizeBriefing } from "./briefing-normalizer.js";
 import { detectIssues } from "./briefing-issues.js";
 import { assessReadiness } from "./briefing-readiness.js";
 import { resolveModuleTyping } from "./module-typing.js";
+import { buildWallLayouts, distributionSummary } from "./layout-distributor.js";
 
 // ============================================================
 // Engine input/output types (mirrored from soma-id/types.ts)
@@ -101,6 +102,18 @@ export interface BlueprintModule {
   features?: string[];
 }
 
+/** P0.4 — Wall layout with identity */
+export interface WallLayout {
+  wallId: string;          // "north", "east", etc.
+  label: string;           // "Parede A (Norte)", human-readable
+  orientation: string;     // "north", "east", "south", "west"
+  wallWidth: number;       // full wall width in mm
+  usableWidth: number;     // after doors/windows subtraction
+  totalModuleWidth: number;// sum of assigned module widths
+  modules: BlueprintModule[];
+  distributionNotes: string[]; // why modules were assigned here
+}
+
 export interface BlueprintData {
   layout: string;
   materials: {
@@ -108,6 +121,9 @@ export interface BlueprintData {
     internalColor: string;
     thickness: number;
   };
+  // P0.4 — Multi-wall structure (primary)
+  walls: WallLayout[];
+  // Legacy compatibility — populated from walls[0] and walls[1]
   mainWall: {
     totalWidth: number;
     modules: BlueprintModule[];
@@ -915,6 +931,7 @@ export function runCalcEngine(layout: AiLayoutPlan, project: EngineProject): Blu
       internalColor: project.materialPalette[0]?.name || "MDP 18mm",
       thickness: THICKNESS,
     },
+    walls: [], // P0.4 — populated by buildWallLayouts in runEnginePipeline
     mainWall: {
       totalWidth: mainTotalWidth,
       modules: mainModules,
@@ -1363,8 +1380,31 @@ export function runEnginePipeline(
   );
   console.log(`[ENGINE] Blueprint: ${blueprint.mainWall.modules.length} modules, ${totalParts} parts`);
 
+  // Step 2.5: Build multi-wall layout (P0.4)
+  const resolvedWalls = resolveWalls(briefing);
+  const { walls: wallLayouts, decisions } = buildWallLayouts(
+    blueprint.mainWall,
+    blueprint.sideWall,
+    resolvedWalls,
+  );
+  blueprint.walls = wallLayouts;
+  // Update mainWall/sideWall from walls[] for backward compat
+  if (wallLayouts.length > 0) {
+    blueprint.mainWall = { totalWidth: wallLayouts[0].totalModuleWidth, modules: wallLayouts[0].modules };
+  }
+  if (wallLayouts.length > 1) {
+    const sideMods = wallLayouts.slice(1).flatMap(w => w.modules);
+    blueprint.sideWall = {
+      totalWidth: sideMods.reduce((max, m) => Math.max(max, (m.position?.x || 0) + m.width), 0),
+      modules: sideMods,
+    };
+  }
+  const distNotes = distributionSummary(wallLayouts);
+  blueprint.factoryNotes.push(...distNotes);
+  console.log(`[ENGINE] Multi-wall: ${wallLayouts.length} walls, ${decisions.length} assignments`);
+
   // Step 3: interferenceEngine — pass per-wall widths
-  const walls = resolveWalls(briefing);
+  const walls = resolvedWalls;
   const sideWallW = walls.length > 1 ? walls[1].usable_mm : project.wallWidth;
   const conflicts = runInterferenceEngine(blueprint, {
     wallW: project.wallWidth,

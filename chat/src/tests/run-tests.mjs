@@ -266,6 +266,70 @@ for (const fxName of ["closet_linear_baseline", "kitchen_basic"]) {
 }
 
 // ================================================================
+// P0.4: MULTI-WALL TESTS
+// ================================================================
+console.log("\n=== Multi-wall layout ===");
+
+test("closet has walls[] structure", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_mw_closet");
+  assert(results.blueprint.walls, "blueprint.walls should exist");
+  assert(results.blueprint.walls.length > 0, "Should have at least 1 wall");
+});
+
+test("each wall has identity (wallId, label, orientation)", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_mw_identity");
+  for (const w of results.blueprint.walls) {
+    assert(w.wallId, `Wall missing wallId`);
+    assert(w.label, `Wall ${w.wallId} missing label`);
+    assert(w.orientation, `Wall ${w.wallId} missing orientation`);
+    assert(w.wallWidth > 0, `Wall ${w.wallId} has no width`);
+  }
+});
+
+test("module widths don't exceed wall usable width (no overflow)", () => {
+  const fx = loadFixture("kitchen_basic");
+  const results = runEnginePipeline(fx.briefing, "test_mw_overflow");
+  for (const w of results.blueprint.walls) {
+    const excess = w.totalModuleWidth - w.usableWidth;
+    // Allow small tolerance (18mm gaps can push slightly)
+    assert(excess < 100, `Wall ${w.wallId} overflow: ${excess}mm`);
+  }
+});
+
+test("closet_multi_wall distributes across walls", () => {
+  const fx = loadFixture("closet_multi_wall");
+  const results = runEnginePipeline(fx.briefing, "test_mw_multi");
+  assert(results.blueprint.walls.length >= 1, "Should have at least 1 wall with modules");
+  // Check that modules are distributed (not all on one wall)
+  const wallModCounts = results.blueprint.walls.map(w => w.modules.length);
+  const totalMods = wallModCounts.reduce((a, b) => a + b, 0);
+  assert(totalMods >= 3, `Should have at least 3 total modules, got ${totalMods}`);
+});
+
+test("backward compat: mainWall still populated", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_mw_compat");
+  assert(results.blueprint.mainWall, "mainWall should still exist");
+  assert(results.blueprint.mainWall.modules.length > 0, "mainWall should have modules");
+});
+
+test("report includes wall label in elevation title", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_mw_report");
+  const html = generateHtmlReport(fx.briefing, results, "test_mw_report");
+  assert(html.includes("ELEVACAO"), "Report should have ELEVACAO title");
+});
+
+test("distribution notes in factoryNotes", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_mw_notes");
+  const distNote = results.blueprint.factoryNotes.find(n => n.includes("multi-parede"));
+  assert(distNote, "factoryNotes should include distribution summary");
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);

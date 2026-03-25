@@ -2184,13 +2184,27 @@ export function generateHtmlReport(briefing: ParsedBriefing, results: EngineResu
   const materialPalette = (s as any).material_palette || [];
   const materialWarnings = (s as any).material_warnings || [];
 
-  // Walls array for elevations — dynamic
+  // Walls array for elevations — P0.4: prefer walls[] if available
   const walls: Array<{ label: string; title: string; totalWidth: number; modules: BlueprintModule[] }> = [];
-  if (bp.mainWall.modules.length > 0) {
-    walls.push({ label: "A", title: "ELEVACAO PAREDE A", totalWidth: bp.mainWall.totalWidth, modules: bp.mainWall.modules });
-  }
-  if (bp.sideWall && bp.sideWall.modules.length > 0) {
-    walls.push({ label: "B", title: "ELEVACAO PAREDE B", totalWidth: bp.sideWall.totalWidth, modules: bp.sideWall.modules });
+  if (bp.walls && bp.walls.length > 0) {
+    // P0.4 — multi-wall: one elevation per wall with modules
+    for (const wl of bp.walls) {
+      if (wl.modules.length === 0) continue;
+      walls.push({
+        label: wl.label.replace("Parede ", ""),
+        title: `ELEVACAO ${wl.label.toUpperCase()}`,
+        totalWidth: wl.totalModuleWidth,
+        modules: wl.modules,
+      });
+    }
+  } else {
+    // Legacy fallback: mainWall + sideWall
+    if (bp.mainWall.modules.length > 0) {
+      walls.push({ label: "A", title: "ELEVACAO PAREDE A", totalWidth: bp.mainWall.totalWidth, modules: bp.mainWall.modules });
+    }
+    if (bp.sideWall && bp.sideWall.modules.length > 0) {
+      walls.push({ label: "B", title: "ELEVACAO PAREDE B", totalWidth: bp.sideWall.totalWidth, modules: bp.sideWall.modules });
+    }
   }
 
   // Additional wall zones from briefing (Closet His, etc.)
