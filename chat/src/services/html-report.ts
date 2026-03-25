@@ -249,293 +249,272 @@ function renderModuleInterior(
   features: string[],
   materialColor: string,
   doorColor: string,
+  scaleFactor: number = 1,
 ): string {
   let svg = "";
-  const inset = 4;
+  // Scale stroke widths so details remain visible when SVG viewBox >> display size
+  const ss = (base: number) => Math.round(base * scaleFactor * 10) / 10;
+  const inset = ss(4);
   const ix = x + inset, iy = y + inset;
   const iw = w - inset * 2, ih = h - inset * 2;
 
   // Module body with material color
-  svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${materialColor}" fill-opacity="0.25" stroke="#444" stroke-width="1.5"/>`;
+  svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${materialColor}" fill-opacity="0.25" stroke="#444" stroke-width="${ss(1.5)}"/>`;
 
   // 18mm thickness lines on sides
-  svg += `<line x1="${x + 3}" y1="${y}" x2="${x + 3}" y2="${y + h}" stroke="#888" stroke-width="0.5"/>`;
-  svg += `<line x1="${x + w - 3}" y1="${y}" x2="${x + w - 3}" y2="${y + h}" stroke="#888" stroke-width="0.5"/>`;
+  svg += `<line x1="${x + ss(3)}" y1="${y}" x2="${x + ss(3)}" y2="${y + h}" stroke="#888" stroke-width="${ss(0.5)}"/>`;
+  svg += `<line x1="${x + w - ss(3)}" y1="${y}" x2="${x + w - ss(3)}" y2="${y + h}" stroke="#888" stroke-width="${ss(0.5)}"/>`;
 
   const sub = subtype.toLowerCase();
   const mt = moduleType.toLowerCase();
+  const fs = (size: number) => Math.round(size * scaleFactor * 10) / 10; // scaled font size
 
   if (sub.includes("long_garment") || (mt.includes("cabideiro") && !sub.includes("short"))) {
     // Long garments: bar near top, hanging lines with garment silhouettes
     const barY = iy + ih * 0.06;
-    svg += `<line x1="${ix + 8}" y1="${barY}" x2="${ix + iw - 8}" y2="${barY}" stroke="#666" stroke-width="3" stroke-linecap="round"/>`;
-    svg += `<circle cx="${ix + 8}" cy="${barY}" r="3.5" fill="#999" stroke="#666" stroke-width="0.5"/>`;
-    svg += `<circle cx="${ix + iw - 8}" cy="${barY}" r="3.5" fill="#999" stroke="#666" stroke-width="0.5"/>`;
-    for (let gx = ix + 18; gx < ix + iw - 12; gx += 16) {
+    svg += `<line x1="${ix + ss(8)}" y1="${barY}" x2="${ix + iw - ss(8)}" y2="${barY}" stroke="#666" stroke-width="${ss(3)}" stroke-linecap="round"/>`;
+    svg += `<circle cx="${ix + ss(8)}" cy="${barY}" r="${ss(4)}" fill="#999" stroke="#666" stroke-width="${ss(0.8)}"/>`;
+    svg += `<circle cx="${ix + iw - ss(8)}" cy="${barY}" r="${ss(4)}" fill="#999" stroke="#666" stroke-width="${ss(0.8)}"/>`;
+    const gStep = Math.max(ss(16), iw / 8);
+    for (let gx = ix + ss(18); gx < ix + iw - ss(12); gx += gStep) {
       const gh = ih * 0.7;
-      svg += `<path d="M${gx - 4} ${barY + 2} L${gx} ${barY - 3} L${gx + 4} ${barY + 2}" stroke="#aaa" stroke-width="0.8" fill="none"/>`;
-      svg += `<line x1="${gx}" y1="${barY + 2}" x2="${gx}" y2="${barY + gh}" stroke="#c0c0c0" stroke-width="0.6"/>`;
-      svg += `<path d="M${gx - 6} ${barY + gh} Q${gx} ${barY + gh + 4} ${gx + 6} ${barY + gh}" stroke="#c0c0c0" stroke-width="0.5" fill="none"/>`;
+      svg += `<path d="M${gx - ss(6)} ${barY + ss(2)} L${gx} ${barY - ss(3)} L${gx + ss(6)} ${barY + ss(2)}" stroke="#888" stroke-width="${ss(1.2)}" fill="none"/>`;
+      svg += `<line x1="${gx}" y1="${barY + ss(2)}" x2="${gx}" y2="${barY + gh}" stroke="#999" stroke-width="${ss(1)}"/>`;
+      svg += `<path d="M${gx - ss(8)} ${barY + gh} Q${gx} ${barY + gh + ss(8)} ${gx + ss(8)} ${barY + gh}" stroke="#999" stroke-width="${ss(0.8)}" fill="none"/>`;
     }
+    svg += `<text x="${x + w / 2}" y="${y + h - ss(4)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">CABIDEIRO</text>`;
   } else if (sub.includes("short_garment") || (mt.includes("cabideiro") && sub.includes("short"))) {
     // Short garments: bar higher, shelves below
     const barY = iy + ih * 0.06;
-    svg += `<line x1="${ix + 8}" y1="${barY}" x2="${ix + iw - 8}" y2="${barY}" stroke="#666" stroke-width="3" stroke-linecap="round"/>`;
-    svg += `<circle cx="${ix + 8}" cy="${barY}" r="3.5" fill="#999" stroke="#666" stroke-width="0.5"/>`;
-    svg += `<circle cx="${ix + iw - 8}" cy="${barY}" r="3.5" fill="#999" stroke="#666" stroke-width="0.5"/>`;
-    for (let gx = ix + 18; gx < ix + iw - 12; gx += 16) {
+    svg += `<line x1="${ix + ss(8)}" y1="${barY}" x2="${ix + iw - ss(8)}" y2="${barY}" stroke="#666" stroke-width="${ss(3)}" stroke-linecap="round"/>`;
+    svg += `<circle cx="${ix + ss(8)}" cy="${barY}" r="${ss(4)}" fill="#999" stroke="#666" stroke-width="${ss(0.8)}"/>`;
+    svg += `<circle cx="${ix + iw - ss(8)}" cy="${barY}" r="${ss(4)}" fill="#999" stroke="#666" stroke-width="${ss(0.8)}"/>`;
+    const gStep = Math.max(ss(16), iw / 8);
+    for (let gx = ix + ss(18); gx < ix + iw - ss(12); gx += gStep) {
       const gh = ih * 0.4;
-      svg += `<path d="M${gx - 4} ${barY + 2} L${gx} ${barY - 3} L${gx + 4} ${barY + 2}" stroke="#aaa" stroke-width="0.8" fill="none"/>`;
-      svg += `<line x1="${gx}" y1="${barY + 2}" x2="${gx}" y2="${barY + gh}" stroke="#c0c0c0" stroke-width="0.6"/>`;
+      svg += `<path d="M${gx - ss(6)} ${barY + ss(2)} L${gx} ${barY - ss(3)} L${gx + ss(6)} ${barY + ss(2)}" stroke="#888" stroke-width="${ss(1.2)}" fill="none"/>`;
+      svg += `<line x1="${gx}" y1="${barY + ss(2)}" x2="${gx}" y2="${barY + gh}" stroke="#999" stroke-width="${ss(1)}"/>`;
     }
     const shelfStart = iy + ih * 0.55;
     const shelfCount = 3;
-    const spacing = (ih - (shelfStart - iy) - 8) / shelfCount;
+    const spacing = (ih - (shelfStart - iy) - ss(8)) / shelfCount;
     for (let s = 0; s < shelfCount; s++) {
       const sy = shelfStart + s * spacing;
-      svg += `<rect x="${ix + 2}" y="${sy}" width="${iw - 4}" height="3" fill="#d8d0c0" stroke="#999" stroke-width="0.5"/>`;
+      svg += `<rect x="${ix + ss(2)}" y="${sy}" width="${iw - ss(4)}" height="${ss(4)}" fill="#d8d0c0" stroke="#999" stroke-width="${ss(0.8)}"/>`;
     }
+    svg += `<text x="${x + w / 2}" y="${y + h - ss(4)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">CABIDEIRO CURTO</text>`;
   } else if (sub.includes("shoe") || mt.includes("sapateira")) {
     // Shoe rack: inclined shelves 15° with shoe silhouettes (ellipses)
-    const shelfCount = Math.max(4, Math.min(10, Math.round(ih / 40)));
+    const shelfCount = Math.max(4, Math.min(10, Math.round(ih / ss(40))));
     const spacing = ih / (shelfCount + 1);
     for (let s = 1; s <= shelfCount; s++) {
       const sy = iy + s * spacing;
-      const tilt = Math.min(10, spacing * 0.3);
-      svg += `<line x1="${ix}" y1="${sy + tilt}" x2="${ix + iw}" y2="${sy}" stroke="#999" stroke-width="1.2"/>`;
-      if (iw > 40) {
-        const shoeW = Math.min(18, iw / 5);
-        for (let sx = ix + 8; sx < ix + iw - shoeW; sx += shoeW + 4) {
-          svg += `<ellipse cx="${sx + shoeW / 2}" cy="${sy + tilt * 0.5 - 3}" rx="${shoeW / 2}" ry="3" fill="#c0b8a8" fill-opacity="0.5" stroke="#bbb" stroke-width="0.3"/>`;
+      const tilt = Math.min(ss(10), spacing * 0.3);
+      svg += `<line x1="${ix}" y1="${sy + tilt}" x2="${ix + iw}" y2="${sy}" stroke="#777" stroke-width="${ss(1.5)}"/>`;
+      if (iw > ss(40)) {
+        const shoeW = Math.min(ss(25), iw / 5);
+        for (let sx = ix + ss(8); sx < ix + iw - shoeW; sx += shoeW + ss(6)) {
+          svg += `<ellipse cx="${sx + shoeW / 2}" cy="${sy + tilt * 0.5 - ss(3)}" rx="${shoeW / 2}" ry="${ss(5)}" fill="#c0b8a8" fill-opacity="0.5" stroke="#888" stroke-width="${ss(0.6)}"/>`;
         }
       }
     }
+    svg += `<text x="${x + w / 2}" y="${y + ss(14)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">SAPATEIRA</text>`;
   } else if (sub.includes("boot")) {
     // Boot rack: wider spaced inclined shelves with boot silhouettes (rectangles)
-    const shelfCount = Math.max(3, Math.min(6, Math.round(ih / 70)));
+    const shelfCount = Math.max(3, Math.min(6, Math.round(ih / ss(70))));
     const spacing = ih / (shelfCount + 1);
     for (let s = 1; s <= shelfCount; s++) {
       const sy = iy + s * spacing;
-      const tilt = Math.min(12, spacing * 0.25);
-      svg += `<line x1="${ix}" y1="${sy + tilt}" x2="${ix + iw}" y2="${sy}" stroke="#999" stroke-width="1.2"/>`;
-      if (iw > 40) {
-        const bootW = Math.min(14, iw / 4);
-        for (let sx = ix + 10; sx < ix + iw - bootW; sx += bootW + 8) {
-          svg += `<rect x="${sx}" y="${sy + tilt * 0.3 - spacing * 0.5}" width="${bootW}" height="${spacing * 0.45}" rx="2" fill="#a09080" fill-opacity="0.3" stroke="#bbb" stroke-width="0.3"/>`;
+      const tilt = Math.min(ss(12), spacing * 0.25);
+      svg += `<line x1="${ix}" y1="${sy + tilt}" x2="${ix + iw}" y2="${sy}" stroke="#777" stroke-width="${ss(1.5)}"/>`;
+      if (iw > ss(40)) {
+        const bootW = Math.min(ss(20), iw / 4);
+        for (let sx = ix + ss(10); sx < ix + iw - bootW; sx += bootW + ss(10)) {
+          svg += `<rect x="${sx}" y="${sy + tilt * 0.3 - spacing * 0.5}" width="${bootW}" height="${spacing * 0.45}" rx="${ss(2)}" fill="#a09080" fill-opacity="0.3" stroke="#888" stroke-width="${ss(0.6)}"/>`;
         }
       }
     }
+    svg += `<text x="${x + w / 2}" y="${y + ss(14)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">SAPATEIRA BOTAS</text>`;
   } else if (sub.includes("bag") || mt.includes("vitrine")) {
     // Vitrine: glass shelves (dashed) + LED strips
-    const shelfCount = Math.max(3, Math.min(6, Math.round(ih / 60)));
+    const shelfCount = Math.max(3, Math.min(6, Math.round(ih / ss(60))));
     const spacing = ih / (shelfCount + 1);
     for (let s = 1; s <= shelfCount; s++) {
       const sy = iy + s * spacing;
-      svg += `<line x1="${ix + 2}" y1="${sy}" x2="${ix + iw - 2}" y2="${sy}" stroke="#6AAAB0" stroke-width="1.2" stroke-dasharray="6,3"/>`;
-      svg += `<line x1="${ix + 4}" y1="${sy - 3}" x2="${ix + iw - 4}" y2="${sy - 3}" stroke="#FFD700" stroke-width="1.5" opacity="0.7"/>`;
+      svg += `<line x1="${ix + ss(2)}" y1="${sy}" x2="${ix + iw - ss(2)}" y2="${sy}" stroke="#6AAAB0" stroke-width="${ss(1.5)}" stroke-dasharray="${ss(8)},${ss(4)}"/>`;
+      svg += `<line x1="${ix + ss(4)}" y1="${sy - ss(4)}" x2="${ix + iw - ss(4)}" y2="${sy - ss(4)}" stroke="#FFD700" stroke-width="${ss(2)}" opacity="0.7"/>`;
     }
     if (features.includes("glass_door") || mt.includes("vitrine")) {
-      svg += `<rect x="${x + 1}" y="${y + 1}" width="${w - 2}" height="${h - 2}" fill="none" stroke="#6AAAB0" stroke-width="1" stroke-dasharray="8,4" rx="1"/>`;
+      svg += `<rect x="${x + ss(1)}" y="${y + ss(1)}" width="${w - ss(2)}" height="${h - ss(2)}" fill="none" stroke="#6AAAB0" stroke-width="${ss(1.2)}" stroke-dasharray="${ss(10)},${ss(5)}" rx="${ss(1)}"/>`;
     }
-  } else if (sub.includes("makeup") || mt.includes("bancada") || mt.includes("vanity")) {
-    // Makeup station: mirror + LED + countertop + drawers + outlet
+    svg += `<text x="${x + w / 2}" y="${y + ss(14)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#2288AA" font-family="Arial,sans-serif">VITRINE VIDRO + LED</text>`;
+  } else if (sub.includes("makeup") || mt.includes("vanity")) {
+    // Makeup station: mirror + LED + countertop + drawers
     const mirrorH = ih * 0.3;
     const mirrorY = iy + ih * 0.08;
-    svg += `<rect x="${ix + 6}" y="${mirrorY}" width="${iw - 12}" height="${mirrorH}" fill="#E8F4F8" stroke="#6AAAB0" stroke-width="0.8"/>`;
-    svg += `<line x1="${ix + 6}" y1="${mirrorY}" x2="${ix + iw - 6}" y2="${mirrorY + mirrorH}" stroke="#D0E8F0" stroke-width="0.3"/>`;
-    svg += `<line x1="${ix + iw - 6}" y1="${mirrorY}" x2="${ix + 6}" y2="${mirrorY + mirrorH}" stroke="#D0E8F0" stroke-width="0.3"/>`;
-    svg += `<line x1="${ix + 4}" y1="${mirrorY - 2}" x2="${ix + iw - 4}" y2="${mirrorY - 2}" stroke="#FFD700" stroke-width="2" opacity="0.8"/>`;
-    svg += `<line x1="${ix + 4}" y1="${mirrorY + mirrorH + 2}" x2="${ix + iw - 4}" y2="${mirrorY + mirrorH + 2}" stroke="#FFD700" stroke-width="2" opacity="0.8"/>`;
+    svg += `<rect x="${ix + ss(6)}" y="${mirrorY}" width="${iw - ss(12)}" height="${mirrorH}" fill="#E8F4F8" stroke="#6AAAB0" stroke-width="${ss(1)}"/>`;
+    svg += `<line x1="${ix + ss(6)}" y1="${mirrorY}" x2="${ix + iw - ss(6)}" y2="${mirrorY + mirrorH}" stroke="#D0E8F0" stroke-width="${ss(0.5)}"/>`;
+    svg += `<line x1="${ix + iw - ss(6)}" y1="${mirrorY}" x2="${ix + ss(6)}" y2="${mirrorY + mirrorH}" stroke="#D0E8F0" stroke-width="${ss(0.5)}"/>`;
+    svg += `<line x1="${ix + ss(4)}" y1="${mirrorY - ss(2)}" x2="${ix + iw - ss(4)}" y2="${mirrorY - ss(2)}" stroke="#FFD700" stroke-width="${ss(3)}" opacity="0.8"/>`;
+    svg += `<line x1="${ix + ss(4)}" y1="${mirrorY + mirrorH + ss(2)}" x2="${ix + iw - ss(4)}" y2="${mirrorY + mirrorH + ss(2)}" stroke="#FFD700" stroke-width="${ss(3)}" opacity="0.8"/>`;
+    svg += `<text x="${x + w / 2}" y="${mirrorY + mirrorH / 2 + ss(3)}" text-anchor="middle" font-size="${fs(8)}" fill="#6AA" font-family="Arial,sans-serif">ESPELHO</text>`;
     const counterY = mirrorY + mirrorH + ih * 0.08;
-    svg += `<rect x="${x}" y="${counterY}" width="${w}" height="4" fill="#d0c8b8" stroke="#888" stroke-width="0.8"/>`;
-    const drawStart = counterY + 8;
+    svg += `<rect x="${x}" y="${counterY}" width="${w}" height="${ss(6)}" fill="#d0c8b8" stroke="#888" stroke-width="${ss(1)}"/>`;
+    svg += `<text x="${x + w / 2}" y="${counterY - ss(3)}" text-anchor="middle" font-size="${fs(7)}" fill="#888" font-family="Arial,sans-serif">BANCADA 850mm</text>`;
+    const drawStart = counterY + ss(10);
     const drawCount = 3;
-    const drawH = (iy + ih - drawStart - 4) / drawCount;
+    const drawH = (iy + ih - drawStart - ss(4)) / drawCount;
     for (let d = 0; d < drawCount; d++) {
       const dy = drawStart + d * drawH;
-      svg += `<rect x="${ix + 2}" y="${dy}" width="${iw - 4}" height="${drawH - 4}" fill="${materialColor}" fill-opacity="0.15" stroke="#999" stroke-width="0.7" rx="1"/>`;
-      svg += `<rect x="${x + w / 2 - 10}" y="${dy + drawH / 2 - 3}" width="20" height="3" rx="1.5" fill="#888"/>`;
+      svg += `<rect x="${ix + ss(2)}" y="${dy}" width="${iw - ss(4)}" height="${drawH - ss(4)}" fill="${materialColor}" fill-opacity="0.15" stroke="#999" stroke-width="${ss(0.8)}" rx="${ss(1)}"/>`;
+      svg += `<line x1="${x + w / 2 - ss(12)}" y1="${dy + (drawH - ss(4)) / 2}" x2="${x + w / 2 + ss(12)}" y2="${dy + (drawH - ss(4)) / 2}" stroke="#888" stroke-width="${ss(2)}" stroke-linecap="round"/>`;
     }
-    svg += `<circle cx="${ix + iw - 12}" cy="${counterY - 8}" r="4" fill="none" stroke="#666" stroke-width="0.8"/>`;
-    svg += `<line x1="${ix + iw - 14}" y1="${counterY - 8}" x2="${ix + iw - 10}" y2="${counterY - 8}" stroke="#666" stroke-width="0.8"/>`;
   } else if (sub.includes("case") || mt.includes("arma")) {
     // Gun safe: mirror door + shelves + sensor + LED
-    svg += `<rect x="${ix + 2}" y="${iy + 2}" width="${iw - 4}" height="${ih - 4}" fill="#E0E8E8" stroke="#6AAAB0" stroke-width="0.8"/>`;
-    svg += `<line x1="${ix + 2}" y1="${iy + 2}" x2="${ix + iw - 2}" y2="${iy + ih - 2}" stroke="#D0E8F0" stroke-width="0.4"/>`;
-    svg += `<line x1="${ix + iw - 2}" y1="${iy + 2}" x2="${ix + 2}" y2="${iy + ih - 2}" stroke="#D0E8F0" stroke-width="0.4"/>`;
-    svg += `<circle cx="${ix + iw - 10}" cy="${y + h / 2}" r="3.5" fill="#888" stroke="#666" stroke-width="0.5"/>`;
-    svg += `<circle cx="${ix + iw - 10}" cy="${iy + 10}" r="3" fill="none" stroke="#e74c3c" stroke-width="0.8"/>`;
-    svg += `<path d="M${ix + iw - 14} ${iy + 6} Q${ix + iw - 10} ${iy + 2} ${ix + iw - 6} ${iy + 6}" fill="none" stroke="#e74c3c" stroke-width="0.5"/>`;
-    svg += `<line x1="${ix + 4}" y1="${iy + 4}" x2="${ix + iw - 16}" y2="${iy + 4}" stroke="#FFD700" stroke-width="1.5" opacity="0.7"/>`;
+    svg += `<rect x="${ix + ss(2)}" y="${iy + ss(2)}" width="${iw - ss(4)}" height="${ih - ss(4)}" fill="#E0E8E8" stroke="#6AAAB0" stroke-width="${ss(1)}"/>`;
+    svg += `<line x1="${ix + ss(2)}" y1="${iy + ss(2)}" x2="${ix + iw - ss(2)}" y2="${iy + ih - ss(2)}" stroke="#D0E8F0" stroke-width="${ss(0.6)}"/>`;
+    svg += `<line x1="${ix + iw - ss(2)}" y1="${iy + ss(2)}" x2="${ix + ss(2)}" y2="${iy + ih - ss(2)}" stroke="#D0E8F0" stroke-width="${ss(0.6)}"/>`;
+    svg += `<circle cx="${ix + iw - ss(12)}" cy="${y + h / 2}" r="${ss(5)}" fill="#888" stroke="#666" stroke-width="${ss(0.8)}"/>`;
+    svg += `<circle cx="${ix + iw - ss(12)}" cy="${iy + ss(12)}" r="${ss(4)}" fill="none" stroke="#e74c3c" stroke-width="${ss(1)}"/>`;
+    svg += `<line x1="${ix + ss(4)}" y1="${iy + ss(4)}" x2="${ix + iw - ss(16)}" y2="${iy + ss(4)}" stroke="#FFD700" stroke-width="${ss(2)}" opacity="0.7"/>`;
+    svg += `<text x="${x + w / 2}" y="${y + ss(20)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">ARMAS</text>`;
   } else if (sub.includes("jewel") || mt.includes("gaveteiro") || mt.includes("ilha")) {
     // Drawers with handles + velvet dividers
-    const drawerCount = Math.max(3, Math.min(7, Math.round(ih / 50)));
+    const drawerCount = Math.max(3, Math.min(7, Math.round(ih / ss(50))));
     const topH = ih * 0.08;
-    svg += `<rect x="${x}" y="${y}" width="${w}" height="${topH}" fill="#D0E8F0" fill-opacity="0.5" stroke="#6AAAB0" stroke-width="0.8"/>`;
-    const drawerH = (ih - topH - 8) / drawerCount;
+    svg += `<rect x="${x}" y="${y}" width="${w}" height="${topH}" fill="#D0E8F0" fill-opacity="0.5" stroke="#6AAAB0" stroke-width="${ss(1)}"/>`;
+    const drawerH = (ih - topH - ss(8)) / drawerCount;
     for (let d = 0; d < drawerCount; d++) {
       const dy = iy + topH + d * drawerH;
-      svg += `<rect x="${ix + 2}" y="${dy}" width="${iw - 4}" height="${drawerH - 4}" fill="${materialColor}" fill-opacity="0.15" stroke="#999" stroke-width="0.7" rx="1"/>`;
-      svg += `<rect x="${x + w / 2 - 10}" y="${dy + drawerH / 2 - 2}" width="20" height="3" rx="1.5" fill="#888"/>`;
-      if (iw > 60) {
-        const divCount = Math.min(4, Math.floor(iw / 30));
+      svg += `<rect x="${ix + ss(2)}" y="${dy}" width="${iw - ss(4)}" height="${drawerH - ss(4)}" fill="${materialColor}" fill-opacity="0.15" stroke="#999" stroke-width="${ss(0.8)}" rx="${ss(1)}"/>`;
+      svg += `<line x1="${x + w / 2 - ss(12)}" y1="${dy + (drawerH - ss(4)) / 2}" x2="${x + w / 2 + ss(12)}" y2="${dy + (drawerH - ss(4)) / 2}" stroke="#888" stroke-width="${ss(2)}" stroke-linecap="round"/>`;
+      if (iw > ss(60)) {
+        const divCount = Math.min(4, Math.floor(iw / ss(30)));
         for (let dv = 1; dv < divCount; dv++) {
-          const dvx = ix + 2 + (iw - 4) / divCount * dv;
-          svg += `<line x1="${dvx}" y1="${dy + 2}" x2="${dvx}" y2="${dy + drawerH - 6}" stroke="#c0b0a0" stroke-width="0.4" stroke-dasharray="2,2"/>`;
+          const dvx = ix + ss(2) + (iw - ss(4)) / divCount * dv;
+          svg += `<line x1="${dvx}" y1="${dy + ss(2)}" x2="${dvx}" y2="${dy + drawerH - ss(6)}" stroke="#c0b0a0" stroke-width="${ss(0.6)}" stroke-dasharray="${ss(3)},${ss(3)}"/>`;
         }
       }
     }
   } else if (sub.includes("suitcase") || mt.includes("maleiro")) {
-    // Maleiro: open space + 1-2 suitcase silhouettes
-    for (let hy = iy + 8; hy < iy + ih - 20; hy += 14) {
-      svg += `<line x1="${ix}" y1="${hy}" x2="${ix + iw}" y2="${hy}" stroke="#ddd" stroke-width="0.3"/>`;
+    // Maleiro: open space + suitcase silhouette
+    for (let hy = iy + ss(8); hy < iy + ih - ss(20); hy += ss(14)) {
+      svg += `<line x1="${ix}" y1="${hy}" x2="${ix + iw}" y2="${hy}" stroke="#ddd" stroke-width="${ss(0.5)}"/>`;
     }
-    const sW = Math.min(iw * 0.5, 60); const sH = ih * 0.4;
-    svg += `<rect x="${ix + iw / 2 - sW / 2}" y="${iy + ih - sH - 10}" width="${sW}" height="${sH}" rx="4" fill="none" stroke="#bbb" stroke-width="0.8"/>`;
-    svg += `<path d="M${ix + iw / 2 - sW * 0.2} ${iy + ih - sH - 10} Q${ix + iw / 2} ${iy + ih - sH - 20} ${ix + iw / 2 + sW * 0.2} ${iy + ih - sH - 10}" fill="none" stroke="#bbb" stroke-width="0.8"/>`;
-    svg += `<text x="${x + w / 2}" y="${y + 14}" text-anchor="middle" font-size="8" font-weight="bold" fill="#555" font-family="Arial,sans-serif">MALEIRO</text>`;
+    const sW = Math.min(iw * 0.5, ss(80)); const sH = ih * 0.4;
+    svg += `<rect x="${ix + iw / 2 - sW / 2}" y="${iy + ih - sH - ss(10)}" width="${sW}" height="${sH}" rx="${ss(5)}" fill="none" stroke="#999" stroke-width="${ss(1.2)}"/>`;
+    svg += `<path d="M${ix + iw / 2 - sW * 0.2} ${iy + ih - sH - ss(10)} Q${ix + iw / 2} ${iy + ih - sH - ss(25)} ${ix + iw / 2 + sW * 0.2} ${iy + ih - sH - ss(10)}" fill="none" stroke="#999" stroke-width="${ss(1)}"/>`;
+    svg += `<text x="${x + w / 2}" y="${y + ss(18)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">MALEIRO</text>`;
   } else if (sub.includes("oven_tower")) {
-    // Torre Forno/Micro: 2 rounded rects stacked (oven bottom, micro top)
-    const gap = 8;
-    const microH = ih * 0.28;
-    const ovenH = ih * 0.35;
-    const shelfY = iy + microH + gap;
-    const ovenY = shelfY + gap;
-    // Micro-ondas (top)
-    svg += `<rect x="${ix + 4}" y="${iy + 4}" width="${iw - 8}" height="${microH}" rx="5" fill="#E8E8E8" stroke="#666" stroke-width="1.2"/>`;
-    svg += `<rect x="${ix + 10}" y="${iy + 10}" width="${iw * 0.6}" height="${microH - 16}" rx="3" fill="#222" fill-opacity="0.08" stroke="#888" stroke-width="0.6"/>`;
-    svg += `<circle cx="${ix + iw - 20}" cy="${iy + microH / 2}" r="4" fill="none" stroke="#888" stroke-width="1"/>`;
-    svg += `<text x="${x + w / 2}" y="${iy + microH / 2 + 3}" text-anchor="middle" font-size="7" font-weight="bold" fill="#666" font-family="Arial,sans-serif">MICRO</text>`;
-    // Shelf between
-    svg += `<rect x="${ix + 2}" y="${shelfY}" width="${iw - 4}" height="4" fill="#d8d0c0" stroke="#999" stroke-width="0.5"/>`;
-    // Forno (bottom)
-    svg += `<rect x="${ix + 4}" y="${ovenY}" width="${iw - 8}" height="${ovenH}" rx="5" fill="#E0E0E0" stroke="#555" stroke-width="1.2"/>`;
-    svg += `<rect x="${ix + 10}" y="${ovenY + 6}" width="${iw * 0.65}" height="${ovenH - 18}" rx="3" fill="#1a1a1a" fill-opacity="0.06" stroke="#888" stroke-width="0.6"/>`;
-    svg += `<circle cx="${ix + iw - 20}" cy="${ovenY + ovenH / 2}" r="5" fill="none" stroke="#888" stroke-width="1.2"/>`;
-    svg += `<circle cx="${ix + iw - 20}" cy="${ovenY + ovenH / 2}" r="1.5" fill="#888"/>`;
-    svg += `<text x="${x + w / 2}" y="${ovenY + ovenH / 2 + 3}" text-anchor="middle" font-size="8" font-weight="bold" fill="#555" font-family="Arial,sans-serif">FORNO</text>`;
-    // Drawers/space below oven
-    const belowY = ovenY + ovenH + gap;
-    const belowH = iy + ih - belowY - 4;
-    if (belowH > 30) {
-      svg += `<rect x="${ix + 4}" y="${belowY}" width="${iw - 8}" height="${belowH}" rx="1" fill="${materialColor}" fill-opacity="0.1" stroke="#999" stroke-width="0.6"/>`;
-      svg += `<line x1="${x + w / 2 - 12}" y1="${belowY + belowH / 2}" x2="${x + w / 2 + 12}" y2="${belowY + belowH / 2}" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>`;
+    // Torre Forno/Micro
+    const gap = ss(8);
+    const microH = ih * 0.28; const ovenH = ih * 0.35;
+    const shelfY = iy + microH + gap; const ovenY = shelfY + gap;
+    svg += `<rect x="${ix + ss(4)}" y="${iy + ss(4)}" width="${iw - ss(8)}" height="${microH}" rx="${ss(5)}" fill="#E8E8E8" stroke="#666" stroke-width="${ss(1.5)}"/>`;
+    svg += `<rect x="${ix + ss(10)}" y="${iy + ss(10)}" width="${iw * 0.6}" height="${microH - ss(16)}" rx="${ss(3)}" fill="#222" fill-opacity="0.08" stroke="#888" stroke-width="${ss(0.8)}"/>`;
+    svg += `<circle cx="${ix + iw - ss(20)}" cy="${iy + microH / 2}" r="${ss(5)}" fill="none" stroke="#888" stroke-width="${ss(1.2)}"/>`;
+    svg += `<text x="${x + w / 2}" y="${iy + microH / 2 + ss(3)}" text-anchor="middle" font-size="${fs(8)}" font-weight="bold" fill="#666" font-family="Arial,sans-serif">MICRO</text>`;
+    svg += `<rect x="${ix + ss(2)}" y="${shelfY}" width="${iw - ss(4)}" height="${ss(5)}" fill="#d8d0c0" stroke="#999" stroke-width="${ss(0.8)}"/>`;
+    svg += `<rect x="${ix + ss(4)}" y="${ovenY}" width="${iw - ss(8)}" height="${ovenH}" rx="${ss(5)}" fill="#E0E0E0" stroke="#555" stroke-width="${ss(1.5)}"/>`;
+    svg += `<rect x="${ix + ss(10)}" y="${ovenY + ss(6)}" width="${iw * 0.65}" height="${ovenH - ss(18)}" rx="${ss(3)}" fill="#1a1a1a" fill-opacity="0.06" stroke="#888" stroke-width="${ss(0.8)}"/>`;
+    svg += `<circle cx="${ix + iw - ss(20)}" cy="${ovenY + ovenH / 2}" r="${ss(6)}" fill="none" stroke="#888" stroke-width="${ss(1.5)}"/>`;
+    svg += `<circle cx="${ix + iw - ss(20)}" cy="${ovenY + ovenH / 2}" r="${ss(2)}" fill="#888"/>`;
+    svg += `<text x="${x + w / 2}" y="${ovenY + ovenH / 2 + ss(3)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">FORNO</text>`;
+    const belowY = ovenY + ovenH + gap; const belowH = iy + ih - belowY - ss(4);
+    if (belowH > ss(30)) {
+      svg += `<rect x="${ix + ss(4)}" y="${belowY}" width="${iw - ss(8)}" height="${belowH}" rx="${ss(1)}" fill="${materialColor}" fill-opacity="0.1" stroke="#999" stroke-width="${ss(0.8)}"/>`;
+      svg += `<line x1="${x + w / 2 - ss(12)}" y1="${belowY + belowH / 2}" x2="${x + w / 2 + ss(12)}" y2="${belowY + belowH / 2}" stroke="#888" stroke-width="${ss(2)}" stroke-linecap="round"/>`;
     }
   } else if (sub.includes("cooktop")) {
-    // Bancada Cooktop: cooktop surface + drawers below
     const topH = ih * 0.08;
-    // Countertop
-    svg += `<rect x="${x}" y="${iy}" width="${w}" height="${topH}" fill="#d0c8b8" stroke="#888" stroke-width="0.8"/>`;
-    svg += `<text x="${x + w / 2}" y="${iy + topH / 2 + 3}" text-anchor="middle" font-size="6" fill="#666" font-family="Arial,sans-serif">BANCADA</text>`;
-    // Cooktop circles on top
-    const cY = iy + topH / 2;
-    const spacing = iw / 4;
+    svg += `<rect x="${x}" y="${iy}" width="${w}" height="${topH}" fill="#d0c8b8" stroke="#888" stroke-width="${ss(1)}"/>`;
+    const cY = iy + topH / 2; const spacing = iw / 4;
     for (let ci = 0; ci < 3; ci++) {
       const cx = ix + spacing * (ci + 0.5);
-      svg += `<circle cx="${cx}" cy="${cY}" r="${Math.min(spacing * 0.3, 12)}" fill="none" stroke="#333" stroke-width="1.5"/>`;
-      svg += `<circle cx="${cx}" cy="${cY}" r="${Math.min(spacing * 0.12, 5)}" fill="#333" fill-opacity="0.3"/>`;
+      svg += `<circle cx="${cx}" cy="${cY}" r="${Math.min(spacing * 0.3, ss(15))}" fill="none" stroke="#333" stroke-width="${ss(2)}"/>`;
+      svg += `<circle cx="${cx}" cy="${cY}" r="${Math.min(spacing * 0.12, ss(6))}" fill="#333" fill-opacity="0.3"/>`;
     }
-    // Drawers below
-    const drawCount = 2;
-    const drawAreaH = ih - topH - 8;
-    const drawH = drawAreaH / drawCount;
+    const drawCount = 2; const drawAreaH = ih - topH - ss(8); const drawH = drawAreaH / drawCount;
     for (let d = 0; d < drawCount; d++) {
-      const dy = iy + topH + 4 + d * drawH;
-      svg += `<rect x="${ix + 2}" y="${dy}" width="${iw - 4}" height="${drawH - 4}" fill="${materialColor}" fill-opacity="0.1" stroke="#999" stroke-width="0.7" rx="1"/>`;
-      svg += `<line x1="${x + w / 2 - 12}" y1="${dy + (drawH - 4) / 2}" x2="${x + w / 2 + 12}" y2="${dy + (drawH - 4) / 2}" stroke="#888" stroke-width="1.8" stroke-linecap="round"/>`;
-      svg += `<text x="${x + w / 2}" y="${dy + (drawH - 4) / 2 + 10}" text-anchor="middle" font-size="6" fill="#aaa" font-family="Arial,sans-serif">Gaveta ${d + 1}</text>`;
+      const dy = iy + topH + ss(4) + d * drawH;
+      svg += `<rect x="${ix + ss(2)}" y="${dy}" width="${iw - ss(4)}" height="${drawH - ss(4)}" fill="${materialColor}" fill-opacity="0.1" stroke="#999" stroke-width="${ss(0.8)}" rx="${ss(1)}"/>`;
+      svg += `<line x1="${x + w / 2 - ss(12)}" y1="${dy + (drawH - ss(4)) / 2}" x2="${x + w / 2 + ss(12)}" y2="${dy + (drawH - ss(4)) / 2}" stroke="#888" stroke-width="${ss(2)}" stroke-linecap="round"/>`;
     }
-    svg += `<text x="${x + w / 2}" y="${y + h - 4}" text-anchor="middle" font-size="7" font-weight="bold" fill="#555" font-family="Arial,sans-serif">COOKTOP</text>`;
+    svg += `<text x="${x + w / 2}" y="${y + h - ss(4)}" text-anchor="middle" font-size="${fs(8)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">COOKTOP</text>`;
   } else if (sub.includes("sink")) {
-    // Bancada Pia: cuba (ellipse) + torneira + drawers below
     const topH = ih * 0.08;
-    svg += `<rect x="${x}" y="${iy}" width="${w}" height="${topH}" fill="#d0c8b8" stroke="#888" stroke-width="0.8"/>`;
-    // Cuba (ellipse)
-    const cubaW = Math.min(iw * 0.5, 120); const cubaH = topH * 0.7;
-    svg += `<ellipse cx="${x + w / 2}" cy="${iy + topH / 2}" rx="${cubaW / 2}" ry="${cubaH / 2}" fill="#C8D8E0" stroke="#888" stroke-width="1"/>`;
-    svg += `<ellipse cx="${x + w / 2}" cy="${iy + topH / 2}" rx="${cubaW / 2 - 6}" ry="${cubaH / 2 - 3}" fill="none" stroke="#aaa" stroke-width="0.5"/>`;
-    // Torneira (vertical line + T)
-    const tX = x + w / 2 + cubaW / 2 + 10;
-    svg += `<line x1="${tX}" y1="${iy - 5}" x2="${tX}" y2="${iy + topH / 2 - 5}" stroke="#888" stroke-width="2"/>`;
-    svg += `<line x1="${tX - 8}" y1="${iy - 5}" x2="${tX + 2}" y2="${iy - 5}" stroke="#888" stroke-width="2" stroke-linecap="round"/>`;
-    svg += `<circle cx="${tX - 8}" cy="${iy}" r="1.5" fill="#888"/>`;
-    // Drawers/doors below
-    const drawCount = 3;
-    const drawAreaH = ih - topH - 8;
-    const drawH = drawAreaH / drawCount;
+    svg += `<rect x="${x}" y="${iy}" width="${w}" height="${topH}" fill="#d0c8b8" stroke="#888" stroke-width="${ss(1)}"/>`;
+    const cubaW = Math.min(iw * 0.5, ss(150)); const cubaH = topH * 0.7;
+    svg += `<ellipse cx="${x + w / 2}" cy="${iy + topH / 2}" rx="${cubaW / 2}" ry="${cubaH / 2}" fill="#C8D8E0" stroke="#888" stroke-width="${ss(1.2)}"/>`;
+    svg += `<ellipse cx="${x + w / 2}" cy="${iy + topH / 2}" rx="${cubaW / 2 - ss(6)}" ry="${cubaH / 2 - ss(3)}" fill="none" stroke="#aaa" stroke-width="${ss(0.6)}"/>`;
+    const tX = x + w / 2 + cubaW / 2 + ss(12);
+    svg += `<line x1="${tX}" y1="${iy - ss(6)}" x2="${tX}" y2="${iy + topH / 2 - ss(5)}" stroke="#888" stroke-width="${ss(2.5)}"/>`;
+    svg += `<line x1="${tX - ss(10)}" y1="${iy - ss(6)}" x2="${tX + ss(2)}" y2="${iy - ss(6)}" stroke="#888" stroke-width="${ss(2.5)}" stroke-linecap="round"/>`;
+    const drawCount = 3; const drawAreaH = ih - topH - ss(8); const drawH = drawAreaH / drawCount;
     for (let d = 0; d < drawCount; d++) {
-      const dy = iy + topH + 4 + d * drawH;
-      svg += `<rect x="${ix + 2}" y="${dy}" width="${iw - 4}" height="${drawH - 4}" fill="${materialColor}" fill-opacity="0.1" stroke="#999" stroke-width="0.7" rx="1"/>`;
-      svg += `<line x1="${x + w / 2 - 12}" y1="${dy + (drawH - 4) / 2}" x2="${x + w / 2 + 12}" y2="${dy + (drawH - 4) / 2}" stroke="#888" stroke-width="1.8" stroke-linecap="round"/>`;
+      const dy = iy + topH + ss(4) + d * drawH;
+      svg += `<rect x="${ix + ss(2)}" y="${dy}" width="${iw - ss(4)}" height="${drawH - ss(4)}" fill="${materialColor}" fill-opacity="0.1" stroke="#999" stroke-width="${ss(0.8)}" rx="${ss(1)}"/>`;
+      svg += `<line x1="${x + w / 2 - ss(12)}" y1="${dy + (drawH - ss(4)) / 2}" x2="${x + w / 2 + ss(12)}" y2="${dy + (drawH - ss(4)) / 2}" stroke="#888" stroke-width="${ss(2)}" stroke-linecap="round"/>`;
     }
-    svg += `<text x="${x + w / 2}" y="${y + h - 4}" text-anchor="middle" font-size="7" font-weight="bold" fill="#555" font-family="Arial,sans-serif">PIA</text>`;
+    svg += `<text x="${x + w / 2}" y="${y + h - ss(4)}" text-anchor="middle" font-size="${fs(8)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">PIA</text>`;
   } else if (sub.includes("niche")) {
-    // Nicho aberto: lighter background, no door lines
-    svg += `<rect x="${ix + 2}" y="${iy + 2}" width="${iw - 4}" height="${ih - 4}" fill="#F8F8F5" stroke="#ccc" stroke-width="0.5" rx="2"/>`;
+    svg += `<rect x="${ix + ss(2)}" y="${iy + ss(2)}" width="${iw - ss(4)}" height="${ih - ss(4)}" fill="#F8F8F5" stroke="#ccc" stroke-width="${ss(0.8)}" rx="${ss(2)}"/>`;
     if (features.includes("LED")) {
-      svg += `<line x1="${ix + 4}" y1="${iy + 4}" x2="${ix + iw - 4}" y2="${iy + 4}" stroke="#FFD700" stroke-width="2" opacity="0.7"/>`;
-      svg += `<text x="${x + w / 2}" y="${iy + 14}" text-anchor="middle" font-size="5" fill="#C90" font-family="Arial,sans-serif">LED</text>`;
+      svg += `<line x1="${ix + ss(4)}" y1="${iy + ss(4)}" x2="${ix + iw - ss(4)}" y2="${iy + ss(4)}" stroke="#FFD700" stroke-width="${ss(3)}" opacity="0.7"/>`;
     }
-    svg += `<text x="${x + w / 2}" y="${y + h / 2 + 3}" text-anchor="middle" font-size="8" font-weight="bold" fill="#999" font-family="Arial,sans-serif">NICHO</text>`;
+    svg += `<text x="${x + w / 2}" y="${y + h / 2 + ss(3)}" text-anchor="middle" font-size="${fs(9)}" font-weight="bold" fill="#999" font-family="Arial,sans-serif">NICHO</text>`;
   } else if (sub.includes("corner")) {
-    // Armário canto: diagonal line + magic corner icon
-    svg += `<line x1="${ix}" y1="${iy}" x2="${ix + iw}" y2="${iy + ih}" stroke="#ccc" stroke-width="0.5" stroke-dasharray="4,4"/>`;
-    // Magic corner shelves (2 rotating trays)
-    const cX = x + w / 2; const cY = y + h / 2;
-    svg += `<ellipse cx="${cX}" cy="${cY - 15}" rx="${iw * 0.35}" ry="8" fill="none" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>`;
-    svg += `<ellipse cx="${cX}" cy="${cY + 15}" rx="${iw * 0.35}" ry="8" fill="none" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>`;
-    svg += `<circle cx="${cX}" cy="${cY}" r="3" fill="#888"/>`;
-    svg += `<text x="${cX}" y="${cY + 35}" text-anchor="middle" font-size="7" font-weight="bold" fill="#555" font-family="Arial,sans-serif">CANTO</text>`;
+    svg += `<line x1="${ix}" y1="${iy}" x2="${ix + iw}" y2="${iy + ih}" stroke="#ccc" stroke-width="${ss(0.8)}" stroke-dasharray="${ss(5)},${ss(5)}"/>`;
+    const cX = x + w / 2; const cY2 = y + h / 2;
+    svg += `<ellipse cx="${cX}" cy="${cY2 - ss(20)}" rx="${iw * 0.35}" ry="${ss(12)}" fill="none" stroke="#999" stroke-width="${ss(1.2)}" stroke-dasharray="${ss(4)},${ss(4)}"/>`;
+    svg += `<ellipse cx="${cX}" cy="${cY2 + ss(20)}" rx="${iw * 0.35}" ry="${ss(12)}" fill="none" stroke="#999" stroke-width="${ss(1.2)}" stroke-dasharray="${ss(4)},${ss(4)}"/>`;
+    svg += `<circle cx="${cX}" cy="${cY2}" r="${ss(4)}" fill="#888"/>`;
+    svg += `<text x="${cX}" y="${cY2 + ss(40)}" text-anchor="middle" font-size="${fs(8)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">CANTO</text>`;
   } else if (sub.includes("kitchen_drawer")) {
-    // Kitchen drawers: stacked drawers with round handles + categories
-    const drawerCount = Math.max(2, Math.min(5, Math.round(ih / 120)));
-    const drawerH = (ih - 8) / drawerCount;
+    const drawerCount = Math.max(2, Math.min(5, Math.round(ih / ss(120))));
+    const drawerH = (ih - ss(8)) / drawerCount;
     for (let d = 0; d < drawerCount; d++) {
-      const dy = iy + 4 + d * drawerH;
-      svg += `<rect x="${ix + 2}" y="${dy}" width="${iw - 4}" height="${drawerH - 4}" fill="${materialColor}" fill-opacity="0.1" stroke="#999" stroke-width="0.8" rx="1"/>`;
-      // Round handle (puxador)
-      svg += `<circle cx="${x + w / 2}" cy="${dy + (drawerH - 4) / 2}" r="3" fill="#888" stroke="#666" stroke-width="0.5"/>`;
-      svg += `<text x="${x + w / 2}" y="${dy + (drawerH - 4) / 2 + 12}" text-anchor="middle" font-size="6" fill="#aaa" font-family="Arial,sans-serif">Gaveta ${d + 1}</text>`;
+      const dy = iy + ss(4) + d * drawerH;
+      svg += `<rect x="${ix + ss(2)}" y="${dy}" width="${iw - ss(4)}" height="${drawerH - ss(4)}" fill="${materialColor}" fill-opacity="0.1" stroke="#999" stroke-width="${ss(1)}" rx="${ss(1)}"/>`;
+      svg += `<circle cx="${x + w / 2}" cy="${dy + (drawerH - ss(4)) / 2}" r="${ss(4)}" fill="#888" stroke="#666" stroke-width="${ss(0.8)}"/>`;
+      svg += `<text x="${x + w / 2}" y="${dy + (drawerH - ss(4)) / 2 + ss(14)}" text-anchor="middle" font-size="${fs(7)}" fill="#aaa" font-family="Arial,sans-serif">Gaveta ${d + 1}</text>`;
     }
-    svg += `<text x="${x + w / 2}" y="${y + h - 4}" text-anchor="middle" font-size="7" font-weight="bold" fill="#555" font-family="Arial,sans-serif">GAVETEIRO</text>`;
+    svg += `<text x="${x + w / 2}" y="${y + h - ss(4)}" text-anchor="middle" font-size="${fs(8)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">GAVETEIRO</text>`;
   } else if (sub.includes("upper_cabinet")) {
-    // Upper cabinet: 2-3 shelves with simplified dish outlines
-    const shelfCount = 3;
-    const shelfSpacing = ih / (shelfCount + 1);
+    const shelfCount = 3; const shelfSpacing = ih / (shelfCount + 1);
     for (let s = 1; s <= shelfCount; s++) {
       const sy = iy + s * shelfSpacing;
-      svg += `<line x1="${ix + 2}" y1="${sy}" x2="${ix + iw - 2}" y2="${sy}" stroke="#999" stroke-width="1.2"/>`;
-      // Dish silhouettes on shelf
-      const dishW = Math.min(iw * 0.15, 20);
+      svg += `<line x1="${ix + ss(2)}" y1="${sy}" x2="${ix + iw - ss(2)}" y2="${sy}" stroke="#999" stroke-width="${ss(1.5)}"/>`;
+      const dishW = Math.min(iw * 0.15, ss(25));
       for (let di = 0; di < 3 && s < shelfCount; di++) {
-        const dx = ix + 10 + di * (dishW + 6);
-        svg += `<rect x="${dx}" y="${sy - 14}" width="${dishW}" height="12" rx="2" fill="none" stroke="#ccc" stroke-width="0.5"/>`;
+        const dx = ix + ss(10) + di * (dishW + ss(8));
+        svg += `<rect x="${dx}" y="${sy - ss(16)}" width="${dishW}" height="${ss(14)}" rx="${ss(2)}" fill="none" stroke="#bbb" stroke-width="${ss(0.6)}"/>`;
       }
     }
-    svg += `<text x="${x + w / 2}" y="${y + 14}" text-anchor="middle" font-size="7" font-weight="bold" fill="#555" font-family="Arial,sans-serif">ARMARIO SUPERIOR</text>`;
+    svg += `<text x="${x + w / 2}" y="${y + ss(14)}" text-anchor="middle" font-size="${fs(8)}" font-weight="bold" fill="#555" font-family="Arial,sans-serif">ARMARIO SUPERIOR</text>`;
   } else {
-    // Generic: simple shelf divisions
-    const divisions = Math.max(2, Math.floor(ih / 80));
+    // Generic: shelf divisions
+    const divisions = Math.max(2, Math.floor(ih / ss(80)));
     for (let d = 1; d < divisions; d++) {
       const dy = iy + (ih / divisions) * d;
-      svg += `<rect x="${ix + 2}" y="${dy}" width="${iw - 4}" height="3" fill="#e0d8d0" stroke="#bbb" stroke-width="0.4"/>`;
+      svg += `<rect x="${ix + ss(2)}" y="${dy}" width="${iw - ss(4)}" height="${ss(4)}" fill="#e0d8d0" stroke="#bbb" stroke-width="${ss(0.6)}"/>`;
     }
   }
 
-  // Door overlay if doorColor provided and different from material
+  // Door overlay
   if (doorColor && doorColor !== materialColor && (mt.includes("vitrine") || mt.includes("arma") || features.includes("door"))) {
-    svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${doorColor}" fill-opacity="0.12" stroke="${doorColor}" stroke-width="1" stroke-dasharray="4,4"/>`;
+    svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${doorColor}" fill-opacity="0.12" stroke="${doorColor}" stroke-width="${ss(1.2)}" stroke-dasharray="${ss(5)},${ss(5)}"/>`;
   }
 
   // LED feature
-  if (features.includes("LED") && !sub.includes("makeup") && !sub.includes("case")) {
-    svg += `<line x1="${ix + 4}" y1="${iy + 3}" x2="${ix + iw - 4}" y2="${iy + 3}" stroke="#FFD700" stroke-width="1.5" opacity="0.6"/>`;
+  if (features.includes("LED") && !sub.includes("makeup") && !sub.includes("case") && !sub.includes("niche")) {
+    svg += `<line x1="${ix + ss(4)}" y1="${iy + ss(3)}" x2="${ix + iw - ss(4)}" y2="${iy + ss(3)}" stroke="#FFD700" stroke-width="${ss(2)}" opacity="0.6"/>`;
   }
 
   // Sensor feature
   if (features.includes("sensor") && !sub.includes("case")) {
-    svg += `<circle cx="${ix + iw - 8}" cy="${iy + 8}" r="3" fill="none" stroke="#e74c3c" stroke-width="0.7"/>`;
-    svg += `<circle cx="${ix + iw - 8}" cy="${iy + 8}" r="1" fill="#e74c3c"/>`;
+    svg += `<circle cx="${ix + iw - ss(10)}" cy="${iy + ss(10)}" r="${ss(4)}" fill="none" stroke="#e74c3c" stroke-width="${ss(1)}"/>`;
+    svg += `<circle cx="${ix + iw - ss(10)}" cy="${iy + ss(10)}" r="${ss(1.5)}" fill="#e74c3c"/>`;
   }
 
   return svg;
@@ -1301,6 +1280,8 @@ function renderWallInteriorSvg(
   const padL = 100, padR = 60, padT = 50, padB = 60;
   const vbW = wallW + padL + padR;
   const vbH = wallH + padT + padB;
+  // Scale factor: viewBox is much larger than display (max-width 900px)
+  const ssFactor = Math.max(1, vbW / 900);
 
   let svg = `<svg viewBox="0 0 ${vbW} ${vbH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;height:auto;display:block;margin:0 auto;background:#fff;">`;
   svg += svgDefs(`${prefix}_`);
@@ -1341,7 +1322,7 @@ function renderWallInteriorSvg(
       const details = detectModuleDetails(mod);
       const matColor = getModuleMaterialColor(mod);
       const doorClr = getDoorMaterialColor(mod);
-      svg += renderModuleInterior(mt, details.subtype, mx, my, mod.width, mod.height, details.features, matColor, doorClr);
+      svg += renderModuleInterior(mt, details.subtype, mx, my, mod.width, mod.height, details.features, matColor, doorClr, ssFactor);
     }
 
     // Internal vertical cotas (SEM portas — full detail)
