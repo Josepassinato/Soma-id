@@ -1,0 +1,43 @@
+{
+  "id": "FX-004",
+  "name": "invalid_fabrication_case",
+  "description": "Briefing incompleto — deve ser bloqueado pelo readiness gate",
+  "briefing": {
+    "client": {
+      "name": "",
+      "email": "",
+      "phone": null,
+      "referral": ""
+    },
+    "project": {
+      "type": "",
+      "designer": "",
+      "date_in": "",
+      "date_due": null
+    },
+    "space": {
+      "total_area_m2": 0,
+      "ceiling_height_m": 0,
+      "walls": [],
+      "entry_point": {
+        "wall": "",
+        "width_m": 0
+      }
+    },
+    "zones": [],
+    "materials": {
+      "colors": [],
+      "mood_board": ""
+    },
+    "_meta": {
+      "sources": [
+        "test"
+      ],
+      "confidence": 0,
+      "missing_fields": [],
+      "timestamp": "2026-03-25T05:33:07.038Z"
+    }
+  },
+  "expectedReadyForGeneration": false,
+  "expectedCriticalIssues": 5
+}

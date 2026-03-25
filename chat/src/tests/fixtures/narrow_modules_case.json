@@ -1,0 +1,78 @@
+{
+  "id": "FX-005",
+  "name": "narrow_modules_case",
+  "description": "Módulos estreitos — testa fallback de cotas e render",
+  "briefing": {
+    "client": {
+      "name": "TEST NARROW",
+      "email": "",
+      "phone": null,
+      "referral": ""
+    },
+    "project": {
+      "type": "closet",
+      "designer": "Test",
+      "date_in": "2026-03-25",
+      "date_due": null
+    },
+    "space": {
+      "total_area_m2": 8,
+      "ceiling_height_m": 2.5,
+      "walls": [
+        {
+          "id": "north",
+          "length_m": 2,
+          "features": []
+        }
+      ],
+      "entry_point": {
+        "wall": "south",
+        "width_m": 0.8
+      }
+    },
+    "zones": [
+      {
+        "name": "Closet Min",
+        "wall": "north",
+        "items": [
+          {
+            "type": "shelves",
+            "quantity": 2
+          },
+          {
+            "type": "drawers",
+            "subtype": "gavetas",
+            "quantity": 2
+          },
+          {
+            "type": "nicho",
+            "quantity": 1,
+            "features": [
+              "LED"
+            ]
+          }
+        ]
+      }
+    ],
+    "materials": {
+      "colors": [
+        "Branco"
+      ],
+      "mood_board": "minimal"
+    },
+    "_meta": {
+      "sources": [
+        "test"
+      ],
+      "confidence": 1,
+      "missing_fields": [],
+      "timestamp": "2026-03-25T05:33:07.038Z"
+    }
+  },
+  "expectedModuleCount": 3,
+  "expectedSubtypes": [
+    "shelves",
+    "drawer_bank",
+    "niche"
+  ]
+}

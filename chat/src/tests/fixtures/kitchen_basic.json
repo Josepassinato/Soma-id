@@ -1,0 +1,291 @@
+{
+  "id": "FX-003",
+  "name": "kitchen_basic",
+  "description": "Cozinha Marcos Andrade — 4 modules, kitchen subtypes",
+  "briefing": {
+    "client": {
+      "name": "MARCOS ANDRADE - ALPHAVILLE",
+      "email": "marcos@teste.com",
+      "phone": null,
+      "referral": "SOMA-ID Test"
+    },
+    "project": {
+      "type": "cozinha",
+      "scope": "Cozinha L-shape completa",
+      "designer": "RICARDO",
+      "date_in": "2026-03-25",
+      "date_due": null
+    },
+    "space": {
+      "total_area_m2": 15.12,
+      "ceiling_height_m": 2.8,
+      "walls": [
+        {
+          "id": "north",
+          "label": "Parede A",
+          "length_m": 4.2,
+          "features": [
+            "torre_forno",
+            "armario_superior"
+          ]
+        },
+        {
+          "id": "east",
+          "label": "Parede B",
+          "length_m": 3.6,
+          "features": [
+            "pia",
+            "cooktop",
+            "coifa"
+          ]
+        },
+        {
+          "id": "south",
+          "label": "Parede C",
+          "length_m": 4.2,
+          "features": [
+            "door"
+          ]
+        },
+        {
+          "id": "west",
+          "label": "Parede D",
+          "length_m": 3.6,
+          "features": []
+        }
+      ],
+      "entry_point": {
+        "wall": "south",
+        "width_m": 0.9,
+        "position": "center"
+      }
+    },
+    "zones": [
+      {
+        "name": "Torre Forno/Micro",
+        "wall": "north",
+        "position": "left",
+        "dimensions": {
+          "width_m": 0.6,
+          "depth_m": 0.6
+        },
+        "items": [
+          {
+            "type": "oven_tower",
+            "subtype": "forno_embutido",
+            "quantity": 1,
+            "features": [
+              "forno",
+              "micro"
+            ],
+            "priority": "high"
+          },
+          {
+            "type": "shelves",
+            "subtype": "prateleira",
+            "quantity": 2,
+            "features": []
+          }
+        ],
+        "constraints": []
+      },
+      {
+        "name": "Armario Superior A",
+        "wall": "north",
+        "position": "center",
+        "dimensions": {
+          "width_m": 2.4,
+          "depth_m": 0.35
+        },
+        "items": [
+          {
+            "type": "upper_cabinet",
+            "subtype": "prateleira",
+            "quantity": 3,
+            "features": [
+              "door"
+            ],
+            "notes": "3 portas com prateleiras internas"
+          }
+        ],
+        "constraints": []
+      },
+      {
+        "name": "Bancada Pia",
+        "wall": "east",
+        "position": "left",
+        "dimensions": {
+          "width_m": 1.2,
+          "depth_m": 0.6
+        },
+        "items": [
+          {
+            "type": "sink_cabinet",
+            "subtype": "cuba_inox",
+            "quantity": 1,
+            "features": [
+              "cuba",
+              "torneira"
+            ],
+            "priority": "high"
+          },
+          {
+            "type": "drawers",
+            "subtype": "gavetas",
+            "quantity": 3,
+            "features": [
+              "soft-close"
+            ],
+            "categories": [
+              "talheres",
+              "utensilios",
+              "panos"
+            ]
+          }
+        ],
+        "constraints": [
+          {
+            "type": "min_passage",
+            "value_mm": 1200,
+            "relative_to": "parede oposta (oeste)",
+            "notes": "Circulacao minima cozinha"
+          }
+        ]
+      },
+      {
+        "name": "Bancada Cooktop",
+        "wall": "east",
+        "position": "center",
+        "dimensions": {
+          "width_m": 0.9,
+          "depth_m": 0.6
+        },
+        "items": [
+          {
+            "type": "cooktop_cabinet",
+            "subtype": "cooktop_5_bocas",
+            "quantity": 1,
+            "features": [
+              "cooktop",
+              "coifa"
+            ],
+            "priority": "high"
+          },
+          {
+            "type": "drawers",
+            "subtype": "gavetas",
+            "quantity": 2,
+            "features": [
+              "soft-close"
+            ]
+          }
+        ],
+        "constraints": []
+      },
+      {
+        "name": "Armario Canto",
+        "wall": "north+east",
+        "position": "corner",
+        "dimensions": {
+          "width_m": 0.6,
+          "depth_m": 0.6
+        },
+        "items": [
+          {
+            "type": "corner_cabinet",
+            "subtype": "magic_corner",
+            "quantity": 1,
+            "features": [
+              "magic_corner",
+              "door"
+            ],
+            "notes": "Canto cego com magic corner"
+          }
+        ],
+        "constraints": []
+      },
+      {
+        "name": "Gaveteiro",
+        "wall": "east",
+        "position": "right",
+        "dimensions": {
+          "width_m": 0.8,
+          "depth_m": 0.6
+        },
+        "items": [
+          {
+            "type": "drawers",
+            "subtype": "gaveteiro",
+            "quantity": 4,
+            "features": [
+              "soft-close"
+            ],
+            "categories": [
+              "temperos",
+              "panelas",
+              "formas",
+              "utensílios grandes"
+            ]
+          }
+        ],
+        "constraints": []
+      },
+      {
+        "name": "Nicho Decorativo LED",
+        "wall": "north",
+        "position": "right",
+        "dimensions": {
+          "width_m": 0.4,
+          "depth_m": 0.35
+        },
+        "items": [
+          {
+            "type": "open_niche",
+            "subtype": "nicho_led",
+            "quantity": 1,
+            "features": [
+              "LED",
+              "open"
+            ],
+            "notes": "Nicho aberto decorativo com LED"
+          }
+        ],
+        "constraints": []
+      }
+    ],
+    "materials": {
+      "colors": [
+        "Cinza Grafite",
+        "Branco TX"
+      ],
+      "color_assignments": {
+        "body": "Branco TX",
+        "doors": "Cinza Grafite",
+        "accent": null
+      },
+      "manufacturer": "Duratex",
+      "thickness_mm": 18,
+      "mood_board": "modern_industrial"
+    },
+    "gaps": [],
+    "_meta": {
+      "sources": [
+        "manual_test"
+      ],
+      "confidence": 1,
+      "missing_fields": [],
+      "timestamp": "2026-03-25T01:57:20.604Z",
+      "model": "test-script"
+    }
+  },
+  "expectedModuleCount": 4,
+  "expectedSubtypes": [
+    "sink_base",
+    "cooktop_base",
+    "drawer_bank",
+    "oven_tower"
+  ],
+  "expectedWalls": [
+    "north"
+  ]
+}

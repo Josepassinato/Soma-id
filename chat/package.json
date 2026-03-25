@@ -4,8 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js"
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "test": "tsc -p tsconfig.json && node src/tests/run-tests.mjs",
+    "test:fast": "node src/tests/run-tests.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",

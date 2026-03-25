@@ -1,0 +1,499 @@
+{
+  "id": "FX-001",
+  "name": "closet_linear_baseline",
+  "description": "Closet Sabrina Parkland — 5 modules, single wall, all subtypes (5 mainWall + 5 sideWall)",
+  "briefing": {
+    "client": {
+      "name": "SABRINA - PARKLAND",
+      "email": "priscila@myexxpo.com",
+      "phone": null,
+      "referral": "PRISCILA OLIVEIRA – EXXPO CONSTRUCTION"
+    },
+    "project": {
+      "type": "closet",
+      "scope": "Walk-in Closet Her + Closet His + Makeup Area + Gun Cases Storage + Central Island",
+      "designer": "ALANA",
+      "date_in": "2026-03-17",
+      "date_due": null,
+      "materials": {
+        "modules_body": {
+          "base_material": "mdf"
+        }
+      }
+    },
+    "space": {
+      "total_area_m2": 20.04,
+      "ceiling_height_m": 3,
+      "walls": [
+        {
+          "id": "north",
+          "label": "parede superior",
+          "length_m": 4.9,
+          "features": [],
+          "segments": [
+            {
+              "length_m": 4.9,
+              "function": "closet modules"
+            }
+          ]
+        },
+        {
+          "id": "south",
+          "label": "parede inferior com entrada",
+          "length_m": 4.9,
+          "features": [
+            "door"
+          ],
+          "segments": [
+            {
+              "length_m": 4.9,
+              "function": "entrance wall"
+            }
+          ]
+        },
+        {
+          "id": "east",
+          "label": "parede direita",
+          "length_m": 4.13,
+          "features": [],
+          "segments": [
+            {
+              "length_m": 4.13,
+              "function": "closet modules"
+            }
+          ]
+        },
+        {
+          "id": "west",
+          "label": "parede esquerda",
+          "length_m": 4.13,
+          "features": [],
+          "segments": [
+            {
+              "length_m": 4.13,
+              "function": "closet modules"
+            }
+          ]
+        }
+      ],
+      "entry_point": {
+        "wall": "south",
+        "width_m": 0.9,
+        "position": "center"
+      }
+    },
+    "zones": [
+      {
+        "name": "Closet Her",
+        "wall": "north",
+        "position": "parede principal ao fundo",
+        "dimensions": {
+          "width_m": 4.9,
+          "depth_m": 0.6
+        },
+        "priority_rule": "Cabides > Dobradas",
+        "items": [
+          {
+            "type": "hanging_bar",
+            "subtype": "long_garments",
+            "quantity": 1,
+            "features": [
+              "vestidos",
+              "camisas",
+              "calcas"
+            ],
+            "sizes": [],
+            "categories": [],
+            "access": "frequent",
+            "priority": "high",
+            "notes": "Cliente possui mais roupas para cabides do que dobrar"
+          },
+          {
+            "type": "shelf",
+            "subtype": "folded_clothes",
+            "quantity": 6,
+            "features": [],
+            "sizes": [],
+            "categories": [
+              "roupas dobradas"
+            ],
+            "access": "frequent",
+            "priority": "medium",
+            "notes": "Prateleiras para roupas dobradas"
+          },
+          {
+            "type": "niche",
+            "subtype": "folded_clothes",
+            "quantity": 4,
+            "features": [],
+            "sizes": [],
+            "categories": [
+              "roupas dobradas"
+            ],
+            "access": "frequent",
+            "priority": "medium",
+            "notes": "Nichos para roupas dobradas"
+          },
+          {
+            "type": "shoe_rack",
+            "subtype": "shoes",
+            "quantity": 30,
+            "features": [],
+            "sizes": [
+              "pares normais"
+            ],
+            "categories": [
+              "sapatos"
+            ],
+            "access": "frequent",
+            "priority": "high",
+            "notes": "30 pares de sapatos"
+          },
+          {
+            "type": "shoe_rack",
+            "subtype": "boots",
+            "quantity": 6,
+            "features": [],
+            "sizes": [
+              "pares de botas"
+            ],
+            "categories": [
+              "botas"
+            ],
+            "access": "frequent",
+            "priority": "high",
+            "notes": "6 pares de botas"
+          },
+          {
+            "type": "niche",
+            "subtype": "steamer_tower",
+            "quantity": 1,
+            "features": [
+              "vertical"
+            ],
+            "sizes": [
+              "torre"
+            ],
+            "categories": [
+              "steamer",
+              "escada"
+            ],
+            "access": "frequent",
+            "priority": "medium",
+            "notes": "Nicho vertical para steamer de torre + escada"
+          },
+          {
+            "type": "vitrine",
+            "subtype": "bags",
+            "quantity": 15,
+            "features": [
+              "glass_shelves",
+              "LED",
+              "open_no_door"
+            ],
+            "sizes": [],
+            "categories": [
+              "bolsas"
+            ],
+            "access": "frequent",
+            "priority": "high",
+            "notes": "Vitrines para 15 bolsas sem porta de vidro com prateleiras de vidro e LED"
+          },
+          {
+            "type": "luggage_area",
+            "subtype": "suitcases",
+            "quantity": 4,
+            "features": [
+              "easy_access"
+            ],
+            "sizes": [
+              "2 grandes",
+              "2 pequenas"
+            ],
+            "categories": [
+              "malas"
+            ],
+            "access": "frequent",
+            "priority": "high",
+            "notes": "Área em cima para malas - cliente viaja todo mês e precisa acessar facilmente"
+          }
+        ],
+        "constraints": []
+      },
+      {
+        "name": "Ilha Central",
+        "wall": "freestanding",
+        "position": "centro do closet",
+        "dimensions": {
+          "width_m": 2,
+          "depth_m": 1
+        },
+        "priority_rule": "",
+        "items": [
+          {
+            "type": "jewelry_display",
+            "subtype": "jewelry",
+            "quantity": 1,
+            "features": [
+              "glass_top",
+              "velvet_dividers"
+            ],
+            "sizes": [],
+            "categories": [
+              "joias",
+              "oculos"
+            ],
+            "access": "frequent",
+            "priority": "high",
+            "notes": "Área no topo com tampo de vidro e divisores em veludo para joias e óculos"
+          },
+          {
+            "type": "drawers",
+            "subtype": "lingerie",
+            "quantity": 2,
+            "features": [
+              "soft_close"
+            ],
+            "sizes": [],
+            "categories": [
+              "lingerie"
+            ],
+            "access": "frequent",
+            "priority": "high",
+            "notes": "Gavetas para lingerie"
+          },
+          {
+            "type": "drawers",
+            "subtype": "sleepwear",
+            "quantity": 2,
+            "features": [
+              "soft_close"
+            ],
+            "sizes": [],
+            "categories": [
+              "pijamas"
+            ],
+            "access": "frequent",
+            "priority": "medium",
+            "notes": "Gavetas para pijamas"
+          },
+          {
+            "type": "drawers",
+            "subtype": "swimwear",
+            "quantity": 1,
+            "features": [
+              "soft_close"
+            ],
+            "sizes": [],
+            "categories": [
+              "biquinis"
+            ],
+            "access": "occasional",
+            "priority": "medium",
+            "notes": "Gavetas para biquinis"
+          },
+          {
+            "type": "drawers",
+            "subtype": "accessories",
+            "quantity": 2,
+            "features": [
+              "soft_close"
+            ],
+            "sizes": [],
+            "categories": [
+              "cintos",
+              "acessorios"
+            ],
+            "access": "frequent",
+            "priority": "medium",
+            "notes": "Gavetas para cintos e acessórios"
+          }
+        ],
+        "constraints": [
+          {
+            "type": "clearance",
+            "value_mm": 600,
+            "relative_to": "all_walls",
+            "notes": "Manter circulação mínima ao redor da ilha"
+          }
+        ]
+      },
+      {
+        "name": "Area Makeup",
+        "wall": "east",
+        "position": "parede direita",
+        "dimensions": {
+          "width_m": 1.5,
+          "depth_m": 0.6
+        },
+        "priority_rule": "",
+        "items": [
+          {
+            "type": "vanity",
+            "subtype": "makeup_station",
+            "quantity": 1,
+            "features": [
+              "LED",
+              "elegant_design",
+              "functional"
+            ],
+            "sizes": [],
+            "categories": [
+              "makeup"
+            ],
+            "access": "frequent",
+            "priority": "high",
+            "notes": "Área elegante com iluminação para makeup - confortável e funcional"
+          }
+        ],
+        "constraints": [
+          {
+            "type": "min_passage",
+            "value_mm": 800,
+            "relative_to": "opposite_wall",
+            "notes": "Não estrangular passagem entre área makeup e torre da parede oposta"
+          }
+        ]
+      },
+      {
+        "name": "Area Armas",
+        "wall": "west",
+        "position": "parede esquerda",
+        "dimensions": {
+          "width_m": 1,
+          "depth_m": 0.6
+        },
+        "priority_rule": "",
+        "items": [
+          {
+            "type": "gun_cases_storage",
+            "subtype": "cases",
+            "quantity": 1,
+            "features": [
+              "mirror_door",
+              "LED",
+              "sensor",
+              "shelves"
+            ],
+            "sizes": [],
+            "categories": [
+              "cases",
+              "armas"
+            ],
+            "access": "occasional",
+            "priority": "high",
+            "notes": "Área com espelho na frente, quando abrir terá prateleiras com LEDs e sensor para cases com armas"
+          }
+        ],
+        "constraints": []
+      },
+      {
+        "name": "Closet His",
+        "wall": "west",
+        "position": "ao lado da área de armas",
+        "dimensions": {
+          "width_m": 2,
+          "depth_m": 0.6
+        },
+        "priority_rule": "",
+        "items": [
+          {
+            "type": "shelf",
+            "subtype": "folded_clothes",
+            "quantity": 4,
+            "features": [],
+            "sizes": [],
+            "categories": [
+              "roupas masculinas"
+            ],
+            "access": "frequent",
+            "priority": "medium",
+            "notes": "Prateleiras para roupas masculinas"
+          },
+          {
+            "type": "shoe_rack",
+            "subtype": "shoes",
+            "quantity": 1,
+            "features": [],
+            "sizes": [],
+            "categories": [
+              "sapatos masculinos"
+            ],
+            "access": "frequent",
+            "priority": "medium",
+            "notes": "Espaço para sapatos masculinos"
+          }
+        ],
+        "constraints": []
+      }
+    ],
+    "materials": {
+      "colors": [
+        "bv_lana",
+        "bv_lord"
+      ],
+      "color_assignments": {
+        "body": "bv_lana",
+        "doors": "bv_lord",
+        "accent": null
+      },
+      "manufacturer": "Boa Vista",
+      "thickness_mm": 18,
+      "mood_board": "elegant_neutral"
+    },
+    "gaps": [
+      {
+        "field": "project.date_due",
+        "description": "Data de entrega do projeto não foi especificada",
+        "priority": "LOW",
+        "category": "commercial"
+      },
+      {
+        "field": "client.phone",
+        "description": "Telefone do cliente não foi informado",
+        "priority": "LOW",
+        "category": "commercial"
+      },
+      {
+        "field": "space.ceiling_height_m",
+        "description": "Pé-direito não foi especificado no croqui",
+        "priority": "HIGH",
+        "category": "dimensional"
+      }
+    ],
+    "_meta": {
+      "sources": [
+        "pdf",
+        "image",
+        "text"
+      ],
+      "confidence": 0.85,
+      "missing_fields": [
+        "project.date_due",
+        "client.phone"
+      ],
+      "cross_reference_notes": [
+        "Nome do cliente confirmado entre capa (SABRINA) e briefing (SABRINA - PARKLAND)",
+        "Data de entrada consistente em ambos documentos: 03/17/2026",
+        "Projetista ALANA confirmado em ambos documentos",
+        "Materiais LANA e LORD identificados no mood board e cruzados com catálogo",
+        "Dimensões do espaço extraídas do croqui: 4,9m x 4,13m",
+        "Zonas identificadas no briefing e posicionadas conforme layout do croqui"
+      ],
+      "raw_text": "Client: SABRINA -PARKLAND\nProject: CLOSET\nDate: 03/17/2026\n1096 East Newport Center Dr # 200 - Deerfield Beach - Florida - 33442 - Phone: (786) 660-4180 - Silmara@bhomeconcept.com@bhomeconcept_\n\n \nMOOD BOARDCORES LANA e LORD\nMOOD BOARD\nCORES LANA e LORD\n1096 East Newport Center Dr # 200 - Deerfield Beach - Florida - 33442 - Phone: (786) 660-4180 - Silmara@bhomeconcept.com@bhomeconcept_\n\n\n\nFOTOS CLOSET CLIENTE\nFOTOS CLOSET CLIENTE\n1096 East Newport Center Dr # 200 - Deerfield Beach - Florida - 33442 - Phone: (786) 660-4180 - Silmara@bhomeconcept.com@bhomeconcept_\n\n1096 East Newport Center Dr # 200 - Deerfield Beach - Florida - 33442 - Phone: (786) 660-4180 - Silmara@bhomeconcept.com@bhomeconcept_\n\n1096 East Newport Center Dr # 200 - Deerfield Beach - Florida - 33442 - Phone: (786) 660-4180 - Silmara@bhomeconcept.com@bhomeconcept_\n1096 E Newport Center Dr # 200 - Deerfield Beach - Florida - 33442 – cel (786) 660-4180 - silmara@bhomeconcept.com - @bhomeconcept_     \n  \n \n \nCAPA DE CLIENTE PARA ELABORACAO DE PROJETOS \n \nNOME CLIENTE: SABRINA \nEMAIL: priscila@myexxpo.com \nTELEFONE:  \nQUEM INDICOU: PRISCILA OLIVEIRA – EXXPO CONSTRUCTION  \nPROJETISTA: ALANA \nDATA DE ENTRADA DO PROJETO: 03/17/2026 \nDATA DE ENTREGA DO PROJETO: \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n\n \n \n1096 E Newport Center Dr # 200 - Deerfield Beach - Florida - 33442 – cel (786) 660-4180 - silmara@bhomeconcept.com - @bhomeconcept_     \n  \n \n \nBRIEFING CLIENTE \n \nCLIENTE: SABRINA - PARKLAND \nPROJETO: CLOSET \nDATA DE ENTRADA PROJETO: 03/17/2026 \nPROJETISTA: ALANA \nDATA DE ENTREGA PROJETO:  \n \n \nCONSIDERAR SOLUCOES PARA: \n \nCLOSET HER \nCLIENTE POSSUI MAIS ROUPAS PARA COLOCAR EM CABIDES DO QUE ROUPAS PARA DOBRAR (VER FOTOS \nCLIENTE) – VESTIDOS / CAMISAS E CALCAS \n \n▪ PRATELEIRAS \n▪ NICHOS PARA COLOCAR ROUPAS DOBRADAS \n▪ SAPATEIRA ( CONSIDERAR 30 PARES DE SAPATOS E 06 PARES DE BOTAS) \n▪ NICHO VERTICAL PARA COLOCAR STEAMER DE TORRE + ESCADA \n▪ VITRINES PARA APROXIMADAMENTE 15 BOLSAS (ex",
+      "timestamp": "2026-03-24T22:54:40.139Z",
+      "model": "claude-sonnet-4-20250514"
+    }
+  },
+  "expectedModuleCount": 10,
+  "expectedSubtypes": [
+    "long_garment",
+    "shoe",
+    "boot",
+    "bag",
+    "suitcase"
+  ],
+  "expectedWalls": [
+    "north"
+  ]
+}

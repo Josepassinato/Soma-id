@@ -1,0 +1,104 @@
+{
+  "id": "FX-002",
+  "name": "closet_multi_wall",
+  "description": "Closet com zonas em 2 paredes — prepara para P0.4",
+  "briefing": {
+    "client": {
+      "name": "TEST MULTI-WALL",
+      "email": "",
+      "phone": null,
+      "referral": ""
+    },
+    "project": {
+      "type": "closet",
+      "designer": "Test",
+      "date_in": "2026-03-25",
+      "date_due": null
+    },
+    "space": {
+      "total_area_m2": 20,
+      "ceiling_height_m": 2.8,
+      "walls": [
+        {
+          "id": "north",
+          "length_m": 4,
+          "features": []
+        },
+        {
+          "id": "east",
+          "length_m": 3.5,
+          "features": []
+        },
+        {
+          "id": "south",
+          "length_m": 4,
+          "features": [
+            "door"
+          ]
+        }
+      ],
+      "entry_point": {
+        "wall": "south",
+        "width_m": 0.9
+      }
+    },
+    "zones": [
+      {
+        "name": "Closet Her",
+        "wall": "north",
+        "items": [
+          {
+            "type": "hanging_bar",
+            "subtype": "long_garments",
+            "quantity": 1
+          },
+          {
+            "type": "shoe_rack",
+            "subtype": "shoes",
+            "quantity": 20
+          }
+        ]
+      },
+      {
+        "name": "Closet His",
+        "wall": "east",
+        "items": [
+          {
+            "type": "shelves",
+            "quantity": 5
+          },
+          {
+            "type": "drawers",
+            "subtype": "gavetas",
+            "quantity": 3
+          }
+        ]
+      }
+    ],
+    "materials": {
+      "colors": [
+        "Lana"
+      ],
+      "mood_board": "modern"
+    },
+    "_meta": {
+      "sources": [
+        "test"
+      ],
+      "confidence": 1,
+      "missing_fields": [],
+      "timestamp": "2026-03-25T05:33:07.036Z"
+    }
+  },
+  "expectedModuleCount": 4,
+  "expectedSubtypes": [
+    "long_garment",
+    "shoe",
+    "shelves",
+    "drawer_bank"
+  ],
+  "expectedWalls": [
+    "north",
+    "east"
+  ]
+}
