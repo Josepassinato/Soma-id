@@ -22,6 +22,7 @@ import {
   internalVCotas, materialCallout,
 } from "./report/dimension-system.js";
 import { renderMaterialLegend } from "./report/legend-renderer.js";
+import { resolveModuleTyping } from "./module-typing.js";
 
 /* ============================================================
    Inline definitions removed — now imported from report/ modules
@@ -346,62 +347,42 @@ function renderModuleInterior(
  *  Reads moduleId, name, AND engine notes (e.g. "Subtipo: gavetas", "Zona: Bancada Pia")
  *  to determine the correct visual subtype for renderModuleInterior.
  */
+/** Detect module subtype and features.
+ *  P0.2: Prefers explicit moduleType/moduleSubtype fields (set by engine).
+ *  Falls back to legacy text parsing for old sessions without typing.
+ */
 function detectModuleDetails(mod: BlueprintModule): { subtype: string; features: string[] } {
-  const id = (mod.moduleId || "").toLowerCase();
-  const name = (mod.name || "").toLowerCase();
-  const notesArr = mod.notes || [];
-  const notesStr = notesArr.join(" ").toLowerCase();
-  const all = id + " " + name + " " + notesStr;
+  // P0.2 — Use explicit typing as primary source
+  if (mod.moduleSubtype && mod.moduleSubtype !== "generic") {
+    const features = mod.features ? [...mod.features] : [];
+    // Enrich features from notes if not already present
+    const notesStr = (mod.notes || []).join(" ").toLowerCase();
+    if (notesStr.includes("led") && !features.includes("LED")) features.push("LED");
+    if (notesStr.includes("sensor") && !features.includes("sensor")) features.push("sensor");
+    if (notesStr.includes("vidro") || notesStr.includes("glass")) { if (!features.includes("glass_door")) features.push("glass_door"); }
+    return { subtype: mod.moduleSubtype, features };
+  }
 
-  // Extract structured fields from engine notes: "Subtipo: xxx", "Zona: xxx", "Features: xxx"
-  const subtypeNote = notesArr.find(n => n.toLowerCase().startsWith("subtipo:"));
-  const subVal = subtypeNote ? subtypeNote.split(":")[1].trim().toLowerCase() : "";
-  const zonaNote = notesArr.find(n => n.toLowerCase().startsWith("zona:"));
-  const zonaVal = zonaNote ? zonaNote.split(":")[1].trim().toLowerCase() : "";
-  const featNote = notesArr.find(n => n.toLowerCase().startsWith("features:"));
-  const featVals = featNote ? featNote.split(":")[1].trim().toLowerCase().split(/[,\s]+/) : [];
+  // Legacy fallback for sessions without explicit typing
+  const typing = resolveModuleTyping(mod.moduleId || "", mod.notes || []);
 
-  let subtype = "generic";
-  const features: string[] = [];
+  // Map ModuleSubtype back to renderModuleInterior subtype strings
+  const subtypeMap: Record<string, string> = {
+    long_garment: "long_garment", short_garment: "short_garment", mixed_garment: "long_garment",
+    shoe: "shoe", boot: "boot", bag: "bag", jewelry: "jewel",
+    suitcase: "suitcase", shelves: "shelves", accessories: "shelves",
+    sink_base: "sink_base", cooktop_base: "cooktop_base", oven_tower: "oven_tower",
+    upper_cabinet: "upper_cabinet", corner_cabinet: "corner_cabinet", drawer_bank: "kitchen_drawers",
+    niche: "niche", steamer: "niche",
+    glass_display: "bag", led_panel: "niche", mirror_door: "shelves",
+    gun_safe: "case", vanity: "makeup",
+    generic: "generic",
+  };
 
-  // === Closet subtypes ===
-  if (all.includes("long_garment") || (all.includes("cabideiro") && all.includes("long"))) subtype = "long_garments";
-  else if (all.includes("short_garment") || (all.includes("cabideiro") && all.includes("short"))) subtype = "short_garments";
-  else if (all.includes("cabideiro")) subtype = "long_garments";
-  else if (all.includes("boot") || subVal === "boots") subtype = "boots";
-  else if (all.includes("shoe") || all.includes("sapateir") || subVal === "shoes") subtype = "shoes";
-  else if (all.includes("bag") || all.includes("bolsa") || all.includes("vitrine") || subVal === "bags") subtype = "bags";
-  else if (all.includes("makeup") || all.includes("vanity") || subVal === "makeup_station") subtype = "makeup_station";
-  else if (all.includes("arma") || all.includes("gun") || subVal === "cases") subtype = "cases";
-  else if (all.includes("joia") || all.includes("jewel") || all.includes("ilha") || subVal === "jewelry") subtype = "jewelry";
-  else if (all.includes("mala") || all.includes("maleiro") || all.includes("suitcase") || all.includes("luggage") || subVal === "suitcases") subtype = "suitcases";
-  // === Kitchen subtypes (detected from zone names, subtypes, and features) ===
-  else if (all.includes("forno") || all.includes("oven") || all.includes("micro") || subVal.includes("forno")) subtype = "oven_tower";
-  else if (all.includes("cooktop") || all.includes("fogao") || zonaVal.includes("cooktop")) subtype = "cooktop_base";
-  else if (all.includes("pia") || all.includes("sink") || all.includes("cuba") || zonaVal.includes("pia")) subtype = "sink_base";
-  else if (all.includes("nicho") || all.includes("niche") || subVal.includes("nicho")) subtype = "niche";
-  else if (all.includes("canto") || all.includes("corner") || all.includes("magic")) subtype = "corner_cabinet";
-  else if (zonaVal.includes("bancada") && !zonaVal.includes("makeup")) subtype = "kitchen_drawers";
-  else if (subVal === "gaveteiro" || (subVal === "gavetas" && zonaVal.includes("gaveteiro"))) subtype = "kitchen_drawers";
-  else if (subVal === "gavetas") subtype = "kitchen_drawers";
-  else if (all.includes("prateleira") || all.includes("shelf") || subVal === "prateleira") subtype = "shelves";
-  // === Upper cabinets ===
-  else if (all.includes("superior") || all.includes("upper_cabinet") || all.includes("aereo")) subtype = "upper_cabinet";
-
-  // Features from notes and text
-  if (all.includes("led") || featVals.includes("led")) features.push("LED");
-  if (all.includes("sensor") || featVals.includes("sensor")) features.push("sensor");
-  if (all.includes("mirror") || all.includes("espelho")) features.push("mirror");
-  if (all.includes("glass") || all.includes("vidro")) features.push("glass_door");
-  if (all.includes("door") || all.includes("porta")) features.push("door");
-  if (all.includes("soft-close") || all.includes("soft_close") || featVals.includes("soft-close")) features.push("soft-close");
-  if (all.includes("coifa") || featVals.includes("coifa")) features.push("coifa");
-  if (all.includes("cooktop") || featVals.includes("cooktop")) features.push("cooktop");
-  if (all.includes("forno") || featVals.includes("forno")) features.push("forno");
-  if (all.includes("micro") || featVals.includes("micro")) features.push("micro");
-  if (all.includes("cuba") || featVals.includes("cuba")) features.push("cuba");
-
-  return { subtype, features };
+  return {
+    subtype: subtypeMap[typing.moduleSubtype] || "generic",
+    features: typing.features,
+  };
 }
 
 /** Get material color from module cut list */

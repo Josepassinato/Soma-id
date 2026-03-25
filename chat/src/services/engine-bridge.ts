@@ -12,6 +12,7 @@ import { getModel } from "./gemini.js";
 import { normalizeBriefing } from "./briefing-normalizer.js";
 import { detectIssues } from "./briefing-issues.js";
 import { assessReadiness } from "./briefing-readiness.js";
+import { resolveModuleTyping } from "./module-typing.js";
 
 // ============================================================
 // Engine input/output types (mirrored from soma-id/types.ts)
@@ -93,6 +94,11 @@ export interface BlueprintModule {
   boundingBox: BoundingBox;
   notes: string[];
   cutList: CutListItem[];
+  // P0.2 — Explicit typing fields
+  moduleType?: import("./module-typing.js").ModuleType;
+  moduleSubtype?: import("./module-typing.js").ModuleSubtype;
+  zone?: string;
+  features?: string[];
 }
 
 export interface BlueprintData {
@@ -825,6 +831,13 @@ function processWallModules(
       notes: mod.notes,
       cutList,
     };
+
+    // P0.2 — Resolve explicit typing
+    const typing = resolveModuleTyping(mod.moduleId, mod.notes);
+    bpModule.moduleType = typing.moduleType;
+    bpModule.moduleSubtype = typing.moduleSubtype;
+    bpModule.zone = typing.zone;
+    bpModule.features = typing.features;
 
     modules.push(bpModule);
 
