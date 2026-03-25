@@ -122,6 +122,30 @@ function svgDefs(prefix: string = ""): string {
       <line x1="0" y1="0" x2="6" y2="6" stroke="#888" stroke-width="0.5"/>
       <line x1="6" y1="0" x2="0" y2="6" stroke="#888" stroke-width="0.5"/>
     </pattern>
+    <!-- Material hatch patterns -->
+    <pattern id="${prefix}hatch_mdf" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#888" stroke-width="0.5"/>
+    </pattern>
+    <pattern id="${prefix}hatch_mdf_light" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#aaa" stroke-width="0.3" opacity="0.5"/>
+    </pattern>
+    <pattern id="${prefix}hatch_wood" patternUnits="userSpaceOnUse" width="20" height="10">
+      <path d="M0,5 Q5,3 10,5 Q15,7 20,5" fill="none" stroke="#8B7355" stroke-width="0.4"/>
+      <path d="M0,2 Q5,0 10,2 Q15,4 20,2" fill="none" stroke="#8B7355" stroke-width="0.3"/>
+      <path d="M0,8 Q5,6 10,8 Q15,10 20,8" fill="none" stroke="#8B7355" stroke-width="0.3"/>
+    </pattern>
+    <pattern id="${prefix}hatch_glass" patternUnits="userSpaceOnUse" width="10" height="10">
+      <line x1="0" y1="0" x2="10" y2="10" stroke="#4A90D9" stroke-width="0.3" opacity="0.5"/>
+      <line x1="10" y1="0" x2="0" y2="10" stroke="#4A90D9" stroke-width="0.3" opacity="0.5"/>
+    </pattern>
+    <pattern id="${prefix}hatch_mirror" patternUnits="userSpaceOnUse" width="6" height="6">
+      <rect width="6" height="6" fill="#E8E8E8"/>
+      <line x1="0" y1="0" x2="6" y2="6" stroke="#999" stroke-width="0.4"/>
+      <line x1="6" y1="0" x2="0" y2="6" stroke="#999" stroke-width="0.4"/>
+    </pattern>
+    <pattern id="${prefix}hatch_stone" patternUnits="userSpaceOnUse" width="8" height="8">
+      <circle cx="2" cy="2" r="0.5" fill="#777"/><circle cx="6" cy="5" r="0.4" fill="#888"/><circle cx="4" cy="7" r="0.5" fill="#777"/>
+    </pattern>
   </defs>`;
 }
 
@@ -603,6 +627,48 @@ function getDoorMaterialColor(mod: BlueprintModule): string {
   return MAT_COLORS.bv_lord;
 }
 
+/** Map material name to SVG hatch pattern ID suffix (used with prefix) */
+function getMaterialHatchId(materialName: string): string {
+  const m = materialName.toLowerCase();
+  if (m.includes("vidro") || m.includes("glass") || m.includes("temperado")) return "hatch_glass";
+  if (m.includes("espelho") || m.includes("mirror")) return "hatch_mirror";
+  if (m.includes("pedra") || m.includes("granito") || m.includes("marmore") || m.includes("stone")) return "hatch_stone";
+  if (m.includes("carvalho") || m.includes("freijo") || m.includes("noce") || m.includes("madeira") || m.includes("lamina")) return "hatch_wood";
+  if (m.includes("mdf 6mm") || m.includes("mdf 3mm") || m.includes("fundo")) return "hatch_mdf_light";
+  // Default for MDP/MDF/BP — standard diagonal hatch
+  return "hatch_mdf";
+}
+
+/** Render material legend block for elevation pranchas */
+function renderMaterialLegend(materials: Array<{name: string; color: string}>, prefix: string, x: number, y: number): string {
+  let svg = `<g transform="translate(${x}, ${y})">`;
+  svg += `<text x="0" y="0" font-size="10" font-weight="bold" fill="#333" font-family="Arial,sans-serif">LEGENDA DE MATERIAIS</text>`;
+  svg += `<line x1="0" y1="4" x2="160" y2="4" stroke="#333" stroke-width="0.5"/>`;
+  const seen = new Set<string>();
+  let row = 0;
+  for (const mat of materials) {
+    const key = mat.name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const ry = 14 + row * 20;
+    const hatchId = getMaterialHatchId(mat.name);
+    svg += `<rect x="0" y="${ry}" width="30" height="14" fill="${mat.color}" stroke="#999" stroke-width="0.3"/>`;
+    svg += `<rect x="0" y="${ry}" width="30" height="14" fill="url(#${prefix}${hatchId})" stroke="#999" stroke-width="0.3"/>`;
+    svg += `<text x="38" y="${ry + 10}" font-size="8" fill="#333" font-family="Arial,sans-serif">${mat.name}</text>`;
+    row++;
+  }
+  svg += `</g>`;
+  return svg;
+}
+
+/** Standard technical drawing scales */
+const STANDARD_SCALES = [1, 2, 5, 10, 15, 20, 25, 50, 75, 100];
+
+/** Normalize a raw scale ratio to the nearest standard scale */
+function normalizeScale(rawScale: number): number {
+  return STANDARD_SCALES.find(s => s >= rawScale) || STANDARD_SCALES[STANDARD_SCALES.length - 1];
+}
+
 /* ============================================================
    SVG: Floor Plan (Top-down view)
    ============================================================ */
@@ -630,7 +696,8 @@ function renderFloorPlanSvg(briefing: ParsedBriefing, results: EngineResults): s
   const vbH = sD + padT + padB;
 
   // Calculate auto-scale text
-  const autoScaleRatio = Math.ceil(Math.max(roomW, roomD) / 400);
+  const rawScaleRatio = Math.ceil(Math.max(roomW, roomD) / 400);
+  const autoScaleRatio = normalizeScale(rawScaleRatio);
   const scaleText = `Escala 1:${autoScaleRatio}`;
 
   let svg = `<svg viewBox="0 0 ${vbW} ${vbH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;height:auto;display:block;margin:0 auto;background:#fff;">`;
@@ -948,8 +1015,11 @@ function renderWallSvg(
     const fill = modFill(mod);
     const mt = modType(mod);
 
-    // Module body
+    // Module body — base color + material hatch overlay
+    const modMat = mod.cutList?.[0]?.material || "";
+    const hatchId = getMaterialHatchId(modMat);
     svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="${fill}" stroke="#333" stroke-width="${ss(2)}"/>`;
+    svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="url(#${prefix}${hatchId})" stroke="none"/>`;
 
     // 18mm side panels with ABNT hatch fill (solid material cross-section)
     svg += `<rect x="${mx}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#555" stroke-width="${ss(0.8)}"/>`;
@@ -1252,13 +1322,22 @@ function renderWallSvg(
     }
   }
 
-  // Material color swatches
-  const materials = new Set(modules.map(m => m.cutList?.[0]?.material || "MDF 18mm"));
-  let swatchX = padL;
-  for (const mat of materials) {
-    svg += `<rect x="${swatchX}" y="${padT - 25}" width="12" height="12" fill="${getColorForMaterial(mat)}" stroke="${STROKE}" stroke-width="0.5"/>`;
-    svg += `<text x="${swatchX + 16}" y="${padT - 15}" font-size="9" fill="#666" font-family="Arial,sans-serif">${esc(mat)}</text>`;
-    swatchX += 120;
+  // Material legend with hatch samples
+  {
+    const matSet = new Map<string, string>();
+    for (const m of modules) {
+      const matName = m.cutList?.[0]?.material || "MDF 18mm";
+      if (!matSet.has(matName.toLowerCase())) {
+        matSet.set(matName.toLowerCase(), matName);
+      }
+      // Also add door material if different
+      const doorCut = (m.cutList || []).find(c => (c.piece || "").toLowerCase().includes("porta") || (c.piece || "").toLowerCase().includes("front"));
+      if (doorCut && !matSet.has(doorCut.material.toLowerCase())) {
+        matSet.set(doorCut.material.toLowerCase(), doorCut.material);
+      }
+    }
+    const matList = Array.from(matSet.values()).map(name => ({ name, color: getColorForMaterial(name) }));
+    svg += renderMaterialLegend(matList, `${prefix}_`, padL + wallW - 180, padT - 30 - matList.length * 20);
   }
 
   svg += `</svg>`;
@@ -1309,13 +1388,17 @@ function renderWallInteriorSvg(
     const insetW = mod.width - 12;
 
     // Module outline (solid = open, no doors)
+    const modMatName = mod.cutList?.[0]?.material || "";
+    const modHatchId = getMaterialHatchId(modMatName);
     svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="#FAFAFA" stroke="#666" stroke-width="1.5"/>`;
-    // 18mm side panels with ABNT hatch
-    svg += `<rect x="${mx}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#999" stroke-width="0.5"/>`;
-    svg += `<rect x="${mx + mod.width - 18}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#999" stroke-width="0.5"/>`;
+    // 18mm side panels with material-specific hatch (ABNT cross-section standard)
+    svg += `<rect x="${mx}" y="${my}" width="18" height="${mod.height}" fill="${getColorForMaterial(modMatName)}" stroke="#999" stroke-width="0.5"/>`;
+    svg += `<rect x="${mx}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_${modHatchId})" stroke="#999" stroke-width="0.5"/>`;
+    svg += `<rect x="${mx + mod.width - 18}" y="${my}" width="18" height="${mod.height}" fill="${getColorForMaterial(modMatName)}" stroke="#999" stroke-width="0.5"/>`;
+    svg += `<rect x="${mx + mod.width - 18}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_${modHatchId})" stroke="#999" stroke-width="0.5"/>`;
     // Top/bottom panels
-    svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="18" fill="url(#${prefix}_wallHatch)" stroke="#999" stroke-width="0.3" opacity="0.5"/>`;
-    svg += `<rect x="${mx}" y="${my + mod.height - 18}" width="${mod.width}" height="18" fill="url(#${prefix}_wallHatch)" stroke="#999" stroke-width="0.3" opacity="0.5"/>`;
+    svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="18" fill="url(#${prefix}_${modHatchId})" stroke="#999" stroke-width="0.3" opacity="0.5"/>`;
+    svg += `<rect x="${mx}" y="${my + mod.height - 18}" width="${mod.width}" height="18" fill="url(#${prefix}_${modHatchId})" stroke="#999" stroke-width="0.3" opacity="0.5"/>`;
 
     // Use restored renderModuleInterior with detectModuleDetails for rich interior rendering
     {
