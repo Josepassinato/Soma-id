@@ -1181,6 +1181,92 @@ test("factory release with measurement waived", () => {
 });
 
 // ================================================================
+// P2.3: BOA VISTA OPERATIONALIZATION TESTS
+// ================================================================
+console.log("\n=== Boa Vista operationalization ===");
+
+const { findBoaVistaFamily, findBoaVistaMaterial, checkCompatibility, assessBoaVistaCoverage, BOA_VISTA_FAMILIES, BOA_VISTA_MATERIALS, BOA_VISTA_HARDWARE } = await import(path.join(DIST, "services/boa-vista-coverage.js"));
+
+test("Boa Vista has real material catalog", () => {
+  assert(BOA_VISTA_MATERIALS.length >= 12, `Should have >= 12 BV materials, got ${BOA_VISTA_MATERIALS.length}`);
+  for (const m of BOA_VISTA_MATERIALS) {
+    assert(m.manufacturer === "Boa Vista", `Material ${m.displayName} should be Boa Vista`);
+    assert(m.catalogVersion === "BV-2025", "Should be BV-2025 catalog");
+  }
+});
+
+test("Boa Vista has real hardware catalog", () => {
+  assert(BOA_VISTA_HARDWARE.length >= 13, `Should have >= 13 BV hardware, got ${BOA_VISTA_HARDWARE.length}`);
+  for (const h of BOA_VISTA_HARDWARE) {
+    assert(h.hardwareId.startsWith("bv-hw-"), `Hardware ${h.displayName} should have bv-hw- prefix`);
+  }
+});
+
+test("Boa Vista has product families for closet", () => {
+  const cabideiro = findBoaVistaFamily("long_garment");
+  assert(cabideiro, "Should find long_garment family");
+  assert.equal(cabideiro.boaVistaLine, "Linha Closet Premium");
+  assert(cabideiro.allowedMaterials.length > 0, "Should have allowed materials");
+  assert(cabideiro.pricingReference.basePrice > 0, "Should have base price");
+});
+
+test("Boa Vista has product families for kitchen", () => {
+  const pia = findBoaVistaFamily("sink_base");
+  assert(pia, "Should find sink_base family");
+  assert.equal(pia.boaVistaLine, "Linha Cozinha");
+
+  const torre = findBoaVistaFamily("oven_tower");
+  assert(torre, "Should find oven_tower family");
+});
+
+test("Boa Vista material lookup works", () => {
+  const lana = findBoaVistaMaterial("Lana");
+  assert(lana, "Should find Lana");
+  assert.equal(lana.materialId, "bv-lana");
+
+  const unknown = findBoaVistaMaterial("Exotic Unknown Wood");
+  assert.equal(unknown, null, "Unknown material should return null");
+});
+
+test("compatibility blocks forbidden combinations", () => {
+  // BV Preto + Cabideiro Longo = forbidden
+  const violations = checkCompatibility(["bv-preto"], [], "bvf-cabideiro-longo");
+  assert(violations.length > 0, "Should detect forbidden combination");
+  assert.equal(violations[0].severity, "block");
+});
+
+test("coverage assessment for closet project", () => {
+  const coverage = assessBoaVistaCoverage("test-cov", [
+    { moduleSubtype: "long_garment", name: "Cabideiro", traceId: "M-A01" },
+    { moduleSubtype: "shoe", name: "Sapateira", traceId: "M-A02" },
+    { moduleSubtype: "glass_display", name: "Vitrine", traceId: "M-A03" },
+  ], ["Lana", "Lord"], ["dobradica", "corredica"]);
+
+  assert.equal(coverage.coveredByBoaVista, 3, "All 3 should be covered");
+  assert.equal(coverage.coveragePercent, 100, "Should be 100% coverage");
+  assert(coverage.materialsCovered >= 2, "Both materials should be covered");
+});
+
+test("coverage assessment detects fallback", () => {
+  const coverage = assessBoaVistaCoverage("test-cov-2", [
+    { moduleSubtype: "long_garment", name: "Cabideiro", traceId: "M-A01" },
+    { moduleSubtype: "unknown_special", name: "Custom Module", traceId: "M-A02" },
+  ], ["Lana"], []);
+
+  assert.equal(coverage.coveredByBoaVista, 1);
+  assert.equal(coverage.fallbackGeneric, 1);
+  assert.equal(coverage.coveragePercent, 50);
+  assert(coverage.diagnosticNotes.some(n => n.includes("fallback")), "Should note fallback");
+});
+
+test("all BV families have pricing reference", () => {
+  for (const f of BOA_VISTA_FAMILIES) {
+    assert(f.pricingReference.basePrice > 0, `Family ${f.familyId} should have base price`);
+    assert(f.pricingReference.currency === "USD", `Family ${f.familyId} should use USD`);
+  }
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
