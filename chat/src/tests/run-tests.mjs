@@ -19,6 +19,7 @@ const { detectIssues } = await import(path.join(DIST, "services/briefing-issues.
 const { assessReadiness } = await import(path.join(DIST, "services/briefing-readiness.js"));
 const { runEnginePipeline } = await import(path.join(DIST, "services/engine-bridge.js"));
 const { generateHtmlReport } = await import(path.join(DIST, "services/html-report.js"));
+const { validateFabrication } = await import(path.join(DIST, "services/fabrication-validator.js"));
 
 let passed = 0;
 let failed = 0;
@@ -454,6 +455,70 @@ for (const fxName of ["closet_linear_baseline", "kitchen_basic"]) {
     assert(pranchaCount >= 10, `Should have at least 10 pranchas, got ${pranchaCount}`);
   });
 }
+
+// ================================================================
+// P0.8: FABRICATION VALIDATION TESTS
+// ================================================================
+console.log("\n=== Fabrication validation ===");
+
+test("closet has fabrication validation in results", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_fv_closet");
+  assert(results.fabricationValidation, "Should have fabricationValidation");
+  assert(typeof results.fabricationValidation.isReadyForFactory === "boolean", "Should have isReadyForFactory flag");
+  assert(typeof results.fabricationValidation.totalChecks === "number", "Should have totalChecks");
+});
+
+test("kitchen has fabrication validation", () => {
+  const fx = loadFixture("kitchen_basic");
+  const results = runEnginePipeline(fx.briefing, "test_fv_kitchen");
+  assert(results.fabricationValidation, "Should have fabricationValidation");
+  assert(results.summary.isReadyForFactory !== undefined, "Summary should have isReadyForFactory");
+});
+
+test("validation results have proper structure", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_fv_struct");
+  const fv = results.fabricationValidation;
+  for (const r of fv.results) {
+    assert(r.code, `Result missing code`);
+    assert(r.severity, `Result ${r.code} missing severity`);
+    assert(r.message, `Result ${r.code} missing message`);
+    assert(r.entityTraceId, `Result ${r.code} missing entityTraceId`);
+    assert(r.entityName, `Result ${r.code} missing entityName`);
+    assert(["info", "warning", "critical"].includes(r.severity), `Invalid severity: ${r.severity}`);
+  }
+});
+
+test("report shows fabrication validation section", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_fv_report");
+  const html = generateHtmlReport(fx.briefing, results, "test_fv_report");
+  assert(html.includes("Validacao de Fabricabilidade"), "Report should show fabrication validation");
+});
+
+test("isReadyForFactory false when critical exists", () => {
+  // Create a module with depth too shallow for hanging (FV-003)
+  const fakeWalls = [{
+    wallId: "north", label: "Test", orientation: "north",
+    wallWidth: 3000, usableWidth: 3000, totalModuleWidth: 800,
+    modules: [{
+      id: "test", moduleId: "closet_cabideiro", name: "Cabideiro Raso",
+      type: "base", width: 800, height: 2400, depth: 300, // too shallow!
+      position: { x: 0, y: 0, z: 0 },
+      boundingBox: { min: { x: 0, y: 0, z: 0 }, max: { x: 800, y: 2400, z: 300 } },
+      notes: [], cutList: [],
+      moduleType: "closet_storage", moduleSubtype: "long_garment",
+      traceId: "M-A01", shortLabel: "A01", parentWallTraceId: "W-NORTH-01",
+    }],
+    distributionNotes: [], traceId: "W-NORTH-01",
+  }];
+  const result = validateFabrication(fakeWalls);
+  assert.equal(result.isReadyForFactory, false, "Should NOT be ready with shallow hanging");
+  assert(result.criticalCount > 0, "Should have critical issues");
+  const fv003 = result.results.find(r => r.code === "FV-003");
+  assert(fv003, "Should have FV-003 (hanging depth) critical");
+});
 
 // ================================================================
 // RESULTS

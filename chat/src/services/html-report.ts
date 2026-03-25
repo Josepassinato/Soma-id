@@ -2900,6 +2900,39 @@ ${SHEET_COMPOSITION_CSS}
   <h3 style="font-size:14px;font-weight:700;margin:8px 0;color:#27ae60">Nenhum conflito de engenharia detectado</h3>
   <p style="font-size:12px;color:#666">O interferenceEngine validou todos os modulos e nao encontrou sobreposicoes, violacoes de contorno ou problemas ergonomicos.</p>`}
 
+  <!-- P0.8 — Fabrication Validation -->
+  ${(() => {
+    const fv = results.fabricationValidation;
+    if (!fv || fv.totalChecks === 0) return `
+  <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:#27ae60">Validacao de Fabricabilidade: OK</h3>
+  <p style="font-size:12px;color:#666">Nenhum problema de fabricacao detectado.</p>`;
+
+    const statusColor = fv.isReadyForFactory ? "#27ae60" : "#e74c3c";
+    const statusLabel = fv.isReadyForFactory ? "PRONTO PARA FABRICA" : "NAO PRONTO — REQUER ATENCAO";
+    let html = `
+  <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:${statusColor}">Validacao de Fabricabilidade: ${statusLabel}</h3>
+  <div class="metrics" style="margin-bottom:8px">
+    <div class="metric ${fv.criticalCount > 0 ? "red" : "green"}"><div class="val">${fv.criticalCount}</div><div class="lbl">Criticos</div></div>
+    <div class="metric ${fv.warningCount > 0 ? "orange" : "green"}"><div class="val">${fv.warningCount}</div><div class="lbl">Avisos</div></div>
+    <div class="metric blue"><div class="val">${fv.totalChecks}</div><div class="lbl">Verificacoes</div></div>
+  </div>`;
+    if (fv.results.length > 0) {
+      html += `<table><tr><th>Cod.</th><th>Sev.</th><th>Modulo</th><th>Problema</th><th>Acao Sugerida</th></tr>`;
+      for (const r of fv.results) {
+        const sevClass = r.severity === "critical" ? "color:#e74c3c;font-weight:bold" : r.severity === "warning" ? "color:#e6a817" : "color:#888";
+        html += `<tr>
+          <td style="font-family:monospace">${esc(r.code)}</td>
+          <td style="${sevClass}">${r.severity === "critical" ? "CRITICO" : r.severity === "warning" ? "AVISO" : "INFO"}</td>
+          <td>${esc(r.entityName)} <span style="font-family:monospace;font-size:9px;color:#888">${esc(r.entityTraceId)}</span></td>
+          <td>${esc(r.message)}</td>
+          <td style="font-size:11px;color:#666">${esc(r.suggestedAction || "-")}</td>
+        </tr>`;
+      }
+      html += `</table>`;
+    }
+    return html;
+  })()}
+
   <!-- Material Warnings -->
   ${materialWarnings.length > 0 ? `
   <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:#e6a817">Avisos de Material</h3>

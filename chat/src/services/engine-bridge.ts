@@ -15,6 +15,7 @@ import { assessReadiness } from "./briefing-readiness.js";
 import { resolveModuleTyping } from "./module-typing.js";
 import { buildWallLayouts, distributionSummary } from "./layout-distributor.js";
 import { applyTraceability, validateTraceability } from "./traceability.js";
+import { validateFabrication, type FabricationValidationSummary } from "./fabrication-validator.js";
 
 // ============================================================
 // Engine input/output types (mirrored from soma-id/types.ts)
@@ -189,6 +190,8 @@ export interface EngineResults {
   blueprint: BlueprintData;
   nesting: NestingResult;
   conflicts: InterferenceConflict[];
+  // P0.8 — Fabrication validation
+  fabricationValidation?: FabricationValidationSummary;
   summary: {
     total_modules: number;
     total_parts: number;
@@ -199,6 +202,7 @@ export interface EngineResults {
     hardware_items: number;
     estimated_cost_usd: number;
     estimated_cost_brl: number;
+    isReadyForFactory?: boolean;
   };
 }
 
@@ -1450,12 +1454,20 @@ export function runEnginePipeline(
   const estimatedCostUsd = sheetCostUsd + hardwareCostUsd;
   const estimatedCostBrl = nesting.totalSheets * 280 + blueprint.hardwareMap.length * 45;
 
+  // Step 5: Fabrication validation (P0.8)
+  const roomDepthMm = (briefing.space?.walls?.length >= 2)
+    ? Math.min(...briefing.space.walls.map(w => w.length_m * 1000))
+    : undefined;
+  const fabValidation = validateFabrication(wallLayouts, roomDepthMm);
+  console.log(`[ENGINE] Fabrication: ${fabValidation.totalChecks} checks — ${fabValidation.criticalCount} critical, ${fabValidation.warningCount} warnings | Ready: ${fabValidation.isReadyForFactory}`);
+
   const totalModules = blueprint.mainWall.modules.length + (blueprint.sideWall?.modules?.length || 0);
 
   return {
     blueprint,
     nesting,
     conflicts,
+    fabricationValidation: fabValidation,
     summary: {
       total_modules: totalModules,
       total_parts: nesting.totalParts,
@@ -1466,6 +1478,7 @@ export function runEnginePipeline(
       hardware_items: blueprint.hardwareMap.length,
       estimated_cost_usd: estimatedCostUsd,
       estimated_cost_brl: estimatedCostBrl,
+      isReadyForFactory: fabValidation.isReadyForFactory,
     },
   };
 }
