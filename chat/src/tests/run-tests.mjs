@@ -913,6 +913,97 @@ test("revision history retrieval", () => {
 });
 
 // ================================================================
+// P1.6: DRILLING & ASSEMBLY TESTS
+// ================================================================
+console.log("\n=== Drilling & assembly ===");
+
+const { generateDrillingForPiece, findPatterns, getAllPatterns } = await import(path.join(DIST, "services/drilling-patterns.js"));
+const { generateAssemblyHints, findAssemblyProfile, getAllProfiles } = await import(path.join(DIST, "services/assembly-hints.js"));
+
+test("drawer bank lateral drilling generates points", () => {
+  const result = generateDrillingForPiece("drawer_bank", "lateral", 580, 900, 580, "P-A01-01");
+  assert.equal(result.supported, true, "Should be supported");
+  assert(result.points.length > 0, `Should have drilling points, got ${result.points.length}`);
+  assert(result.patternsUsed.length > 0, "Should list patterns used");
+  // Check traceability
+  for (const p of result.points) {
+    assert.equal(p.pieceTraceId, "P-A01-01", "Should carry pieceTraceId");
+    assert(p.diameter > 0, "Should have valid diameter");
+    assert(p.depth > 0, "Should have valid depth");
+  }
+});
+
+test("shelf support drilling generates 32mm system holes", () => {
+  const result = generateDrillingForPiece("shelves", "lateral", 580, 2400, 600, "P-A02-01");
+  assert.equal(result.supported, true);
+  const shelfHoles = result.points.filter(p => p.drillType === "suporte_prateleira");
+  assert(shelfHoles.length > 20, `Should have many shelf support holes (32mm system), got ${shelfHoles.length}`);
+});
+
+test("hanging bar drilling generates mounting points", () => {
+  const result = generateDrillingForPiece("long_garment", "lateral", 580, 2400, 600);
+  assert.equal(result.supported, true);
+  const barHoles = result.points.filter(p => p.drillType === "cabideiro");
+  assert(barHoles.length >= 2, "Should have at least 2 bar mounting points");
+});
+
+test("unsupported module/piece returns supported=false", () => {
+  const result = generateDrillingForPiece("unknown_type", "random_piece", 500, 500, 500);
+  assert.equal(result.supported, false);
+  assert.equal(result.points.length, 0);
+});
+
+test("assembly profile exists for drawer_bank", () => {
+  const profile = findAssemblyProfile("drawer_bank");
+  assert(profile, "Should find drawer_bank profile");
+  assert(profile.hints.length >= 4, "Should have at least 4 assembly steps");
+  assert(profile.requiredHardware.includes("corredica"), "Should require corredica");
+});
+
+test("assembly hints generated with traceability", () => {
+  const hints = generateAssemblyHints("long_garment", "M-A01");
+  assert(hints.length > 0, "Should generate hints");
+  for (const h of hints) {
+    assert.equal(h.moduleTraceId, "M-A01");
+    assert(h.sequence > 0, "Should have sequence number");
+    assert(h.joinType, "Should have joinType");
+  }
+});
+
+test("kitchen sink assembly profile exists", () => {
+  const profile = findAssemblyProfile("sink_base");
+  assert(profile, "Should find sink_base profile");
+  assert(profile.requiredHardware.includes("dobradica"), "Should require dobradica");
+});
+
+test("oven tower assembly profile exists", () => {
+  const profile = findAssemblyProfile("oven_tower");
+  assert(profile, "Should find oven_tower profile");
+  const wallFix = profile.hints.find(h => h.relatedPieceRole === "parede");
+  assert(wallFix, "Oven tower should have wall fixing hint (safety)");
+});
+
+test("all patterns have valid structure", () => {
+  const patterns = getAllPatterns();
+  assert(patterns.length >= 6, `Should have at least 6 patterns, got ${patterns.length}`);
+  for (const p of patterns) {
+    assert(p.patternId, "Pattern should have ID");
+    assert(p.pieceRole, "Pattern should have pieceRole");
+    assert(typeof p.generate === "function", "Pattern should have generate function");
+  }
+});
+
+test("all assembly profiles have valid structure", () => {
+  const profiles = getAllProfiles();
+  assert(profiles.length >= 5, `Should have at least 5 profiles, got ${profiles.length}`);
+  for (const p of profiles) {
+    assert(p.profileId, "Profile should have ID");
+    assert(p.moduleSubtype, "Profile should have moduleSubtype");
+    assert(p.hints.length > 0, `Profile ${p.profileId} should have hints`);
+  }
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
