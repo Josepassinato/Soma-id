@@ -1,5 +1,68 @@
 # HISTORICO.md — SOMA-ID
 
+## 2026-03-24 — Refinamento Iterativo de Imagem Conceito
+
+### O que foi feito
+
+**Objetivo:** Permitir que o usuario peca ajustes pontuais na imagem conceito sem regenerar do zero. Ex: "mude a cor da ilha para Lana", "adicione mais iluminacao LED".
+
+**1. Session interface (session.ts):**
+- Nova interface `ImageHistoryEntry` (prompt, url, userRequest, timestamp)
+- Novos campos na Session: `lastImagePrompt`, `lastImageUrl`, `imageHistory[]`
+
+**2. Backend — Endpoint `POST /session/:id/refine-image` (conversation.ts):**
+- Recebe `userRequest` (texto livre do usuario)
+- Pega `lastImagePrompt` da sessao (prompt original)
+- Envia para Gemini 2.5 Flash gerar um novo prompt modificado mantendo todos os elementos exceto o que o usuario pediu para mudar
+- Fallback: se Gemini falhar, append da modificacao ao prompt original
+- Gera nova imagem via Imagen-4 (primary) ou Gemini Flash Image (fallback)
+- Salva prompt refinado + imagem na sessao e no imageHistory
+
+**3. Backend — Endpoint `POST /session/:id/revert-image` (conversation.ts):**
+- Remove ultima entrada do imageHistory
+- Restaura prompt e imagem da versao anterior
+- Retorna imagem anterior
+
+**4. Frontend — Estado e deteccao (chat.html):**
+- Novos campos no estado: `S.lastImagePrompt`, `S.imageHistory[]`
+- Prompt e imagem salvos no frontend apos geracao bem-sucedida
+- `isImageRefinementRequest()`: detecta ~40 keywords de refinamento visual (mude, troque, adicione, remova, cor, piso, parede, etc.)
+- Exclusao de `ENCHANTMENT_FEEDBACK` do interceptor de perguntas livres (para que refinamentos nao sejam capturados como free questions)
+
+**5. Frontend — Refinamento (chat.html):**
+- `refineConceptImage(userRequest)`: chama `/refine-image`, mostra nova imagem, atualiza historico
+- `revertToPreviousImage()`: chama `/revert-image`, mostra imagem anterior
+- `showEnchantmentChips()`: chips dinamicos — "Aprovado", "Gerar outra", "Voltar a anterior" (so aparece se ha historico), "Pular"
+- `handleEnchantFeedback` atualizado: detecta refinamento ou revert antes de ir para summary
+- Mensagem da imagem atualizada: "Voce pode pedir ajustes — ex: mude a cor da ilha para Lana"
+
+### Testes
+| Teste | Resultado |
+|---|---|
+| TypeScript build | Zero erros |
+| Health endpoint | OK (localhost:8091) |
+| HTTPS frontend | HTTP 200, funcoes novas presentes |
+| POST /refine-image (sessao inexistente) | 404 correto |
+| POST /revert-image (sessao inexistente) | 404 correto |
+| PM2 restart | Online, sem erros no startup |
+
+### Arquivos alterados
+- `chat/src/services/session.ts` — ImageHistoryEntry interface, lastImagePrompt/lastImageUrl/imageHistory na Session
+- `chat/src/routes/conversation.ts` — salva prompt/imagem na sessao apos generate-image, endpoints refine-image e revert-image
+- `chat/public/chat.html` — estado frontend, isImageRefinementRequest, refineConceptImage, revertToPreviousImage, showEnchantmentChips, handleEnchantFeedback atualizado
+
+### Estado atual
+- Frontend: https://somaid.12brain.org (HTTP 200)
+- Chat: http://localhost:8091 (PM2 online, health OK)
+- Sandbox: `/root/sandbox/soma-id_2026-03-24-refinamento/` (mantido)
+
+### Integracoes ativas
+- Gemini API: refinamento de prompt (Gemini 2.5 Flash) + geracao de imagem (Imagen-4 / Gemini Flash Image): OK
+- imageHistory: persistido na sessao (file-based): OK
+- Fluxo de chat: briefing → perguntas → estilo → materiais → imagem → **refinamento iterativo** → summary → engines → resultado: OK
+
+---
+
 ## 2026-03-24 — Pranchas Técnicas Profissionais (Padrão Promob/SketchUp Layout)
 
 ### O que foi feito
