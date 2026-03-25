@@ -1004,6 +1004,72 @@ test("all assembly profiles have valid structure", () => {
 });
 
 // ================================================================
+// P2.1: PRODUCTION PACKET TESTS
+// ================================================================
+console.log("\n=== Production packet ===");
+
+const { generatePieceLabels } = await import(path.join(DIST, "services/piece-labels.js"));
+const { generateProductionPacket } = await import(path.join(DIST, "services/production-packet.js"));
+
+test("piece labels generated for closet", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_pkt_labels");
+  const labels = generatePieceLabels(results.blueprint.walls);
+  assert(labels.length > 0, "Should generate labels");
+  for (const l of labels) {
+    assert(l.pieceRole, "Label should have pieceRole");
+    assert(l.material, "Label should have material");
+    assert(l.widthMm > 0, "Label should have valid width");
+    assert(["supported", "unsupported", "none"].includes(l.drillingStatus), "Should have valid drillingStatus");
+  }
+});
+
+test("production packet has wall groups", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_pkt_walls");
+  const packet = generateProductionPacket(results.blueprint.walls, results, "test-proj");
+  assert(packet.wallGroups.length > 0, "Should have wall groups");
+  assert(packet.totalModules > 0, "Should have modules");
+  assert(packet.totalPieces > 0, "Should have pieces");
+});
+
+test("production packet has module groups with assembly", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_pkt_modules");
+  const packet = generateProductionPacket(results.blueprint.walls, results, "test-proj");
+  const allModGroups = packet.wallGroups.flatMap(w => w.modules);
+  assert(allModGroups.length > 0, "Should have module groups");
+  // At least some modules should have assembly steps
+  const withAssembly = allModGroups.filter(m => m.assemblySteps.length > 0);
+  assert(withAssembly.length > 0, `Should have modules with assembly steps, got ${withAssembly.length}`);
+});
+
+test("production packet tracks drilling points", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_pkt_drill");
+  const packet = generateProductionPacket(results.blueprint.walls, results, "test-proj");
+  assert(packet.totalDrillingPoints >= 0, "Should track drilling points");
+  // Closet should have at least some drilling
+  assert(packet.totalDrillingPoints > 0, `Closet should have drilling points, got ${packet.totalDrillingPoints}`);
+});
+
+test("production packet distinguishes supported vs unsupported", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_pkt_support");
+  const packet = generateProductionPacket(results.blueprint.walls, results, "test-proj");
+  assert(packet.fullySupported + packet.unsupported === packet.totalModules, "Supported + unsupported should equal total");
+  assert(packet.productionNotes.length > 0, "Should have production notes");
+});
+
+test("kitchen production packet works", () => {
+  const fx = loadFixture("kitchen_basic");
+  const results = runEnginePipeline(fx.briefing, "test_pkt_kitchen");
+  const packet = generateProductionPacket(results.blueprint.walls, results, "test-proj-k");
+  assert(packet.totalModules > 0, "Kitchen should have modules");
+  assert(packet.totalPieces > 0, "Kitchen should have pieces");
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
