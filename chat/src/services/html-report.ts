@@ -178,6 +178,96 @@ function dimLine(
   return lines;
 }
 
+/* ============================================================
+   Professional ABNT Dimension Lines — Horizontal cotas
+   ============================================================ */
+const DIM_STYLE = {
+  gap: 3,        // gap between object and extension line start
+  overshoot: 3,  // extension line past dimension line
+  tickSize: 4,   // length of 45° terminator tick
+  lineWidth: 0.4,
+  tickWidth: 0.7,
+  fontSize: 7,
+  baseOffset: 20, // distance from object to first cota level
+  levelSpacing: 18, // distance between cota levels
+  minTextGap: 10, // minimum space for text to fit between ticks
+  color: "#333",
+};
+
+/** Render a single professional horizontal dimension line with extension lines and 45° ticks */
+function renderDimH(
+  x1: number, x2: number,
+  objY: number,     // Y of the object edge (bottom of module / floor line)
+  dimY: number,     // Y where the dimension line sits
+  label: string,
+  ss: (n: number) => number = (n) => n,
+): string {
+  const { gap, overshoot, tickSize, lineWidth, tickWidth, fontSize, minTextGap, color } = DIM_STYLE;
+  const g = ss(gap); const ov = ss(overshoot); const tk = ss(tickSize);
+  const lw = ss(lineWidth); const tw = ss(tickWidth); const fs = ss(fontSize);
+
+  let svg = "";
+  // Extension lines: from object edge (with gap) down to dimension line (with overshoot)
+  const extStart = objY + g;
+  const extEnd = dimY + ov;
+  svg += `<line x1="${x1}" y1="${extStart}" x2="${x1}" y2="${extEnd}" stroke="${color}" stroke-width="${lw}"/>`;
+  svg += `<line x1="${x2}" y1="${extStart}" x2="${x2}" y2="${extEnd}" stroke="${color}" stroke-width="${lw}"/>`;
+
+  // Check if text fits between ticks
+  const span = Math.abs(x2 - x1);
+  const textW = label.length * fs * 0.6; // approximate text width
+  const textFits = span > textW + ss(minTextGap) * 2;
+
+  if (textFits) {
+    // Dimension line split around text
+    const cx = (x1 + x2) / 2;
+    const halfText = textW / 2 + ss(4);
+    svg += `<line x1="${x1}" y1="${dimY}" x2="${cx - halfText}" y2="${dimY}" stroke="${color}" stroke-width="${lw}"/>`;
+    svg += `<line x1="${cx + halfText}" y1="${dimY}" x2="${x2}" y2="${dimY}" stroke="${color}" stroke-width="${lw}"/>`;
+    // Text centered
+    svg += `<text x="${cx}" y="${dimY + fs * 0.35}" text-anchor="middle" font-size="${fs}" fill="${color}" font-family="Arial,sans-serif">${label}</text>`;
+  } else {
+    // Full dimension line + text above
+    svg += `<line x1="${x1}" y1="${dimY}" x2="${x2}" y2="${dimY}" stroke="${color}" stroke-width="${lw}"/>`;
+    svg += `<text x="${(x1 + x2) / 2}" y="${dimY - ss(2)}" text-anchor="middle" font-size="${fs}" fill="${color}" font-family="Arial,sans-serif">${label}</text>`;
+  }
+
+  // 45° tick terminators at both ends
+  svg += `<line x1="${x1 - tk * 0.5}" y1="${dimY + tk * 0.5}" x2="${x1 + tk * 0.5}" y2="${dimY - tk * 0.5}" stroke="${color}" stroke-width="${tw}"/>`;
+  svg += `<line x1="${x2 - tk * 0.5}" y1="${dimY + tk * 0.5}" x2="${x2 + tk * 0.5}" y2="${dimY - tk * 0.5}" stroke="${color}" stroke-width="${tw}"/>`;
+
+  return svg;
+}
+
+/** Render stacked horizontal dimensions for elevation views:
+ *  Level 1 = individual module widths
+ *  Level 2 = total wall width
+ */
+function renderElevationCotas(
+  modules: Array<{ x: number; width: number; label: string }>,
+  totalWidth: number,
+  padL: number,
+  floorY: number,   // Y coordinate of the floor line (bottom of wall)
+  ss: (n: number) => number,
+): string {
+  let svg = "";
+  const { baseOffset, levelSpacing } = DIM_STYLE;
+
+  // Level 1: individual module widths
+  const y1 = floorY + ss(baseOffset);
+  for (const m of modules) {
+    svg += renderDimH(m.x, m.x + m.width, floorY, y1, m.label, ss);
+  }
+
+  // Level 2: total wall width
+  const y2 = y1 + ss(levelSpacing);
+  const totalX1 = padL;
+  const totalX2 = padL + totalWidth;
+  svg += renderDimH(totalX1, totalX2, floorY, y2, `${totalWidth} mm`, ss);
+
+  return svg;
+}
+
 /** Internal vertical cotas for module interiors — shows each shelf/bar/drawer height */
 function internalVCotas(
   mx: number, my: number, modW: number, modH: number,
@@ -948,7 +1038,7 @@ function renderWallSvg(
 ): string {
   const wallW = totalWidth || 3000;
   const wallH = Math.max(wallHeight, ...modules.map(m => (m.position?.y || 0) + m.height));
-  const padL = 100, padR = 80, padT = 40, padB = 100;
+  const padL = 100, padR = 80, padT = 40, padB = 130;
   const vbW = wallW + padL + padR;
   const vbH = wallH + padT + padB;
 
@@ -1283,27 +1373,21 @@ function renderWallSvg(
     // Dimensions below
     svg += `<text x="${mx + mod.width / 2}" y="${padT + wallH + ss(22)}" text-anchor="middle" font-size="${ss(8)}" fill="#666" font-family="Arial,sans-serif">${mod.width}x${mod.height}x${mod.depth}</text>`;
 
-    // Level 1 COTAS (CABINETS): individual module widths
-    const dimY1 = padT + wallH + 15;
-    svg += dimLine(mx, dimY1, mx + mod.width, dimY1, `${mod.width}`, 10, `${prefix}_`);
-
     // Module height dimension (right side for tall modules)
     if (mod.height > 800) {
       svg += dimLine(mx + mod.width + 8, my, mx + mod.width + 8, my + mod.height, `${mod.height}`, 9, `${prefix}_`);
     }
   }
 
-  // Level 2 COTAS (ARCHITECTURAL): group widths
-  const dimY2 = padT + wallH + 38;
-  for (const grp of moduleGroups) {
-    if (grp.endX - grp.startX > 50) {
-      svg += dimLine(grp.startX, dimY2, grp.endX, dimY2, `${Math.round(grp.endX - grp.startX - padL + (modules[0]?.position?.x || 0))}`, 10, `${prefix}_`);
-    }
+  // Professional ABNT horizontal cotas: Level 1 (modules) + Level 2 (total)
+  {
+    const cotaModules = modules.map(m => ({
+      x: padL + (m.position?.x || 0),
+      width: m.width,
+      label: `${m.width}`,
+    }));
+    svg += renderElevationCotas(cotaModules, wallW, padL, padT + wallH, ss);
   }
-
-  // Level 3 COTAS (OVERALL): total wall width
-  const dimY3 = padT + wallH + 58;
-  svg += dimLine(padL, dimY3, padL + wallW, dimY3, `${wallW} mm`, 14, `${prefix}_`);
 
   // Overall wall height dimension (left side)
   svg += dimLine(padL - 45, padT, padL - 45, padT + wallH, `${wallH} mm`, 13, `${prefix}_`);
