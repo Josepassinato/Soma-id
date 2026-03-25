@@ -1,324 +1,32 @@
 /**
  * html-report.ts
- * Generates a standalone multi-prancha HTML technical report with SVG drawings.
- * Zero external dependencies — all CSS inline, print-friendly.
- * Professional industrial carpentry documentation (Promob/CAD style).
+ * Orchestrator — composes multi-prancha HTML technical report from modular renderers.
+ * P0.1: Extracted helpers into report/ submodules for maintainability.
  */
 
 import type { EngineResults, BlueprintModule, Sheet, InterferenceConflict } from "./engine-bridge.js";
 import type { ParsedBriefing } from "../types.js";
 
-/* ============================================================
-   Constants
-   ============================================================ */
-const GOLD = "#c9a84c";
-const DIM_RED = "#cc0000";
-const HDR_BG = "#333333";
-const HDR_FG = "#ffffff";
-const STROKE = "#333333";
-const LIGHT_FILL = "#f5f5f5";
-
-const MOD_FILLS: Record<string, string> = {
-  base: "#FAFAFA",
-  upper: "#F0F0F0",
-  freestanding: "#F0F5FA",
-  island: "#F5F2ED",
-  vanity: "#F0F5F0",
-  gun_safe: "#F0EDED",
-};
-
-const PIECE_COLORS = [
-  "#E3F2FD", "#FFF3E0", "#E8F5E9", "#FCE4EC",
-  "#F3E5F5", "#FFF8E1", "#E0F7FA", "#FBE9E7",
-];
-
-const ZONE_COLORS = [
-  "#E8F0FE", "#FFF3E0", "#E8F5E9", "#FCE4EC",
-  "#F3E5F5", "#FFF8E1", "#E0F7FA", "#FBE9E7",
-];
-
-/* Material colors — Boa Vista palette */
-const MAT_COLORS: Record<string, string> = {
-  bv_lana: "#e0d5c1",
-  bv_lord: "#50617D",
-  mdf_6mm: "#d0d0d0",
-  mdf_branco: "#f5f5f0",
-};
+// P0.1 — Modular imports
+import {
+  GOLD, DIM_RED, HDR_BG, HDR_FG, STROKE, LIGHT_FILL,
+  MOD_FILLS, PIECE_COLORS, ZONE_COLORS, MAT_COLORS,
+  esc, fmtCost, modType, modFill, today, nowFull,
+  formatProjectNumber, normalizeScale, STANDARD_SCALES,
+} from "./report/svg-primitives.js";
+import {
+  svgDefs, getMaterialHatchId, getColorForMaterial, MATERIAL_COLOR_MAP,
+} from "./report/material-patterns.js";
+import {
+  DIM_STYLE, dimLine, renderDimH, renderElevationCotas,
+  internalVCotas, materialCallout,
+} from "./report/dimension-system.js";
+import { renderMaterialLegend } from "./report/legend-renderer.js";
 
 /* ============================================================
-   Helpers
+   Inline definitions removed — now imported from report/ modules
+   (svg-primitives, material-patterns, dimension-system, legend-renderer)
    ============================================================ */
-function esc(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function fmtCost(n: number): string {
-  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function modType(mod: BlueprintModule): string {
-  const id = (mod.moduleId || "").toLowerCase();
-  const tp = (mod.type || "").toLowerCase();
-  if (id.includes("ilha") || tp.includes("island")) return "island";
-  if (id.includes("bancada") || id.includes("vanity") || tp.includes("vanity")) return "vanity";
-  if (id.includes("armas") || tp.includes("gun")) return "gun_safe";
-  if (tp.includes("upper") || id.includes("maleiro")) return "upper";
-  if (tp.includes("free")) return "freestanding";
-  return "base";
-}
-
-function modFill(mod: BlueprintModule): string {
-  return MOD_FILLS[modType(mod)] || MOD_FILLS.base;
-}
-
-function today(): string {
-  return new Date().toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
-}
-
-function nowFull(): string {
-  return new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-}
-
-/** Format session ID into project number SOMA-XXXX-XXXX-XXX */
-function formatProjectNumber(sessionId: string): string {
-  const clean = sessionId.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-  const p1 = clean.substring(0, 4) || "0000";
-  const p2 = clean.substring(4, 8) || "0000";
-  const p3 = clean.substring(8, 11) || "000";
-  return `SOMA-${p1}-${p2}-${p3}`;
-}
-
-/* ============================================================
-   SVG Marker Definitions (shared)
-   ============================================================ */
-function svgDefs(prefix: string = ""): string {
-  return `<defs>
-    <marker id="${prefix}arrowS" markerWidth="6" markerHeight="4" refX="0" refY="2" orient="auto">
-      <path d="M6,0 L0,2 L6,4 Z" fill="${DIM_RED}"/>
-    </marker>
-    <marker id="${prefix}arrowE" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
-      <path d="M0,0 L6,2 L0,4 Z" fill="${DIM_RED}"/>
-    </marker>
-    <marker id="${prefix}arrowBlkS" markerWidth="6" markerHeight="4" refX="0" refY="2" orient="auto">
-      <path d="M6,0 L0,2 L6,4 Z" fill="${STROKE}"/>
-    </marker>
-    <marker id="${prefix}arrowBlkE" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
-      <path d="M0,0 L6,2 L0,4 Z" fill="${STROKE}"/>
-    </marker>
-    <pattern id="${prefix}hatchPattern" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="8" stroke="#ccc" stroke-width="0.5"/>
-    </pattern>
-    <pattern id="${prefix}wasteHatch" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="10" stroke="#e0d0d0" stroke-width="0.7"/>
-    </pattern>
-    <pattern id="${prefix}wallHatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="6" stroke="#888" stroke-width="0.6"/>
-    </pattern>
-    <pattern id="${prefix}wallHatchX" patternUnits="userSpaceOnUse" width="6" height="6">
-      <line x1="0" y1="0" x2="6" y2="6" stroke="#888" stroke-width="0.5"/>
-      <line x1="6" y1="0" x2="0" y2="6" stroke="#888" stroke-width="0.5"/>
-    </pattern>
-    <!-- Material hatch patterns -->
-    <pattern id="${prefix}hatch_mdf" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="8" stroke="#888" stroke-width="0.5"/>
-    </pattern>
-    <pattern id="${prefix}hatch_mdf_light" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="8" stroke="#aaa" stroke-width="0.3" opacity="0.5"/>
-    </pattern>
-    <pattern id="${prefix}hatch_wood" patternUnits="userSpaceOnUse" width="20" height="10">
-      <path d="M0,5 Q5,3 10,5 Q15,7 20,5" fill="none" stroke="#8B7355" stroke-width="0.4"/>
-      <path d="M0,2 Q5,0 10,2 Q15,4 20,2" fill="none" stroke="#8B7355" stroke-width="0.3"/>
-      <path d="M0,8 Q5,6 10,8 Q15,10 20,8" fill="none" stroke="#8B7355" stroke-width="0.3"/>
-    </pattern>
-    <pattern id="${prefix}hatch_glass" patternUnits="userSpaceOnUse" width="10" height="10">
-      <line x1="0" y1="0" x2="10" y2="10" stroke="#4A90D9" stroke-width="0.3" opacity="0.5"/>
-      <line x1="10" y1="0" x2="0" y2="10" stroke="#4A90D9" stroke-width="0.3" opacity="0.5"/>
-    </pattern>
-    <pattern id="${prefix}hatch_mirror" patternUnits="userSpaceOnUse" width="6" height="6">
-      <rect width="6" height="6" fill="#E8E8E8"/>
-      <line x1="0" y1="0" x2="6" y2="6" stroke="#999" stroke-width="0.4"/>
-      <line x1="6" y1="0" x2="0" y2="6" stroke="#999" stroke-width="0.4"/>
-    </pattern>
-    <pattern id="${prefix}hatch_stone" patternUnits="userSpaceOnUse" width="8" height="8">
-      <circle cx="2" cy="2" r="0.5" fill="#777"/><circle cx="6" cy="5" r="0.4" fill="#888"/><circle cx="4" cy="7" r="0.5" fill="#777"/>
-    </pattern>
-  </defs>`;
-}
-
-/** Dimension line in red with arrows */
-function dimLine(
-  x1: number, y1: number, x2: number, y2: number,
-  label: string, fontSize: number = 12, prefix: string = "",
-  offset: number = 0,
-): string {
-  const isHoriz = Math.abs(y1 - y2) < 2;
-  let lines = "";
-  if (isHoriz) {
-    const y = y1 + offset;
-    // Extension lines
-    if (offset !== 0) {
-      lines += `<line x1="${x1}" y1="${y1}" x2="${x1}" y2="${y}" stroke="${DIM_RED}" stroke-width="0.5" stroke-dasharray="2,2"/>`;
-      lines += `<line x1="${x2}" y1="${y2}" x2="${x2}" y2="${y}" stroke="${DIM_RED}" stroke-width="0.5" stroke-dasharray="2,2"/>`;
-    }
-    lines += `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${DIM_RED}" stroke-width="0.7" marker-start="url(#${prefix}arrowS)" marker-end="url(#${prefix}arrowE)"/>`;
-    lines += `<text x="${(x1 + x2) / 2}" y="${y - 3}" text-anchor="middle" font-size="${fontSize}" fill="${DIM_RED}" font-weight="bold" class="dim-label">${label}</text>`;
-  } else {
-    const x = x1 + offset;
-    if (offset !== 0) {
-      lines += `<line x1="${x1}" y1="${y1}" x2="${x}" y2="${y1}" stroke="${DIM_RED}" stroke-width="0.5" stroke-dasharray="2,2"/>`;
-      lines += `<line x1="${x1}" y1="${y2}" x2="${x}" y2="${y2}" stroke="${DIM_RED}" stroke-width="0.5" stroke-dasharray="2,2"/>`;
-    }
-    lines += `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${DIM_RED}" stroke-width="0.7" marker-start="url(#${prefix}arrowS)" marker-end="url(#${prefix}arrowE)"/>`;
-    lines += `<text x="${x - 4}" y="${(y1 + y2) / 2}" text-anchor="middle" font-size="${fontSize}" fill="${DIM_RED}" font-weight="bold" class="dim-label" transform="rotate(-90 ${x - 4} ${(y1 + y2) / 2})">${label}</text>`;
-  }
-  return lines;
-}
-
-/* ============================================================
-   Professional ABNT Dimension Lines — Horizontal cotas
-   ============================================================ */
-const DIM_STYLE = {
-  gap: 3,        // gap between object and extension line start
-  overshoot: 3,  // extension line past dimension line
-  tickSize: 4,   // length of 45° terminator tick
-  lineWidth: 0.4,
-  tickWidth: 0.7,
-  fontSize: 7,
-  baseOffset: 20, // distance from object to first cota level
-  levelSpacing: 18, // distance between cota levels
-  minTextGap: 10, // minimum space for text to fit between ticks
-  color: "#333",
-};
-
-/** Render a single professional horizontal dimension line with extension lines and 45° ticks */
-function renderDimH(
-  x1: number, x2: number,
-  objY: number,     // Y of the object edge (bottom of module / floor line)
-  dimY: number,     // Y where the dimension line sits
-  label: string,
-  ss: (n: number) => number = (n) => n,
-): string {
-  const { gap, overshoot, tickSize, lineWidth, tickWidth, fontSize, minTextGap, color } = DIM_STYLE;
-  const g = ss(gap); const ov = ss(overshoot); const tk = ss(tickSize);
-  const lw = ss(lineWidth); const tw = ss(tickWidth); const fs = ss(fontSize);
-
-  let svg = "";
-  // Extension lines: from object edge (with gap) down to dimension line (with overshoot)
-  const extStart = objY + g;
-  const extEnd = dimY + ov;
-  svg += `<line x1="${x1}" y1="${extStart}" x2="${x1}" y2="${extEnd}" stroke="${color}" stroke-width="${lw}"/>`;
-  svg += `<line x1="${x2}" y1="${extStart}" x2="${x2}" y2="${extEnd}" stroke="${color}" stroke-width="${lw}"/>`;
-
-  // Check if text fits between ticks
-  const span = Math.abs(x2 - x1);
-  const textW = label.length * fs * 0.6; // approximate text width
-  const textFits = span > textW + ss(minTextGap) * 2;
-
-  if (textFits) {
-    // Dimension line split around text
-    const cx = (x1 + x2) / 2;
-    const halfText = textW / 2 + ss(4);
-    svg += `<line x1="${x1}" y1="${dimY}" x2="${cx - halfText}" y2="${dimY}" stroke="${color}" stroke-width="${lw}"/>`;
-    svg += `<line x1="${cx + halfText}" y1="${dimY}" x2="${x2}" y2="${dimY}" stroke="${color}" stroke-width="${lw}"/>`;
-    // Text centered
-    svg += `<text x="${cx}" y="${dimY + fs * 0.35}" text-anchor="middle" font-size="${fs}" fill="${color}" font-family="Arial,sans-serif">${label}</text>`;
-  } else {
-    // Full dimension line + text above
-    svg += `<line x1="${x1}" y1="${dimY}" x2="${x2}" y2="${dimY}" stroke="${color}" stroke-width="${lw}"/>`;
-    svg += `<text x="${(x1 + x2) / 2}" y="${dimY - ss(2)}" text-anchor="middle" font-size="${fs}" fill="${color}" font-family="Arial,sans-serif">${label}</text>`;
-  }
-
-  // 45° tick terminators at both ends
-  svg += `<line x1="${x1 - tk * 0.5}" y1="${dimY + tk * 0.5}" x2="${x1 + tk * 0.5}" y2="${dimY - tk * 0.5}" stroke="${color}" stroke-width="${tw}"/>`;
-  svg += `<line x1="${x2 - tk * 0.5}" y1="${dimY + tk * 0.5}" x2="${x2 + tk * 0.5}" y2="${dimY - tk * 0.5}" stroke="${color}" stroke-width="${tw}"/>`;
-
-  return svg;
-}
-
-/** Render stacked horizontal dimensions for elevation views:
- *  Level 1 = individual module widths
- *  Level 2 = total wall width
- */
-function renderElevationCotas(
-  modules: Array<{ x: number; width: number; label: string }>,
-  totalWidth: number,
-  padL: number,
-  floorY: number,   // Y coordinate of the floor line (bottom of wall)
-  ss: (n: number) => number,
-): string {
-  let svg = "";
-  const { baseOffset, levelSpacing } = DIM_STYLE;
-
-  // Level 1: individual module widths
-  const y1 = floorY + ss(baseOffset);
-  for (const m of modules) {
-    svg += renderDimH(m.x, m.x + m.width, floorY, y1, m.label, ss);
-  }
-
-  // Level 2: total wall width
-  const y2 = y1 + ss(levelSpacing);
-  const totalX1 = padL;
-  const totalX2 = padL + totalWidth;
-  svg += renderDimH(totalX1, totalX2, floorY, y2, `${totalWidth} mm`, ss);
-
-  return svg;
-}
-
-/** Internal vertical cotas for module interiors — shows each shelf/bar/drawer height */
-function internalVCotas(
-  mx: number, my: number, modW: number, modH: number,
-  heights: number[], // array of y-offsets from module top (in mm)
-  prefix: string, ss: (n: number) => number,
-): string {
-  if (heights.length === 0) return "";
-  let svg = "";
-  const cx = mx + modW + ss(12); // right side of module
-  // Sort heights ascending
-  const sorted = [...heights].sort((a, b) => a - b);
-  // Add top (0) and bottom (modH) as anchors
-  const anchors = [0, ...sorted, modH];
-  for (let i = 0; i < anchors.length - 1; i++) {
-    const y1 = my + anchors[i];
-    const y2 = my + anchors[i + 1];
-    const span = anchors[i + 1] - anchors[i];
-    if (span < 30) continue; // skip tiny gaps
-    // Small tick marks
-    svg += `<line x1="${mx + modW + ss(4)}" y1="${y1}" x2="${cx + ss(4)}" y2="${y1}" stroke="${DIM_RED}" stroke-width="0.4"/>`;
-    svg += `<line x1="${mx + modW + ss(4)}" y1="${y2}" x2="${cx + ss(4)}" y2="${y2}" stroke="${DIM_RED}" stroke-width="0.4"/>`;
-    // Vertical line
-    svg += `<line x1="${cx}" y1="${y1 + 2}" x2="${cx}" y2="${y2 - 2}" stroke="${DIM_RED}" stroke-width="0.5"/>`;
-    // Label
-    const labelY = (y1 + y2) / 2;
-    svg += `<text x="${cx + ss(4)}" y="${labelY + 3}" font-size="${ss(7)}" fill="${DIM_RED}" font-weight="bold" font-family="Arial,sans-serif">${Math.round(span)}</text>`;
-  }
-  return svg;
-}
-
-/** Material callout leader: line from point to annotation box */
-function materialCallout(
-  x1: number, y1: number, // origin point on drawing
-  x2: number, y2: number, // annotation box position
-  label: string,
-  prefix: string,
-  ss: (n: number) => number,
-): string {
-  let svg = "";
-  // Small circle at origin
-  svg += `<circle cx="${x1}" cy="${y1}" r="${ss(2)}" fill="${DIM_RED}" stroke="none"/>`;
-  // Leader line (thin, with elbow)
-  const elbowX = x2;
-  const elbowY = y1;
-  svg += `<polyline points="${x1},${y1} ${elbowX},${elbowY} ${x2},${y2}" fill="none" stroke="#555" stroke-width="${ss(0.6)}"/>`;
-  // Annotation text
-  svg += `<text x="${x2 + ss(3)}" y="${y2 + ss(3)}" font-size="${ss(7)}" fill="#444" font-family="Arial,sans-serif" font-style="italic">${label}</text>`;
-  // Underline
-  svg += `<line x1="${x2}" y1="${y2 + ss(5)}" x2="${x2 + label.length * ss(4)}" y2="${y2 + ss(5)}" stroke="#555" stroke-width="${ss(0.4)}"/>`;
-  return svg;
-}
 
 /* ============================================================
    Carimbo (Professional Stamp)
@@ -718,47 +426,6 @@ function getDoorMaterialColor(mod: BlueprintModule): string {
 }
 
 /** Map material name to SVG hatch pattern ID suffix (used with prefix) */
-function getMaterialHatchId(materialName: string): string {
-  const m = materialName.toLowerCase();
-  if (m.includes("vidro") || m.includes("glass") || m.includes("temperado")) return "hatch_glass";
-  if (m.includes("espelho") || m.includes("mirror")) return "hatch_mirror";
-  if (m.includes("pedra") || m.includes("granito") || m.includes("marmore") || m.includes("stone")) return "hatch_stone";
-  if (m.includes("carvalho") || m.includes("freijo") || m.includes("noce") || m.includes("madeira") || m.includes("lamina")) return "hatch_wood";
-  if (m.includes("mdf 6mm") || m.includes("mdf 3mm") || m.includes("fundo")) return "hatch_mdf_light";
-  // Default for MDP/MDF/BP — standard diagonal hatch
-  return "hatch_mdf";
-}
-
-/** Render material legend block for elevation pranchas */
-function renderMaterialLegend(materials: Array<{name: string; color: string}>, prefix: string, x: number, y: number): string {
-  let svg = `<g transform="translate(${x}, ${y})">`;
-  svg += `<text x="0" y="0" font-size="10" font-weight="bold" fill="#333" font-family="Arial,sans-serif">LEGENDA DE MATERIAIS</text>`;
-  svg += `<line x1="0" y1="4" x2="160" y2="4" stroke="#333" stroke-width="0.5"/>`;
-  const seen = new Set<string>();
-  let row = 0;
-  for (const mat of materials) {
-    const key = mat.name.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const ry = 14 + row * 20;
-    const hatchId = getMaterialHatchId(mat.name);
-    svg += `<rect x="0" y="${ry}" width="30" height="14" fill="${mat.color}" stroke="#999" stroke-width="0.3"/>`;
-    svg += `<rect x="0" y="${ry}" width="30" height="14" fill="url(#${prefix}${hatchId})" stroke="#999" stroke-width="0.3"/>`;
-    svg += `<text x="38" y="${ry + 10}" font-size="8" fill="#333" font-family="Arial,sans-serif">${mat.name}</text>`;
-    row++;
-  }
-  svg += `</g>`;
-  return svg;
-}
-
-/** Standard technical drawing scales */
-const STANDARD_SCALES = [1, 2, 5, 10, 15, 20, 25, 50, 75, 100];
-
-/** Normalize a raw scale ratio to the nearest standard scale */
-function normalizeScale(rawScale: number): number {
-  return STANDARD_SCALES.find(s => s >= rawScale) || STANDARD_SCALES[STANDARD_SCALES.length - 1];
-}
-
 /* ============================================================
    SVG: Floor Plan (Top-down view)
    ============================================================ */
@@ -3387,32 +3054,10 @@ function detectZone(mod: BlueprintModule, briefing: ParsedBriefing): string {
   return "Geral";
 }
 
-/** Color map for materials — used by getColorForMaterial and BOM */
-const MATERIAL_COLOR_MAP: Record<string, string> = {
-  lana: "#e0d5c1", areia: "#e0d5c1",
-  lord: "#50617D", "bv_lord": "#50617D",
-  branco: "#f5f5f5", "branco neve": "#f5f5f5",
-  grafite: "#4a4a4a",
-  carvalho: "#c5b49d",
-  freijo: "#8e6c4e",
-  noce: "#5d4037",
-  sage: "#879b8a",
-};
-
-/** Get a hex color for a specific material name */
-function getColorForMaterial(matName: string): string {
-  const lower = matName.toLowerCase();
-  // MDF 6mm (back panels) — neutral gray, no color
-  if (lower.includes("mdf 6mm") || lower.includes("mdf 3mm")) return "#d0d0d0";
-  for (const [key, color] of Object.entries(MATERIAL_COLOR_MAP)) {
-    if (lower.includes(key)) return color;
-  }
-  return "#ccc";
-}
+/* MATERIAL_COLOR_MAP, getColorForMaterial, getModuleColorHex — moved to report/material-patterns.ts */
 
 /** Get a hex color for a module from the blueprint materials */
 function getModuleColorHex(mod: BlueprintModule, bp: { materials: { mdfColor: string; internalColor: string } }): string {
-  // Use the cut item's actual material name for accurate color
   const matName = mod.cutList?.[0]?.material || bp.materials.mdfColor || "";
   return getColorForMaterial(matName);
 }
