@@ -1070,6 +1070,117 @@ test("kitchen production packet works", () => {
 });
 
 // ================================================================
+// P2.2: POST-MEASUREMENT & FACTORY RELEASE TESTS
+// ================================================================
+console.log("\n=== Post-measurement & factory release ===");
+
+const { captureMeasurement, getMeasurementByProject, hasCriticalDeviations, linkMeasurementToRevision } = await import(path.join(DIST, "services/measurement-records.js"));
+const { validateReleaseGate, releaseToFactory } = await import(path.join(DIST, "services/factory-release.js"));
+
+test("measurement capture with deviation detection", () => {
+  const record = captureMeasurement("proj-msr-1", {
+    measuredBy: "Tecnico Jose",
+    walls: [
+      { wallId: "north", measuredLength: 4180 },
+      { wallId: "east", measuredLength: 3620 },
+    ],
+    ceilingHeight: 2790,
+  }, [
+    { id: "north", length_m: 4.2 },
+    { id: "east", length_m: 3.6 },
+  ], 2.8);
+  assert(record.measurementId, "Should have measurementId");
+  assert.equal(record.measuredBy, "Tecnico Jose");
+  assert.equal(record.measuredWalls.length, 2);
+  // North: 4200 vs 4180 = 20mm deviation (significant)
+  const northDev = record.deviations.find(d => d.fieldPath.includes("north"));
+  assert(northDev, "Should detect north wall deviation");
+  assert.equal(northDev.deviationMm, 20);
+});
+
+test("critical deviation detection", () => {
+  const record = captureMeasurement("proj-msr-2", {
+    measuredBy: "Test",
+    walls: [{ wallId: "north", measuredLength: 3500 }], // 700mm off!
+    ceilingHeight: 2800,
+  }, [{ id: "north", length_m: 4.2 }], 2.8);
+  assert(hasCriticalDeviations(record), "Should have critical deviations (700mm off)");
+});
+
+test("measurement linked to revision", () => {
+  const record = captureMeasurement("proj-msr-3", {
+    measuredBy: "Test",
+    walls: [{ wallId: "north", measuredLength: 4200 }],
+    ceilingHeight: 2800,
+  });
+  const linked = linkMeasurementToRevision(record.measurementId, "rev-proj-msr-3-v2");
+  assert.equal(linked, true);
+});
+
+test("factory release blocked without commercial approval", () => {
+  const validation = validateReleaseGate("proj-rel-1", {
+    commerciallyApproved: false,
+    hasReport: true, hasBom: true, hasDxf: true,
+    measurementRequired: false,
+  });
+  assert.equal(validation.canRelease, false);
+  assert(validation.blockingIssues.some(i => i.includes("aprovada")), "Should mention approval");
+});
+
+test("factory release blocked without measurement", () => {
+  const validation = validateReleaseGate("proj-rel-2", {
+    commerciallyApproved: true,
+    fabricationValidation: { isReadyForFactory: true, totalChecks: 0, infoCount: 0, warningCount: 0, criticalCount: 0, results: [] },
+    hasReport: true, hasBom: true, hasDxf: true,
+    measurementRequired: true, // required but not captured
+  });
+  assert.equal(validation.canRelease, false);
+  assert(validation.blockingIssues.some(i => i.includes("Medicao")), "Should mention measurement");
+});
+
+test("factory release blocked with fabrication critical", () => {
+  const validation = validateReleaseGate("proj-rel-3", {
+    commerciallyApproved: true,
+    fabricationValidation: { isReadyForFactory: false, totalChecks: 1, infoCount: 0, warningCount: 0, criticalCount: 1, results: [] },
+    hasReport: true, hasBom: true, hasDxf: true,
+    measurementRequired: false,
+  });
+  assert.equal(validation.canRelease, false);
+  assert(validation.blockingIssues.some(i => i.includes("fabricabilidade")), "Should mention fabrication");
+});
+
+test("factory release succeeds when all gates pass", () => {
+  // First capture measurement for this project
+  captureMeasurement("proj-rel-4", {
+    measuredBy: "Test",
+    walls: [{ wallId: "north", measuredLength: 4200 }],
+    ceilingHeight: 2800,
+  });
+
+  const release = releaseToFactory("proj-rel-4", "rev-v1", "Gerente Jose", {
+    commerciallyApproved: true,
+    fabricationValidation: { isReadyForFactory: true, totalChecks: 5, infoCount: 0, warningCount: 2, criticalCount: 0, results: [] },
+    hasReport: true, hasBom: true, hasDxf: true,
+    measurementRequired: true,
+  });
+  assert.equal(release.releaseStatus, "factory_released");
+  assert.equal(release.releasedBy, "Gerente Jose");
+  assert.equal(release.validation.canRelease, true);
+  assert.equal(release.validation.blockingIssues.length, 0);
+});
+
+test("factory release with measurement waived", () => {
+  const release = releaseToFactory("proj-rel-5", "rev-v1", "Admin", {
+    commerciallyApproved: true,
+    fabricationValidation: { isReadyForFactory: true, totalChecks: 0, infoCount: 0, warningCount: 0, criticalCount: 0, results: [] },
+    hasReport: true, hasBom: true, hasDxf: false,
+    measurementRequired: false, // waived
+  });
+  assert.equal(release.releaseStatus, "factory_released");
+  assert.equal(release.validation.measurementWaived, true);
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
