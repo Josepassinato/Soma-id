@@ -2947,6 +2947,18 @@ ${SHEET_COMPOSITION_CSS}
     ${bp.factoryNotes.map(n => `<li>${esc(n)}</li>`).join("")}
   </ul>` : ""}
 
+  <!-- P1.1 — Catalog Provenance -->
+  ${(() => {
+    const cu = results.catalogUsage;
+    if (!cu) return "";
+    return `
+  <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:#333">Catalogo Utilizado</h3>
+  <table>
+    <tr><td style="font-weight:bold">Catalogo</td><td>${esc(cu.catalogName)}</td><td style="font-weight:bold">Versao</td><td>${esc(cu.catalogVersion)}</td></tr>
+    <tr><td style="font-weight:bold">ID</td><td>${esc(cu.catalogId)}</td><td style="font-weight:bold">Lookups</td><td>${cu.totalLookups} (${cu.catalogHits} catalogo, ${cu.fallbackHits} fallback, ${cu.hardcodedHits} hardcoded)</td></tr>
+  </table>`;
+  })()}
+
   <!-- Material Palette -->
   ${materialPalette.length > 0 ? `
   <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:#333">Paleta de Materiais</h3>

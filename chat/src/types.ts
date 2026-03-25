@@ -138,6 +138,101 @@ export interface NormalizedBriefing extends ParsedBriefing {
   };
 }
 
+/* ============================================================
+   Factory Catalog Truth Layer (P1.1)
+   ============================================================ */
+
+export interface CatalogMaterial {
+  materialId: string;
+  displayName: string;
+  normalizedName: string;     // lowercase, no accents
+  category: string;           // "madeirado", "unicolor", "vidro", "metal", etc.
+  colorFamily: string;        // "brown", "white", "gray", etc.
+  colorHex: string;
+  texture: string;
+  manufacturer?: string;
+  isAvailable: boolean;
+  allowedEnvironments?: string[];  // ["closet", "kitchen", "bathroom"]
+  costBasis?: number;         // base cost per sheet/unit
+  catalogVersion: string;
+}
+
+export interface CatalogHardware {
+  hardwareId: string;
+  displayName: string;
+  category: string;           // "dobradica", "corredica", "puxador", "led", "sensor", etc.
+  specs?: string;             // "35mm copo, soft-close"
+  allowedModuleTypes?: string[];
+  costBasis?: number;
+  isAvailable: boolean;
+}
+
+export interface CatalogModuleTemplate {
+  templateId: string;
+  displayName: string;
+  moduleType: string;
+  moduleSubtype: string;
+  defaultWidth: number;
+  defaultHeight: number;
+  defaultDepth: number;
+  category: string;           // "base", "upper", "freestanding"
+  allowedMaterials?: string[];
+  requiredHardware?: string[];
+  dimensionRules?: {
+    minWidth?: number;
+    maxWidth?: number;
+    minHeight?: number;
+    maxHeight?: number;
+    minDepth?: number;
+    maxDepth?: number;
+  };
+}
+
+export interface CatalogRule {
+  ruleId: string;
+  ruleType: "compatibility" | "availability" | "constraint" | "pricing";
+  scope: string;              // "material", "hardware", "module", "global"
+  description: string;
+  severity: "info" | "warning" | "critical";
+  payload?: Record<string, unknown>;
+}
+
+export interface FactoryCatalog {
+  catalogId: string;
+  catalogName: string;
+  factoryName: string;
+  storeName?: string;
+  version: string;
+  status: "active" | "draft" | "archived";
+  materials: CatalogMaterial[];
+  hardware: CatalogHardware[];
+  moduleTemplates: CatalogModuleTemplate[];
+  rules: CatalogRule[];
+  updatedAt: string;
+}
+
+/** Diagnostic record for catalog usage vs fallback */
+export interface CatalogDiagnostic {
+  entityType: "material" | "hardware" | "module_template";
+  entityName: string;
+  source: "catalog" | "fallback" | "hardcoded";
+  catalogId?: string;
+  catalogVersion?: string;
+  notes?: string;
+}
+
+/** Summary of catalog usage in a project */
+export interface CatalogUsageSummary {
+  catalogId: string;
+  catalogVersion: string;
+  catalogName: string;
+  totalLookups: number;
+  catalogHits: number;
+  fallbackHits: number;
+  hardcodedHits: number;
+  diagnostics: CatalogDiagnostic[];
+}
+
 export interface BriefingResponse {
   success: boolean;
   data?: ParsedBriefing;

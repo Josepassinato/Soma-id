@@ -567,6 +567,68 @@ test("kitchen DXF exports without error", () => {
 });
 
 // ================================================================
+// P1.1: FACTORY CATALOG TESTS
+// ================================================================
+console.log("\n=== Factory catalog ===");
+
+const { getActiveCatalog, lookupMaterial, lookupHardware, lookupModuleTemplate, buildCatalogUsageSummary } = await import(path.join(DIST, "services/factory-catalog.js"));
+
+test("active catalog exists with required fields", () => {
+  const cat = getActiveCatalog();
+  assert(cat.catalogId, "Catalog missing catalogId");
+  assert(cat.catalogName, "Catalog missing catalogName");
+  assert(cat.version, "Catalog missing version");
+  assert(cat.materials.length > 0, "Catalog has no materials");
+  assert(cat.hardware.length > 0, "Catalog has no hardware");
+  assert(cat.moduleTemplates.length > 0, "Catalog has no module templates");
+});
+
+test("material lookup returns from catalog", () => {
+  const diag = [];
+  const mat = lookupMaterial("Lana", diag);
+  assert(mat, "Should find Lana material");
+  assert.equal(mat.normalizedName, "lana");
+  assert(diag.length > 0, "Should have diagnostic entry");
+  assert(diag[0].source !== "hardcoded", "Should not be hardcoded for known material");
+});
+
+test("unknown material returns null with hardcoded diagnostic", () => {
+  const diag = [];
+  const mat = lookupMaterial("XyzUnknownMaterial", diag);
+  assert.equal(mat, null, "Should not find unknown material");
+  assert.equal(diag[0].source, "hardcoded", "Should flag as hardcoded");
+});
+
+test("hardware lookup works", () => {
+  const diag = [];
+  const hw = lookupHardware("dobradica", diag);
+  assert(hw, "Should find dobradica");
+  assert(hw.costBasis > 0, "Should have cost basis");
+});
+
+test("module template lookup works", () => {
+  const diag = [];
+  const tpl = lookupModuleTemplate("closet_storage", "long_garment", diag);
+  assert(tpl, "Should find cabideiro template");
+  assert.equal(tpl.defaultDepth, 600);
+});
+
+test("pipeline includes catalog usage in results", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_cat_pipeline");
+  assert(results.catalogUsage, "Should have catalogUsage");
+  assert(results.catalogUsage.catalogId, "Should have catalogId");
+  assert(results.catalogUsage.totalLookups >= 0, "Should have lookup count");
+});
+
+test("report shows catalog provenance", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_cat_report");
+  const html = generateHtmlReport(fx.briefing, results, "test_cat_report");
+  assert(html.includes("Catalogo Utilizado"), "Report should show catalog section");
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);

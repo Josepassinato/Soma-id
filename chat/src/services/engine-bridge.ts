@@ -16,6 +16,8 @@ import { resolveModuleTyping } from "./module-typing.js";
 import { buildWallLayouts, distributionSummary } from "./layout-distributor.js";
 import { applyTraceability, validateTraceability } from "./traceability.js";
 import { validateFabrication, type FabricationValidationSummary } from "./fabrication-validator.js";
+import { getActiveCatalog, lookupMaterial, buildCatalogUsageSummary, type CatalogDiagnostic } from "./factory-catalog.js";
+import type { CatalogUsageSummary } from "../types.js";
 
 // ============================================================
 // Engine input/output types (mirrored from soma-id/types.ts)
@@ -192,6 +194,8 @@ export interface EngineResults {
   conflicts: InterferenceConflict[];
   // P0.8 — Fabrication validation
   fabricationValidation?: FabricationValidationSummary;
+  // P1.1 — Catalog usage tracking
+  catalogUsage?: CatalogUsageSummary;
   summary: {
     total_modules: number;
     total_parts: number;
@@ -1383,6 +1387,15 @@ export function runEnginePipeline(
 
   console.log(`[ENGINE] Normalization OK — readiness: ${readiness.score}, issues: ${issues.length} (0 critical)`);
 
+  // Step 0.5: Catalog resolution (P1.1)
+  const catalog = getActiveCatalog();
+  const catalogDiagnostics: CatalogDiagnostic[] = [];
+  const briefingColors = briefing.materials?.colors || [];
+  for (const color of briefingColors) {
+    lookupMaterial(color, catalogDiagnostics);
+  }
+  console.log(`[ENGINE] Catalog: ${catalog.catalogId} v${catalog.version} — ${catalogDiagnostics.length} lookups`);
+
   // Step 1: Transform briefing (use normalized version)
   const project = briefingToProject(normalized, sessionId);
   const layout = briefingToLayout(normalized);
@@ -1463,11 +1476,15 @@ export function runEnginePipeline(
 
   const totalModules = blueprint.mainWall.modules.length + (blueprint.sideWall?.modules?.length || 0);
 
+  // P1.1 — Build catalog usage summary
+  const catalogUsage = buildCatalogUsageSummary(catalogDiagnostics);
+
   return {
     blueprint,
     nesting,
     conflicts,
     fabricationValidation: fabValidation,
+    catalogUsage,
     summary: {
       total_modules: totalModules,
       total_parts: nesting.totalParts,
