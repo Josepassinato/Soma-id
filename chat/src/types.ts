@@ -83,6 +83,61 @@ export interface ParsedBriefing {
   };
 }
 
+/* ============================================================
+   Briefing Normalization & Confidence Layer (P0.0)
+   ============================================================ */
+
+/** Status of a single field's confidence */
+export type FieldStatus = "confirmed" | "inferred" | "ambiguous" | "contradictory" | "missing";
+
+/** Source of the field data */
+export type FieldSource = "user_text" | "user_audio" | "pdf" | "image" | "system_default" | "system_inference" | "merged";
+
+/** Confidence metadata for a single critical field */
+export interface FieldConfidence {
+  fieldPath: string;
+  score: number;             // 0.0 to 1.0
+  status: FieldStatus;
+  source: FieldSource;
+  wasInferred: boolean;
+  requiresConfirmation: boolean;
+  notes?: string;
+}
+
+/** Issue severity */
+export type IssueSeverity = "info" | "warning" | "critical";
+
+/** A detected problem in the briefing */
+export interface BriefingIssue {
+  code: string;              // e.g. "NR-001", "AD-002"
+  severity: IssueSeverity;
+  fieldPath: string;
+  message: string;
+  rawEvidence?: string;      // the original text that caused the issue
+  suggestedQuestion?: string; // question to ask the user to resolve
+}
+
+/** Readiness assessment for engine generation */
+export interface BriefingReadiness {
+  isReadyForGeneration: boolean;
+  score: number;             // 0.0 to 1.0
+  criticalMissingCount: number;
+  criticalContradictionCount: number;
+  fieldsRequiringConfirmation: string[];
+  blockingReasons: string[];
+}
+
+/** Normalized briefing — extends ParsedBriefing with confidence layer */
+export interface NormalizedBriefing extends ParsedBriefing {
+  _normalization: {
+    fieldConfidences: FieldConfidence[];
+    issues: BriefingIssue[];
+    readiness: BriefingReadiness;
+    normalizedAt: string;
+    version: number;          // schema version for backward compat
+  };
+}
+
 export interface BriefingResponse {
   success: boolean;
   data?: ParsedBriefing;

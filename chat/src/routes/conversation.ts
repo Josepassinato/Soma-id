@@ -26,6 +26,9 @@ import {
   applyCorrections,
 } from "../services/summary.js";
 import { runEnginePipeline } from "../services/engine-bridge.js";
+import { normalizeBriefing } from "../services/briefing-normalizer.js";
+import { detectIssues } from "../services/briefing-issues.js";
+import { assessReadiness } from "../services/briefing-readiness.js";
 import { transcribeAudio } from "../services/gemini.js";
 import { audioBufferToBase64Wav } from "../services/audio-converter.js";
 import { sendDeliveryEmail, isEmailConfigured, generatePdfBuffer } from "../services/email-delivery.js";
@@ -260,6 +263,16 @@ export default async function conversationRoutes(app: FastifyInstance) {
 
       // Phase 2: Validate checklist
       const checklist = validateChecklist(briefingData);
+
+      // Phase 2.5: Normalize briefing & assess confidence (P0.0)
+      const normalized = normalizeBriefing(briefingData);
+      const normIssues = detectIssues(normalized);
+      normalized._normalization.issues = normIssues;
+      const readiness = assessReadiness(normalized, normIssues);
+      normalized._normalization.readiness = readiness;
+
+      // Use normalized briefing as the canonical source
+      briefingData = normalized;
 
       // Create session
       const session = createSession(briefingData, checklist.gaps);

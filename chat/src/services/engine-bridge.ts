@@ -7,8 +7,11 @@
  * We replicate the needed interfaces here to avoid import path issues.
  */
 
-import type { ParsedBriefing } from "../types.js";
+import type { ParsedBriefing, NormalizedBriefing } from "../types.js";
 import { getModel } from "./gemini.js";
+import { normalizeBriefing } from "./briefing-normalizer.js";
+import { detectIssues } from "./briefing-issues.js";
+import { assessReadiness } from "./briefing-readiness.js";
 
 // ============================================================
 // Engine input/output types (mirrored from soma-id/types.ts)
@@ -1308,9 +1311,36 @@ export function runEnginePipeline(
 ): EngineResults {
   console.log("[ENGINE] Starting pipeline...");
 
-  // Step 1: Transform briefing
-  const project = briefingToProject(briefing, sessionId);
-  const layout = briefingToLayout(briefing);
+  // Step 0: Normalize briefing & assess readiness (P0.0)
+  const normalized = normalizeBriefing(briefing);
+  const issues = detectIssues(normalized);
+  normalized._normalization.issues = issues;
+  const readiness = assessReadiness(normalized, issues);
+  normalized._normalization.readiness = readiness;
+
+  const criticalIssues = issues.filter(i => i.severity === "critical");
+  if (criticalIssues.length > 0) {
+    console.log(`[ENGINE] Normalization: ${issues.length} issues (${criticalIssues.length} critical)`);
+    for (const ci of criticalIssues) {
+      console.log(`[ENGINE]   CRITICAL: ${ci.message} [${ci.fieldPath}]`);
+    }
+  }
+
+  if (!readiness.isReadyForGeneration) {
+    console.log(`[ENGINE] Readiness score: ${readiness.score} — BLOCKED`);
+    console.log(`[ENGINE] Blocking reasons: ${readiness.blockingReasons.join("; ")}`);
+    throw new Error(
+      `Briefing nao esta pronto para geracao (score: ${readiness.score}). ` +
+      `Razoes: ${readiness.blockingReasons.join("; ")}. ` +
+      `Resolva os ${criticalIssues.length} problema(s) critico(s) antes de gerar.`
+    );
+  }
+
+  console.log(`[ENGINE] Normalization OK — readiness: ${readiness.score}, issues: ${issues.length} (0 critical)`);
+
+  // Step 1: Transform briefing (use normalized version)
+  const project = briefingToProject(normalized, sessionId);
+  const layout = briefingToLayout(normalized);
   console.log(`[ENGINE] Layout: ${layout.mainWall.modules.length} modules`);
 
   // Step 2: calcEngine
