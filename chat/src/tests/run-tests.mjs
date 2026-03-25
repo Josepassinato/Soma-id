@@ -330,6 +330,63 @@ test("distribution notes in factoryNotes", () => {
 });
 
 // ================================================================
+// P0.5: TRACEABILITY TESTS
+// ================================================================
+console.log("\n=== Traceability ===");
+
+for (const fxName of ["closet_linear_baseline", "kitchen_basic"]) {
+  const fx = loadFixture(fxName);
+  const results = runEnginePipeline(fx.briefing, `test_trace_${fxName}`);
+
+  // TR-001: All walls have traceId
+  test(`TR-001 ${fxName}: walls have traceId`, () => {
+    for (const w of results.blueprint.walls) {
+      assert(w.traceId, `Wall ${w.wallId} missing traceId`);
+      assert(w.traceId.startsWith("W-"), `Wall traceId should start with W-: ${w.traceId}`);
+    }
+  });
+
+  // TR-001: All modules have traceId
+  test(`TR-001 ${fxName}: modules have traceId + shortLabel`, () => {
+    const allMods = results.blueprint.walls.flatMap(w => w.modules);
+    for (const m of allMods) {
+      assert(m.traceId, `Module ${m.name} missing traceId`);
+      assert(m.shortLabel, `Module ${m.name} missing shortLabel`);
+      assert(m.traceId.startsWith("M-"), `Module traceId format: ${m.traceId}`);
+    }
+  });
+
+  // TR-002: All modules reference parent wall
+  test(`TR-002 ${fxName}: modules have parentWallTraceId`, () => {
+    const allMods = results.blueprint.walls.flatMap(w => w.modules);
+    for (const m of allMods) {
+      assert(m.parentWallTraceId, `Module ${m.name} missing parentWallTraceId`);
+    }
+  });
+
+  // TR-003: All pieces reference parent module
+  test(`TR-003 ${fxName}: pieces have parentModuleTraceId`, () => {
+    const allMods = results.blueprint.walls.flatMap(w => w.modules);
+    for (const m of allMods) {
+      for (const cut of m.cutList) {
+        assert(cut.parentModuleTraceId, `Piece ${cut.piece} in ${m.name} missing parentModuleTraceId`);
+      }
+    }
+  });
+
+  // Report shows trace labels
+  test(`${fxName}: report contains trace labels`, () => {
+    const html = generateHtmlReport(fx.briefing, results, `test_trace_${fxName}`);
+    // Should contain shortLabel like "A01" in the HTML
+    const allMods = results.blueprint.walls.flatMap(w => w.modules);
+    const firstLabel = allMods[0]?.shortLabel;
+    if (firstLabel) {
+      assert(html.includes(firstLabel), `Report should contain shortLabel "${firstLabel}"`);
+    }
+  });
+}
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);

@@ -759,6 +759,12 @@ function renderWallSvg(
     svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="${fill}" stroke="#333" stroke-width="${ss(2)}"/>`;
     svg += `<rect x="${mx}" y="${my}" width="${mod.width}" height="${mod.height}" fill="url(#${prefix}${hatchId})" stroke="none"/>`;
 
+    // P0.5 — Trace ID tag in top-left corner (Vista COM Portas)
+    if (mod.shortLabel) {
+      svg += `<rect x="${mx + ss(2)}" y="${my + ss(2)}" width="${ss(25)}" height="${ss(12)}" fill="#333" fill-opacity="0.8" rx="${ss(2)}"/>`;
+      svg += `<text x="${mx + ss(5)}" y="${my + ss(11)}" font-size="${ss(8)}" fill="#fff" font-weight="bold" font-family="monospace">${mod.shortLabel}</text>`;
+    }
+
     // 18mm side panels with ABNT hatch fill (solid material cross-section)
     svg += `<rect x="${mx}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#555" stroke-width="${ss(0.8)}"/>`;
     svg += `<rect x="${mx + mod.width - 18}" y="${my}" width="18" height="${mod.height}" fill="url(#${prefix}_wallHatch)" stroke="#555" stroke-width="${ss(0.8)}"/>`;
@@ -1181,6 +1187,12 @@ function renderWallInteriorSvg(
     // Module label
     const fontSize = Math.max(8, Math.min(12, mod.width / 12));
     svg += `<text x="${mx + mod.width / 2}" y="${my - 5}" text-anchor="middle" font-size="${fontSize}" font-weight="bold" fill="#333" font-family="Arial,sans-serif">${esc(mod.name)}</text>`;
+
+    // P0.5 — Trace ID tag in top-left corner
+    if (mod.shortLabel) {
+      svg += `<rect x="${mx + 2}" y="${my + 2}" width="${Math.max(25, mod.shortLabel.length * 6)}" height="12" fill="#333" fill-opacity="0.8" rx="2"/>`;
+      svg += `<text x="${mx + 5}" y="${my + 11}" font-size="8" fill="#fff" font-weight="bold" font-family="monospace">${mod.shortLabel}</text>`;
+    }
 
     // Width dimension below each module
     svg += dimLine(mx, padT + wallH + 8, mx + mod.width, padT + wallH + 8, `${mod.width}`, 8, `${prefix}_`);
@@ -2135,11 +2147,11 @@ export function generateHtmlReport(briefing: ParsedBriefing, results: EngineResu
   // Collect all modules
   const allModules = [...bp.mainWall.modules, ...(bp.sideWall?.modules || [])];
 
-  // Collect all cut items with zone info
+  // Collect all cut items with zone info + P0.5 traceability
   const allCuts: Array<{
     piece: string; module: string; zone: string; qty: number;
     w: number; h: number; thickness: number; material: string;
-    edge: string; grain: string; colorHex: string;
+    edge: string; grain: string; colorHex: string; traceLabel: string;
   }> = [];
   for (const mod of allModules) {
     const zone = detectZone(mod, briefing);
@@ -2156,6 +2168,7 @@ export function generateHtmlReport(briefing: ParsedBriefing, results: EngineResu
         edge: cut.edgeBand,
         grain: cut.grainDirection === "none" ? "-" : cut.grainDirection === "vertical" ? "V" : "H",
         colorHex: getColorForMaterial(cut.material),
+        traceLabel: cut.shortLabel || mod.shortLabel || "",
       });
     }
   }
@@ -2692,7 +2705,7 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
   <h3 style="font-size:14px;font-weight:700;margin:16px 0 8px;color:#333">Lista Completa de Pecas</h3>
   <table>
     <tr>
-      <th>#</th><th>Peca</th><th>Modulo</th><th>Zona</th><th>Qtd</th>
+      <th>Cod.</th><th>#</th><th>Peca</th><th>Modulo</th><th>Zona</th><th>Qtd</th>
       <th>Largura mm</th><th>Altura mm</th><th>Esp. mm</th>
       <th>Material</th><th>Fita Borda (faces)</th><th>Veio</th><th>Cor</th>
     </tr>
@@ -2700,7 +2713,7 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
       let tbl = "";
       let idx = 1;
       for (const [zone, cuts] of Object.entries(cutsByZone)) {
-        tbl += `<tr class="zone-header"><td colspan="12">${esc(zone)}</td></tr>`;
+        tbl += `<tr class="zone-header"><td colspan="13">${esc(zone)}</td></tr>`;
         for (const c of cuts) {
           // Determine edge banding per face based on piece type
           const pLow = c.piece.toLowerCase();
@@ -2723,7 +2736,7 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
             }
           }
           tbl += `<tr>
-            <td>${idx++}</td><td>${esc(c.piece)}</td><td>${esc(c.module)}</td><td>${esc(c.zone)}</td>
+            <td style="font-family:monospace;font-size:10px;font-weight:bold">${esc(c.traceLabel || "")}</td><td>${idx++}</td><td>${esc(c.piece)}</td><td>${esc(c.module)}</td><td>${esc(c.zone)}</td>
             <td>${c.qty}</td><td>${c.w}</td><td>${c.h}</td><td>${c.thickness}</td>
             <td>${esc(c.material)}</td><td>${esc(edgeFaces)}</td><td>${c.grain}</td>
             <td><span style="display:inline-block;width:14px;height:14px;background:${c.colorHex || "#ccc"};border:1px solid #999;vertical-align:middle;border-radius:2px"></span> ${esc(c.colorHex || "-")}</td>

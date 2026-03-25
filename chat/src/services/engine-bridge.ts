@@ -14,6 +14,7 @@ import { detectIssues } from "./briefing-issues.js";
 import { assessReadiness } from "./briefing-readiness.js";
 import { resolveModuleTyping } from "./module-typing.js";
 import { buildWallLayouts, distributionSummary } from "./layout-distributor.js";
+import { applyTraceability, validateTraceability } from "./traceability.js";
 
 // ============================================================
 // Engine input/output types (mirrored from soma-id/types.ts)
@@ -76,6 +77,10 @@ export interface CutListItem {
   rawWidth: number;
   rawHeight: number;
   drillingPoints?: Array<{ x: number; y: number; diameter: number; depth: number; type: string }>;
+  // P0.5 — Traceability
+  traceId?: string;              // e.g. "P-A01-03"
+  shortLabel?: string;           // e.g. "A01.03"
+  parentModuleTraceId?: string;  // e.g. "M-A01"
 }
 
 export interface BoundingBox {
@@ -100,6 +105,10 @@ export interface BlueprintModule {
   moduleSubtype?: import("./module-typing.js").ModuleSubtype;
   zone?: string;
   features?: string[];
+  // P0.5 — Traceability
+  traceId?: string;          // e.g. "M-A01"
+  shortLabel?: string;       // e.g. "A01" (for display in elevations)
+  parentWallTraceId?: string; // e.g. "W-NORTH-01"
 }
 
 /** P0.4 — Wall layout with identity */
@@ -112,6 +121,8 @@ export interface WallLayout {
   totalModuleWidth: number;// sum of assigned module widths
   modules: BlueprintModule[];
   distributionNotes: string[]; // why modules were assigned here
+  // P0.5 — Traceability
+  traceId?: string;        // e.g. "W-NORTH-01"
 }
 
 export interface BlueprintData {
@@ -1399,6 +1410,17 @@ export function runEnginePipeline(
       modules: sideMods,
     };
   }
+  // P0.5 — Apply traceability IDs to walls, modules, pieces
+  const traceSummary = applyTraceability(wallLayouts);
+  const traceViolations = validateTraceability(wallLayouts);
+  if (traceViolations.length > 0) {
+    console.log(`[ENGINE] Traceability violations: ${traceViolations.length}`);
+    for (const v of traceViolations) {
+      console.log(`[ENGINE]   ${v.rule}: ${v.message} [${v.entity}]`);
+    }
+  }
+  console.log(`[ENGINE] Traceability: ${traceSummary.totalWalls} walls, ${traceSummary.totalModules} modules, ${traceSummary.totalPieces} pieces`);
+
   const distNotes = distributionSummary(wallLayouts);
   blueprint.factoryNotes.push(...distNotes);
   console.log(`[ENGINE] Multi-wall: ${wallLayouts.length} walls, ${decisions.length} assignments`);
