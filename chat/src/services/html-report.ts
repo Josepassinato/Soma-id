@@ -23,6 +23,10 @@ import {
   internalVCotas, materialCallout,
 } from "./report/dimension-system.js";
 import { renderMaterialLegend } from "./report/legend-renderer.js";
+import {
+  composeSheet, wrapViewBlock, SHEET_COMPOSITION_CSS,
+  type ViewBlock,
+} from "./report/sheet-composer.js";
 import { resolveModuleTyping } from "./module-typing.js";
 
 /* ============================================================
@@ -2455,6 +2459,7 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
 
 /* === HACHURA PATTERN === */
 .hatch-pattern{fill:url(#hatchPattern)}
+${SHEET_COMPOSITION_CSS}
 
 /* === PRINT === */
 @media print{
@@ -2552,31 +2557,40 @@ tr.total-row td{background:#D8D8D8;font-weight:700;border-top:2px solid ${STROKE
     for (let wi = 0; wi < walls.length; wi++) {
       const wall = walls[wi];
       const pW = nextPrancha();
-      html += `
-<!-- ================================================================ -->
-<!-- PRANCHA ${String(pW).padStart(2, "0")} — ${wall.title}                                  -->
-<!-- ================================================================ -->
-<div class="prancha" id="prancha-${String(pW).padStart(2, "0")}">
-  ${pH(pW, wall.title, "A2 Landscape")}
-  <p style="font-size:11px;color:#666;margin-bottom:8px">Vista frontal com portas. Materiais: ${esc(bp.materials.mdfColor || "-")} | Espessura: ${bp.materials.thickness || 18}mm</p>
 
-  <h3 style="font-size:13px;font-weight:700;margin:8px 0 4px;color:#333">Vista COM Portas</h3>
-  <div class="svg-wrap">
-    ${renderWallSvg(wall.title, wall.totalWidth, wall.modules, 2400, `w${String(pW).padStart(2, "0")}`)}
-  </div>
+      // P0.7 — Compose elevation prancha with ViewBlocks
+      const elevViews: ViewBlock[] = [
+        {
+          id: `elev-com-${wi}`,
+          title: "Vista COM Portas",
+          scale: "1:25",
+          content: `<p style="font-size:11px;color:#666;margin-bottom:8px">Vista frontal com portas. Materiais: ${esc(bp.materials.mdfColor || "-")} | Espessura: ${bp.materials.thickness || 18}mm</p>` +
+            renderWallSvg(wall.title, wall.totalWidth, wall.modules, 2400, `w${String(pW).padStart(2, "0")}`),
+          priority: 1,
+        },
+        {
+          id: `elev-sem-${wi}`,
+          title: "Vista SEM Portas (Interior)",
+          scale: "1:25",
+          content: renderWallInteriorSvg(wall.title, wall.totalWidth, wall.modules, 2400, `wi${String(pW).padStart(2, "0")}`),
+          priority: 1,
+        },
+        {
+          id: `elev-table-${wi}`,
+          title: "Modulos",
+          content: `<table>
+    <tr><th>Cod.</th><th>Modulo</th><th>Tipo</th><th>Largura mm</th><th>Altura mm</th><th>Profund. mm</th><th>Posicao X</th><th>Pecas</th><th>Notas</th></tr>
+    ${wall.modules.map(m => `<tr><td style="font-family:monospace;font-weight:bold">${m.shortLabel || ""}</td><td>${esc(m.name)}</td><td>${esc(m.type)}</td><td>${m.width}</td><td>${m.height}</td><td>${m.depth}</td><td>${m.position?.x || 0}</td><td>${m.cutList.length} tipos</td><td>${(m.notes || []).join("; ") || "-"}</td></tr>`).join("")}
+  </table>`,
+          priority: 2,
+        },
+      ];
 
-  <h3 style="font-size:13px;font-weight:700;margin:16px 0 4px;color:#333">Vista SEM Portas (Interior)</h3>
-  <div class="svg-wrap">
-    ${renderWallInteriorSvg(wall.title, wall.totalWidth, wall.modules, 2400, `wi${String(pW).padStart(2, "0")}`)}
-  </div>
-
-  <table>
-    <tr><th>Modulo</th><th>Tipo</th><th>Largura mm</th><th>Altura mm</th><th>Profund. mm</th><th>Posicao X</th><th>Pecas</th><th>Notas</th></tr>
-    ${wall.modules.map(m => `<tr><td>${esc(m.name)}</td><td>${esc(m.type)}</td><td>${m.width}</td><td>${m.height}</td><td>${m.depth}</td><td>${m.position?.x || 0}</td><td>${m.cutList.length} tipos</td><td>${(m.notes || []).join("; ") || "-"}</td></tr>`).join("")}
-  </table>
-  ${pF(pW, "1:25")}
-</div>
-`;
+      html += composeSheet(pW, TOTAL_PRANCHAS, wall.title, elevViews, {
+        clientName, projectType, designer, sessionId,
+        format: "A2 Landscape",
+        scale: "1:25",
+      });
     }
   } else {
     // No walls defined — placeholder

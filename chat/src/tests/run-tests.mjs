@@ -420,6 +420,42 @@ for (const fxName of ["closet_linear_baseline", "kitchen_basic"]) {
 }
 
 // ================================================================
+// P0.7: SHEET COMPOSITION TESTS
+// ================================================================
+console.log("\n=== Sheet composition ===");
+
+for (const fxName of ["closet_linear_baseline", "kitchen_basic"]) {
+  const fx = loadFixture(fxName);
+  const results = runEnginePipeline(fx.briefing, `test_sc_${fxName}`);
+  const html = generateHtmlReport(fx.briefing, results, `test_sc_${fxName}`);
+
+  // SC-002: Title block / carimbo present
+  test(`SC-002 ${fxName}: title block (carimbo) present`, () => {
+    assert(html.includes("carimbo"), "Report should contain carimbo class");
+    assert(html.includes("SOMA-ID Engine"), "Carimbo should have verificador");
+  });
+
+  // SC-003: View titles present
+  test(`SC-003 ${fxName}: view titles present`, () => {
+    assert(html.includes("view-title"), "Report should have view-title class");
+    assert(html.includes("Vista COM Portas"), "Should have COM Portas title");
+    assert(html.includes("Vista SEM Portas"), "Should have SEM Portas title");
+  });
+
+  // SC-004: Scale per view
+  test(`SC-004 ${fxName}: scale per view present`, () => {
+    assert(html.includes("view-scale"), "Report should have view-scale class");
+    assert(html.includes("Escala 1:25"), "Should have 1:25 scale on elevations");
+  });
+
+  // SC-006: Stable layout (prancha count matches index)
+  test(`SC-006 ${fxName}: prancha count stable`, () => {
+    const pranchaCount = (html.match(/class="prancha"/g) || []).length;
+    assert(pranchaCount >= 10, `Should have at least 10 pranchas, got ${pranchaCount}`);
+  });
+}
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
