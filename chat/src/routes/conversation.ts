@@ -865,6 +865,31 @@ export default async function conversationRoutes(app: FastifyInstance) {
   );
 
   // ================================================================
+  // GET /session/:id/dxf — Download DXF technical export (P0.9)
+  // ================================================================
+  app.get(
+    "/session/:id/dxf",
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const session = getSession(request.params.id);
+      if (!session) return reply.status(404).send({ error: "Sessao nao encontrada" });
+
+      if (!session.engine_results) {
+        return reply.status(400).send({ error: "Sem resultados dos engines. Gere o projeto primeiro." });
+      }
+
+      const { generateDxfBuffer } = await import("../services/dxf-export.js");
+      const dxfBuffer = generateDxfBuffer(session.briefing, session.engine_results);
+      const clientName = (session.briefing.client?.name || "projeto").replace(/[^a-zA-Z0-9]/g, "_");
+      const filename = `SOMA-ID_${clientName}_${session.id}.dxf`;
+
+      return reply
+        .header("Content-Type", "application/dxf")
+        .header("Content-Disposition", `attachment; filename="${filename}"`)
+        .send(dxfBuffer);
+    }
+  );
+
+  // ================================================================
   // GET /session/:id/pdf — Download PDF technical sheet
   // ================================================================
   app.get(

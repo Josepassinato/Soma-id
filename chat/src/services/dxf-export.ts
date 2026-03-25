@@ -259,7 +259,20 @@ function buildTables(): string {
  * Draw nesting sheets: sheet outlines, placed pieces, drilling points,
  * labels, and dimension lines.
  */
-function buildNestingEntities(sheets: Sheet[]): string {
+/** P0.9 — Find trace label for a placed piece by matching to module cutList */
+function findPieceTraceLabel(item: PlacedItem, modules: BlueprintModule[]): string {
+  // Find the module this piece belongs to
+  const mod = modules.find(m => m.name === item.moduleName || m.name.includes(item.moduleName));
+  if (!mod) return "";
+  // Find the cut list item matching this piece
+  const baseName = item.partName.replace(/_\d+$/, ""); // "Lateral_1" → "Lateral"
+  const cut = mod.cutList.find(c => c.piece === baseName);
+  if (cut && cut.shortLabel) return cut.shortLabel;
+  if (mod.shortLabel) return mod.shortLabel;
+  return "";
+}
+
+function buildNestingEntities(sheets: Sheet[], allModules: BlueprintModule[] = []): string {
   let s = "";
   let sheetOffsetX = 0;
 
@@ -296,8 +309,11 @@ function buildNestingEntities(sheets: Sheet[]): string {
       s += dimensionH(px, py, px + pw, -DIM_OFFSET * 0.5);
       s += dimensionV(px, py, py + ph, -DIM_OFFSET * 0.5);
 
-      // --- ETIQUETAS layer: piece label ---
+      // --- ETIQUETAS layer: piece label with traceability ---
+      // P0.9: Find traceId from module's cutList
+      const traceLabel = findPieceTraceLabel(item, allModules);
       const labelLines: string[] = [
+        traceLabel ? `[${traceLabel}]` : "",
         item.partName,
         item.moduleName,
         `${item.width}x${item.height}${item.rotated ? " ROT" : ""}`,
@@ -542,8 +558,8 @@ export function generateDxfBuffer(
   // Title block (placed below the nesting area)
   dxf += buildTitleBlock(briefing, results);
 
-  // Nesting: sheet outlines + placed pieces + labels + dimensions
-  dxf += buildNestingEntities(results.nesting.sheets);
+  // Nesting: sheet outlines + placed pieces + labels + dimensions + P0.9 traceability
+  dxf += buildNestingEntities(results.nesting.sheets, modules);
 
   // Drilling points mapped onto nesting sheets
   dxf += buildDrillingEntities(results.nesting.sheets, modules);

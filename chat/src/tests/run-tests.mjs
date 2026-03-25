@@ -521,6 +521,52 @@ test("isReadyForFactory false when critical exists", () => {
 });
 
 // ================================================================
+// P0.9: DXF EXPORT TESTS
+// ================================================================
+console.log("\n=== DXF export ===");
+
+const { generateDxfBuffer } = await import(path.join(DIST, "services/dxf-export.js"));
+
+test("DXF generates valid buffer", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_dxf_closet");
+  const buf = generateDxfBuffer(fx.briefing, results);
+  assert(buf instanceof Buffer, "Should return Buffer");
+  assert(buf.length > 100, `DXF too small: ${buf.length} bytes`);
+  const content = buf.toString("utf-8");
+  assert(content.includes("SECTION"), "DXF should have SECTION");
+  assert(content.includes("ENTITIES"), "DXF should have ENTITIES");
+  assert(content.includes("EOF"), "DXF should end with EOF");
+});
+
+test("DXF contains piece labels", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_dxf_labels");
+  const content = generateDxfBuffer(fx.briefing, results).toString("utf-8");
+  assert(content.includes("Lateral"), "DXF should have piece name Lateral");
+  assert(content.includes("CORTE_EXTERNO"), "DXF should have CUT_OUT layer");
+  assert(content.includes("ETIQUETAS"), "DXF should have ETIQUETAS layer");
+});
+
+test("DXF contains trace labels when available", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_dxf_trace");
+  const content = generateDxfBuffer(fx.briefing, results).toString("utf-8");
+  // Trace labels should appear in bracket format [A01] or similar
+  const hasTrace = content.includes("[A") || content.includes("[B");
+  assert(hasTrace, "DXF should contain trace labels like [A01]");
+});
+
+test("kitchen DXF exports without error", () => {
+  const fx = loadFixture("kitchen_basic");
+  const results = runEnginePipeline(fx.briefing, "test_dxf_kitchen");
+  const buf = generateDxfBuffer(fx.briefing, results);
+  assert(buf.length > 100, "Kitchen DXF should be substantial");
+  const content = buf.toString("utf-8");
+  assert(content.includes("EOF"), "Should be valid DXF");
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
