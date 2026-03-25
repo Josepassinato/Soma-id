@@ -837,6 +837,82 @@ test("approved proposal cannot be revised", () => {
 });
 
 // ================================================================
+// P1.5: REVISION & VERSIONING TESTS
+// ================================================================
+console.log("\n=== Revision & versioning ===");
+
+const { createRevision, getRevisions, getLatestRevision, markCommerciallyApproved, markExecutiveGenerated, createRevisionLink, getRevisionLinks, detectMaterialChanges } = await import(path.join(DIST, "services/revision-manager.js"));
+
+test("revision creation with changeNotes", () => {
+  const rev = createRevision("proj-test-1", "Versao inicial do projeto", {
+    catalogId: "builtin-default-v1",
+    catalogVersion: "1.0.0",
+  });
+  assert(rev.revisionId, "Should have revisionId");
+  assert.equal(rev.versionNumber, 1);
+  assert.equal(rev.status, "draft");
+  assert.equal(rev.changeNotes, "Versao inicial do projeto");
+});
+
+test("sequential versions increment correctly", () => {
+  createRevision("proj-test-2", "v1 — inicial");
+  const rev2 = createRevision("proj-test-2", "v2 — material alterado", {
+    changes: [{
+      changeType: "material_changed",
+      entityType: "material",
+      beforeValue: "Lana",
+      afterValue: "Freijo",
+      impactSummary: "Material principal alterado de Lana para Freijo",
+    }],
+  });
+  assert.equal(rev2.versionNumber, 2);
+  assert.equal(rev2.changes.length, 1);
+  assert.equal(rev2.changes[0].changeType, "material_changed");
+  assert(rev2.basedOnRevisionId, "Should reference previous revision");
+});
+
+test("commercially approved status", () => {
+  createRevision("proj-test-3", "v1");
+  const approved = markCommerciallyApproved("proj-test-3");
+  assert(approved, "Should return approved revision");
+  assert.equal(approved.status, "commercially_approved");
+});
+
+test("executive generated links to revision", () => {
+  createRevision("proj-test-4", "v1");
+  markCommerciallyApproved("proj-test-4");
+  const exec = markExecutiveGenerated("proj-test-4");
+  assert.equal(exec.status, "executive_generated");
+});
+
+test("revision link creation", () => {
+  const link = createRevisionLink("proj-test-5", 1, 1, "approved");
+  assert.equal(link.proposalVersionNumber, 1);
+  assert.equal(link.projectRevisionNumber, 1);
+  assert.equal(link.approvalStatus, "approved");
+  const links = getRevisionLinks("proj-test-5");
+  assert.equal(links.length, 1);
+});
+
+test("material change detection", () => {
+  const changes = detectMaterialChanges("rev-test", ["Lana", "Lord"], ["Freijo", "Lord"]);
+  assert.equal(changes.length, 1);
+  assert.equal(changes[0].changeType, "material_changed");
+  assert(changes[0].impactSummary.includes("Freijo"), "Should mention new material");
+});
+
+test("revision history retrieval", () => {
+  createRevision("proj-test-6", "v1");
+  createRevision("proj-test-6", "v2 — ajuste");
+  createRevision("proj-test-6", "v3 — final");
+  const history = getRevisions("proj-test-6");
+  assert.equal(history.length, 3);
+  const latest = getLatestRevision("proj-test-6");
+  assert.equal(latest.versionNumber, 3);
+  assert.equal(latest.changeNotes, "v3 — final");
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);

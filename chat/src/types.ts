@@ -283,6 +283,63 @@ export interface CommercialProposal {
   updatedAt: string;
 }
 
+/* ============================================================
+   Revision & Versioning (P1.5)
+   ============================================================ */
+
+export type RevisionStatus =
+  | "draft"
+  | "revision_requested"
+  | "revised"
+  | "commercially_approved"
+  | "executive_generated"
+  | "factory_released";
+
+export type ChangeType =
+  | "material_changed"
+  | "module_changed"
+  | "dimension_changed"
+  | "wall_distribution_changed"
+  | "pricing_changed"
+  | "hardware_changed"
+  | "scope_changed"
+  | "note_changed";
+
+export interface RevisionChange {
+  changeId: string;
+  revisionId: string;
+  changeType: ChangeType;
+  entityType: string;       // "material", "module", "pricing", "scope"
+  entityTraceId?: string;
+  fieldPath?: string;
+  beforeValue?: string;
+  afterValue?: string;
+  impactSummary: string;
+}
+
+export interface ProjectRevision {
+  revisionId: string;
+  projectId: string;
+  proposalId?: string;
+  versionNumber: number;
+  status: RevisionStatus;
+  basedOnRevisionId?: string;
+  changeNotes: string;
+  changes: RevisionChange[];
+  pricingSnapshotPrice?: number;
+  pricingSnapshotCurrency?: string;
+  catalogId?: string;
+  catalogVersion?: string;
+  createdAt: string;
+}
+
+export interface RevisionLink {
+  proposalVersionNumber: number;
+  projectRevisionNumber: number;
+  executiveRevisionNumber?: number;
+  approvalStatus: ProposalStatus;
+}
+
 export interface BriefingResponse {
   success: boolean;
   data?: ParsedBriefing;
