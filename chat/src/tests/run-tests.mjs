@@ -629,6 +629,91 @@ test("report shows catalog provenance", () => {
 });
 
 // ================================================================
+// P1.2: PARAMETRIC MODULE LIBRARY TESTS
+// ================================================================
+console.log("\n=== Parametric module library ===");
+
+const { findTemplate, configureModule, validateDimensions, getAllTemplates } = await import(path.join(DIST, "services/module-library.js"));
+const { instantiateModule } = await import(path.join(DIST, "services/module-instantiator.js"));
+
+test("library has closet templates", () => {
+  const tpl = findTemplate("closet_storage", "long_garment");
+  assert(tpl, "Should find long_garment template");
+  assert.equal(tpl.templateId, "closet-long-hanging");
+  assert.equal(tpl.defaultDepth, 600);
+});
+
+test("library has kitchen templates", () => {
+  const sink = findTemplate("kitchen_base", "sink_base");
+  assert(sink, "Should find sink_base template");
+  assert.equal(sink.environmentType, "kitchen");
+
+  const oven = findTemplate("kitchen_tall", "oven_tower");
+  assert(oven, "Should find oven_tower template");
+  assert.equal(oven.defaultHeight, 2200);
+});
+
+test("configureModule clamps to valid range", () => {
+  const tpl = findTemplate("closet_storage", "shoe");
+  const cfg = configureModule(tpl, 2000, 3000, 200); // all out of range
+  assert(cfg.resolvedWidth <= tpl.dimensionRules.widthMax, "Width should be clamped");
+  assert(cfg.resolvedHeight <= tpl.dimensionRules.heightMax, "Height should be clamped");
+  assert(cfg.resolvedDepth >= tpl.dimensionRules.depthMin, "Depth should be clamped");
+  assert.equal(cfg.usedParametricTemplate, true);
+});
+
+test("validateDimensions catches out-of-range", () => {
+  const tpl = findTemplate("closet_storage", "long_garment");
+  const errors = validateDimensions(tpl, 100, 1000, 300); // too narrow, too short, too shallow
+  assert(errors.length >= 2, `Should have errors, got: ${errors.join("; ")}`);
+});
+
+test("instantiateModule uses parametric template for closet", () => {
+  const result = instantiateModule("hanging_bar", "long_garments", 1, [], 2400);
+  assert.equal(result.usedParametricTemplate, true, "Should use parametric template");
+  assert(result.templateId, "Should have templateId");
+  assert(result.width > 0);
+  assert(result.height > 0);
+});
+
+test("instantiateModule uses parametric template for kitchen sink", () => {
+  const result = instantiateModule("sink_cabinet", undefined, 1, ["Zona: Bancada Pia"], 900);
+  assert.equal(result.usedParametricTemplate, true, "Should use parametric template");
+  assert(result.templateId?.includes("sink"), `Template should be sink, got: ${result.templateId}`);
+});
+
+test("instantiateModule uses parametric template for oven tower", () => {
+  const result = instantiateModule("oven_tower", undefined, 1, ["Zona: Torre Forno"], 2200);
+  assert.equal(result.usedParametricTemplate, true);
+  assert(result.templateId?.includes("oven"), `Template should be oven, got: ${result.templateId}`);
+});
+
+test("instantiateModule falls back for unknown type", () => {
+  const result = instantiateModule("custom_unknown_type", undefined, 1, [], 2400);
+  assert.equal(result.usedParametricTemplate, false, "Should fallback for unknown type");
+  assert(result.diagnosticNote.includes("fallback"), "Should note fallback");
+});
+
+test("shoe_rack uses quantity_based width", () => {
+  const result = instantiateModule("shoe_rack", "shoes", 30, [], 2400);
+  assert.equal(result.usedParametricTemplate, true);
+  // 30 × 50mm = 1500mm, capped at widthMax
+  assert(result.width >= 600, `Width should be quantity-based, got ${result.width}`);
+});
+
+test("all templates have valid dimension rules", () => {
+  const templates = getAllTemplates();
+  assert(templates.length >= 12, `Should have at least 12 templates, got ${templates.length}`);
+  for (const t of templates) {
+    const r = t.dimensionRules;
+    assert(r.widthMin < r.widthMax, `${t.templateId}: widthMin >= widthMax`);
+    assert(r.heightMin < r.heightMax, `${t.templateId}: heightMin >= heightMax`);
+    assert(r.depthMin < r.depthMax, `${t.templateId}: depthMin >= depthMax`);
+    assert(r.widthStep > 0, `${t.templateId}: widthStep must be > 0`);
+  }
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
