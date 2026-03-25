@@ -18,7 +18,8 @@ import {
   svgDefs, getMaterialHatchId, getColorForMaterial, MATERIAL_COLOR_MAP,
 } from "./report/material-patterns.js";
 import {
-  DIM_STYLE, dimLine, renderDimH, renderElevationCotas,
+  DIM_STYLE, dimLine, renderDimH, renderDimV,
+  renderElevationCotas, renderElevationVerticalCotas,
   internalVCotas, materialCallout,
 } from "./report/dimension-system.js";
 import { renderMaterialLegend } from "./report/legend-renderer.js";
@@ -1043,21 +1044,16 @@ function renderWallSvg(
     svg += renderElevationCotas(cotaModules, wallW, padL, padT + wallH, ss);
   }
 
-  // Overall wall height dimension (left side)
-  svg += dimLine(padL - 45, padT, padL - 45, padT + wallH, `${wallH} mm`, 13, `${prefix}_`);
-
-  // Vertical cotas on right side: individual module section heights
-  if (modules.length > 0) {
-    const rightMod = modules.reduce((a, b) => ((a.position?.x || 0) + a.width > (b.position?.x || 0) + b.width) ? a : b);
-    const rmx = padL + (rightMod.position?.x || 0) + rightMod.width;
-    const rmy = padT + wallH - (rightMod.position?.y || 0) - rightMod.height;
-    // Full wall height on far right
-    svg += dimLine(padL + wallW + 20, padT, padL + wallW + 20, padT + wallH, `${wallH}`, 11, `${prefix}_`);
-    // Module section height
-    if (rightMod.position?.y && rightMod.position.y > 0) {
-      svg += dimLine(padL + wallW + 40, padT + wallH - rightMod.position.y - rightMod.height, padL + wallW + 40, padT + wallH - rightMod.position.y, `${rightMod.height}`, 9, `${prefix}_`);
-      svg += dimLine(padL + wallW + 40, padT + wallH - rightMod.position.y, padL + wallW + 40, padT + wallH, `${rightMod.position.y}`, 9, `${prefix}_`);
-    }
+  // P0.6 — ABNT vertical cotas: wall height (left) + module heights (right)
+  {
+    const vertModules = modules.map(m => ({
+      x: padL + (m.position?.x || 0),
+      y: m.position?.y || 0,
+      width: m.width,
+      height: m.height,
+      name: m.name,
+    }));
+    svg += renderElevationVerticalCotas(vertModules, wallH, padL, padT, ss);
   }
 
   // Material legend with hatch samples
@@ -1198,10 +1194,26 @@ function renderWallInteriorSvg(
     svg += dimLine(mx, padT + wallH + 8, mx + mod.width, padT + wallH + 8, `${mod.width}`, 8, `${prefix}_`);
   }
 
-  // Overall dimension
-  svg += dimLine(padL, padT + wallH + 25, padL + wallW, padT + wallH + 25, `${wallW} mm`, 12, `${prefix}_`);
-  // Wall height on left
-  svg += dimLine(padL - 20, padT, padL - 20, padT + wallH, `${wallH} mm`, 11, `${prefix}_`);
+  // P0.6 — ABNT horizontal cotas (overall width)
+  {
+    const cotaMods = modules.map(m => ({
+      x: padL + (m.position?.x || 0),
+      width: m.width,
+      label: `${m.width}`,
+    }));
+    svg += renderElevationCotas(cotaMods, wallW, padL, padT + wallH, (n: number) => n);
+  }
+  // P0.6 — ABNT vertical cotas (wall height left + module heights right)
+  {
+    const vertMods = modules.map(m => ({
+      x: padL + (m.position?.x || 0),
+      y: m.position?.y || 0,
+      width: m.width,
+      height: m.height,
+      name: m.name,
+    }));
+    svg += renderElevationVerticalCotas(vertMods, wallH, padL, padT, (n: number) => n);
+  }
 
   svg += `</svg>`;
   return svg;
@@ -1624,10 +1636,10 @@ function renderSectionViewsSvg(briefing: ParsedBriefing, results: EngineResults)
   svg += `<line x1="${rx + mDepthPx + 10}" y1="${circY}" x2="${rx + rD - mDepthPx - 10}" y2="${circY}" stroke="${GOLD}" stroke-width="1.5" marker-end="url(#sec_arrowBlkE)" stroke-dasharray="4,2"/>`;
   svg += `<text x="${rx + rD / 2}" y="${circY - 5}" text-anchor="middle" font-size="7" fill="${GOLD}" font-family="Arial,sans-serif">CIRCULACAO</text>`;
 
-  // Dimensions
-  svg += dimLine(rx, ry + rH + 12, rx + rD, ry + rH + 12, `${roomD} mm`, 9, "sec_");
-  svg += dimLine(rx - 15, ry, rx - 15, ry + rH, `${ceilingH} mm`, 9, "sec_");
-  svg += dimLine(rx, ry + rH + 25, rx + mDepthPx, ry + rH + 25, `${modDepth}`, 7, "sec_");
+  // P0.6 — ABNT section dimensions: room depth, ceiling height, module depth
+  svg += renderDimH(rx, rx + rD, ry + rH, ry + rH + 15, `${roomD} mm`);
+  svg += renderDimH(rx, rx + mDepthPx, ry + rH, ry + rH + 28, `${modDepth}`);
+  svg += renderDimV(ry, ry + rH, rx, rx - 18, `${ceilingH} mm`, (n) => n, "left");
 
   // Tolerance note
   svg += `<text x="${rx}" y="${ry - 8}" font-size="7" fill="#888" font-family="Arial,sans-serif">Desconto parede: 5mm | Folga piso (rodape): 100mm</text>`;

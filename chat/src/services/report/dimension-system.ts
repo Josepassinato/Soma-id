@@ -117,6 +117,90 @@ export function renderElevationCotas(
 }
 
 /* ============================================================
+   Professional ABNT vertical dimension line (45° ticks)
+   ============================================================ */
+export function renderDimV(
+  y1: number, y2: number,
+  objX: number,     // X of the object edge (right side of module / left padding)
+  dimX: number,     // X where the dimension line sits
+  label: string,
+  ss: (n: number) => number = (n) => n,
+  side: "left" | "right" = "left",
+): string {
+  const { gap, overshoot, tickSize, lineWidth, tickWidth, fontSize, minTextGap, color } = DIM_STYLE;
+  const g = ss(gap); const ov = ss(overshoot); const tk = ss(tickSize);
+  const lw = ss(lineWidth); const tw = ss(tickWidth); const fs = ss(fontSize);
+
+  let svg = "";
+  // Extension lines: horizontal from object edge to dimension line
+  const dir = side === "left" ? -1 : 1;
+  const extStart = objX + g * dir;
+  const extEnd = dimX + ov * dir;
+  svg += `<line x1="${extStart}" y1="${y1}" x2="${extEnd}" y2="${y1}" stroke="${color}" stroke-width="${lw}"/>`;
+  svg += `<line x1="${extStart}" y1="${y2}" x2="${extEnd}" y2="${y2}" stroke="${color}" stroke-width="${lw}"/>`;
+
+  // Check if text fits
+  const span = Math.abs(y2 - y1);
+  const textW = label.length * fs * 0.6;
+  const textFits = span > textW + ss(minTextGap) * 2;
+
+  if (textFits) {
+    const cy = (y1 + y2) / 2;
+    const halfText = textW / 2 + ss(4);
+    svg += `<line x1="${dimX}" y1="${y1}" x2="${dimX}" y2="${cy - halfText}" stroke="${color}" stroke-width="${lw}"/>`;
+    svg += `<line x1="${dimX}" y1="${cy + halfText}" x2="${dimX}" y2="${y2}" stroke="${color}" stroke-width="${lw}"/>`;
+    // Rotated text
+    svg += `<text x="${dimX}" y="${cy}" text-anchor="middle" font-size="${fs}" fill="${color}" font-family="Arial,sans-serif" transform="rotate(-90 ${dimX} ${cy})">${label}</text>`;
+  } else {
+    svg += `<line x1="${dimX}" y1="${y1}" x2="${dimX}" y2="${y2}" stroke="${color}" stroke-width="${lw}"/>`;
+    svg += `<text x="${dimX - ss(2)}" y="${(y1 + y2) / 2}" text-anchor="middle" font-size="${fs}" fill="${color}" font-family="Arial,sans-serif" transform="rotate(-90 ${dimX - ss(2)} ${(y1 + y2) / 2})">${label}</text>`;
+  }
+
+  // 45° tick terminators
+  svg += `<line x1="${dimX - tk * 0.5}" y1="${y1 - tk * 0.5}" x2="${dimX + tk * 0.5}" y2="${y1 + tk * 0.5}" stroke="${color}" stroke-width="${tw}"/>`;
+  svg += `<line x1="${dimX - tk * 0.5}" y1="${y2 - tk * 0.5}" x2="${dimX + tk * 0.5}" y2="${y2 + tk * 0.5}" stroke="${color}" stroke-width="${tw}"/>`;
+
+  return svg;
+}
+
+/** Render vertical cotas for elevation: wall height on left, module heights on right */
+export function renderElevationVerticalCotas(
+  modules: Array<{ x: number; y: number; width: number; height: number; name: string }>,
+  wallHeight: number,
+  padL: number,
+  padT: number,
+  ss: (n: number) => number,
+): string {
+  let svg = "";
+  const { baseOffset } = DIM_STYLE;
+
+  // Left side: total wall height
+  const leftX = padL - ss(baseOffset);
+  svg += renderDimV(padT, padT + wallHeight, padL, leftX, `${wallHeight} mm`, ss, "left");
+
+  // Right side: individual module heights (only for modules taller than 600mm)
+  const rightBaseX = padL + Math.max(...modules.map(m => m.x + m.width), 0);
+  let dimOffset = ss(baseOffset);
+
+  // Group by unique height to avoid duplicate cotas
+  const heightGroups = new Map<number, typeof modules[0]>();
+  for (const m of modules) {
+    if (m.height > 600 && !heightGroups.has(m.height)) {
+      heightGroups.set(m.height, m);
+    }
+  }
+
+  for (const [height, m] of heightGroups) {
+    const my = padT + wallHeight - m.y - height;
+    const rightX = rightBaseX + dimOffset;
+    svg += renderDimV(my, my + height, rightBaseX, rightX, `${height}`, ss, "right");
+    dimOffset += ss(18);
+  }
+
+  return svg;
+}
+
+/* ============================================================
    Internal vertical cotas for module interiors
    ============================================================ */
 export function internalVCotas(

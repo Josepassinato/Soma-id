@@ -387,6 +387,39 @@ for (const fxName of ["closet_linear_baseline", "kitchen_basic"]) {
 }
 
 // ================================================================
+// P0.6: DIMENSIONING TESTS
+// ================================================================
+console.log("\n=== Dimensioning ===");
+
+for (const fxName of ["closet_linear_baseline", "kitchen_basic"]) {
+  const fx = loadFixture(fxName);
+  const results = runEnginePipeline(fx.briefing, `test_dim_${fxName}`);
+  const html = generateHtmlReport(fx.briefing, results, `test_dim_${fxName}`);
+
+  // CD-001: Vertical cotas present (ABNT 45° ticks, not red arrows)
+  test(`CD-001 ${fxName}: vertical ABNT cotas present`, () => {
+    // renderDimV generates vertical extension lines with DIM_STYLE.color (#333)
+    // and 45° tick marks — check for rotated text (vertical cota signature)
+    assert(html.includes('transform="rotate(-90'), `Report should have rotated vertical cota text`);
+  });
+
+  // CD-002: Section depth cotas present
+  test(`CD-002 ${fxName}: section depth cotas present`, () => {
+    // Section views should show depth dimension
+    const hasSectionDim = html.includes("CORTE A-A") && (
+      html.includes("600") || html.includes("580") || html.includes("500")
+    );
+    assert(hasSectionDim, "Section should show depth dimension");
+  });
+
+  // CD-003: No NaN in dimensions
+  test(`CD-003 ${fxName}: no NaN in cota values`, () => {
+    const nanInDim = (html.match(/font-family="Arial,sans-serif">NaN/g) || []).length;
+    assert.equal(nanInDim, 0, `Found ${nanInDim} NaN in dimension values`);
+  });
+}
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
