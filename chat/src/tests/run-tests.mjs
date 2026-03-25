@@ -765,6 +765,78 @@ test("report shows pricing info", () => {
 });
 
 // ================================================================
+// P1.4: COMMERCIAL PROPOSAL TESTS
+// ================================================================
+console.log("\n=== Commercial proposal ===");
+
+const { createProposal, reviseProposal, approveProposal, rejectProposal, presentProposal, renderProposalHtml } = await import(path.join(DIST, "services/commercial-proposal.js"));
+
+test("proposal creation from engine results", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_prop_create");
+  const proposal = createProposal("test_session", "SOMA-TEST-001", fx.briefing, results);
+  assert(proposal.proposalId, "Should have proposalId");
+  assert.equal(proposal.status, "draft");
+  assert.equal(proposal.versions.length, 1);
+  assert(proposal.versions[0].pricingSnapshot.commercialPrice > 0, "Should have price");
+  assert(proposal.versions[0].moduleCount > 0, "Should have modules");
+});
+
+test("proposal revision creates new version", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_prop_revise");
+  const proposal = createProposal("test_rev", "SOMA-TEST-002", fx.briefing, results);
+  const revised = reviseProposal(proposal.proposalId, "Cliente pediu material diferente", undefined, ["Freijo", "Branco"]);
+  assert(revised, "Should return revised proposal");
+  assert.equal(revised.status, "revised");
+  assert.equal(revised.versions.length, 2);
+  assert.equal(revised.versions[1].changeNotes, "Cliente pediu material diferente");
+  assert.equal(revised.currentVersion, 2);
+});
+
+test("proposal approval changes status", () => {
+  const fx = loadFixture("kitchen_basic");
+  const results = runEnginePipeline(fx.briefing, "test_prop_approve");
+  const proposal = createProposal("test_appr", "SOMA-TEST-003", fx.briefing, results);
+  const approved = approveProposal(proposal.proposalId, "Cliente aprovou");
+  assert(approved, "Should return approved proposal");
+  assert.equal(approved.status, "approved");
+  assert.equal(approved.approvals.length, 1);
+  assert.equal(approved.approvals[0].status, "approved");
+});
+
+test("proposal rejection with reason", () => {
+  const fx = loadFixture("kitchen_basic");
+  const results = runEnginePipeline(fx.briefing, "test_prop_reject");
+  const proposal = createProposal("test_rej", "SOMA-TEST-004", fx.briefing, results);
+  const rejected = rejectProposal(proposal.proposalId, "Preco muito alto", ["Reduzir modulos"]);
+  assert(rejected, "Should return rejected proposal");
+  assert.equal(rejected.status, "rejected");
+  assert.equal(rejected.approvals[0].reason, "Preco muito alto");
+  assert(rejected.approvals[0].requestedChanges?.length > 0, "Should have requested changes");
+});
+
+test("proposal renders as HTML", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_prop_html");
+  const proposal = createProposal("test_html", "SOMA-TEST-005", fx.briefing, results);
+  const html = renderProposalHtml(proposal);
+  assert(html.includes("Proposta"), "HTML should have proposal title");
+  assert(html.includes("SOMA-ID"), "HTML should have SOMA-ID branding");
+  assert(html.includes(proposal.clientName), "HTML should show client name");
+  assert(html.includes("RASCUNHO"), "Should show draft status");
+});
+
+test("approved proposal cannot be revised", () => {
+  const fx = loadFixture("kitchen_basic");
+  const results = runEnginePipeline(fx.briefing, "test_prop_lock");
+  const proposal = createProposal("test_lock", "SOMA-TEST-006", fx.briefing, results);
+  approveProposal(proposal.proposalId);
+  const result = reviseProposal(proposal.proposalId, "Tentativa de revisao apos aprovacao");
+  assert.equal(result, null, "Should not allow revision after approval");
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);

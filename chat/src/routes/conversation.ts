@@ -865,6 +865,98 @@ export default async function conversationRoutes(app: FastifyInstance) {
   );
 
   // ================================================================
+  // P1.4 — Commercial Proposal Workflow
+  // ================================================================
+
+  // POST /session/:id/proposal — Generate commercial proposal
+  app.post(
+    "/session/:id/proposal",
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const session = getSession(request.params.id);
+      if (!session) return reply.status(404).send({ error: "Sessao nao encontrada" });
+      if (!session.engine_results) return reply.status(400).send({ error: "Gere o projeto primeiro" });
+
+      const { createProposal, getProposalBySession } = await import("../services/commercial-proposal.js");
+      let proposal = getProposalBySession(session.id);
+      if (!proposal) {
+        proposal = createProposal(session.id, session.project_id, session.briefing, session.engine_results);
+      }
+      return reply.send({ proposal });
+    }
+  );
+
+  // GET /session/:id/proposal — Get current proposal
+  app.get(
+    "/session/:id/proposal",
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const { getProposalBySession, renderProposalHtml } = await import("../services/commercial-proposal.js");
+      const proposal = getProposalBySession(request.params.id);
+      if (!proposal) return reply.status(404).send({ error: "Proposta nao encontrada" });
+
+      const accept = (request.headers.accept || "").toLowerCase();
+      if (accept.includes("text/html")) {
+        const html = renderProposalHtml(proposal);
+        return reply.header("Content-Type", "text/html; charset=utf-8").send(html);
+      }
+      return reply.send({ proposal });
+    }
+  );
+
+  // POST /session/:id/proposal/present — Present proposal to client
+  app.post(
+    "/session/:id/proposal/present",
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const { presentProposal, getProposalBySession } = await import("../services/commercial-proposal.js");
+      const proposal = getProposalBySession(request.params.id);
+      if (!proposal) return reply.status(404).send({ error: "Proposta nao encontrada" });
+      const updated = presentProposal(proposal.proposalId);
+      return reply.send({ proposal: updated });
+    }
+  );
+
+  // POST /session/:id/proposal/revise — Revise proposal
+  app.post(
+    "/session/:id/proposal/revise",
+    async (request: FastifyRequest<{ Params: { id: string }; Body: { changeNotes: string; terms?: string; materials?: string[] } }>, reply: FastifyReply) => {
+      const { reviseProposal, getProposalBySession } = await import("../services/commercial-proposal.js");
+      const proposal = getProposalBySession(request.params.id);
+      if (!proposal) return reply.status(404).send({ error: "Proposta nao encontrada" });
+      const body = request.body as { changeNotes?: string; terms?: string; materials?: string[] };
+      if (!body?.changeNotes) return reply.status(400).send({ error: "changeNotes obrigatorio" });
+      const updated = reviseProposal(proposal.proposalId, body.changeNotes, undefined, body.materials, body.terms);
+      if (!updated) return reply.status(400).send({ error: "Proposta nao pode ser revisada no estado atual" });
+      return reply.send({ proposal: updated });
+    }
+  );
+
+  // POST /session/:id/proposal/approve — Approve proposal
+  app.post(
+    "/session/:id/proposal/approve",
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const { approveProposal, getProposalBySession } = await import("../services/commercial-proposal.js");
+      const proposal = getProposalBySession(request.params.id);
+      if (!proposal) return reply.status(404).send({ error: "Proposta nao encontrada" });
+      const body = (request.body || {}) as { reason?: string };
+      const updated = approveProposal(proposal.proposalId, body.reason);
+      return reply.send({ proposal: updated });
+    }
+  );
+
+  // POST /session/:id/proposal/reject — Reject proposal
+  app.post(
+    "/session/:id/proposal/reject",
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const { rejectProposal, getProposalBySession } = await import("../services/commercial-proposal.js");
+      const proposal = getProposalBySession(request.params.id);
+      if (!proposal) return reply.status(404).send({ error: "Proposta nao encontrada" });
+      const body = (request.body || {}) as { reason?: string; requestedChanges?: string[] };
+      if (!body.reason) return reply.status(400).send({ error: "reason obrigatorio" });
+      const updated = rejectProposal(proposal.proposalId, body.reason, body.requestedChanges);
+      return reply.send({ proposal: updated });
+    }
+  );
+
+  // ================================================================
   // GET /session/:id/dxf — Download DXF technical export (P0.9)
   // ================================================================
   app.get(

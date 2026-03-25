@@ -233,6 +233,56 @@ export interface CatalogUsageSummary {
   diagnostics: CatalogDiagnostic[];
 }
 
+/* ============================================================
+   Commercial Proposal Workflow (P1.4)
+   ============================================================ */
+
+export type ProposalStatus = "draft" | "presented" | "revised" | "approved" | "rejected";
+
+export interface ProposalVersion {
+  versionNumber: number;
+  summary: string;
+  commercialImageUrl?: string;
+  pricingSnapshot: {
+    currency: string;
+    technicalCost: number;
+    commercialPrice: number;
+    markupPercent: number;
+    installationCharge: number;
+  };
+  selectedMaterials: string[];
+  moduleCount: number;
+  scopeNotes?: string;
+  commercialTerms?: string;
+  changeNotes?: string;
+  generatedAt: string;
+}
+
+export interface ProposalApproval {
+  status: ProposalStatus;
+  reason?: string;
+  requestedChanges?: string[];
+  timestamp: string;
+}
+
+export interface CommercialProposal {
+  proposalId: string;
+  sessionId: string;
+  projectId: string;
+  pricingProfileId: string;
+  catalogId: string;
+  catalogVersion: string;
+  clientName: string;
+  projectType: string;
+  designer: string;
+  currentVersion: number;
+  versions: ProposalVersion[];
+  approvals: ProposalApproval[];
+  status: ProposalStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface BriefingResponse {
   success: boolean;
   data?: ParsedBriefing;
