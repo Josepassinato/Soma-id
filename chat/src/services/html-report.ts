@@ -27,6 +27,7 @@ import {
   composeSheet, wrapViewBlock, SHEET_COMPOSITION_CSS,
   type ViewBlock,
 } from "./report/sheet-composer.js";
+import { PREMIUM_CSS } from "./report/premium-page-system.js";
 import { resolveModuleTyping } from "./module-typing.js";
 
 /* ============================================================
@@ -2342,13 +2343,11 @@ export function generateHtmlReport(briefing: ParsedBriefing, results: EngineResu
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SOMA-ID — Relatorio Tecnico | ${clientName}</title>
 <style>
-/* === RESET & BASE === */
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;color:#222;background:#fff;line-height:1.5;font-size:13px}
+/* P2.4 — Premium Design System (replaces inline CSS) */
+${PREMIUM_CSS}
 .page{max-width:1000px;margin:0 auto;padding:0}
 
-/* === PRANCHA CONTAINER === */
-.prancha{background:#fff;padding:30px 40px 20px;margin:0;border-bottom:1px solid #ddd;min-height:600px}
+/* Legacy overrides (kept for backward compat — premium system is primary) */
 
 /* === PRANCHA HEADER === */
 .prancha-header{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:2px solid ${GOLD};margin-bottom:12px;font-size:12px;color:#555}

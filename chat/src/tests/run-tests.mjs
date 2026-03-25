@@ -1267,6 +1267,51 @@ test("all BV families have pricing reference", () => {
 });
 
 // ================================================================
+// P2.4: PREMIUM PAGE REFINEMENT TESTS
+// ================================================================
+console.log("\n=== Premium page refinement ===");
+
+test("premium CSS is applied in report", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_prem_css");
+  const html = generateHtmlReport(fx.briefing, results, "test_prem_css");
+  // Premium design tokens should be present
+  assert(html.includes("Premium Design System"), "Should include premium CSS comment");
+  assert(html.includes("letter-spacing"), "Should have letter-spacing (premium typography)");
+  assert(html.includes("font-smoothing"), "Should have font-smoothing");
+});
+
+test("premium headers have consistent hierarchy", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_prem_hier");
+  const html = generateHtmlReport(fx.briefing, results, "test_prem_hier");
+  // Check for premium-style header elements
+  assert(html.includes("prancha-logo"), "Should have prancha-logo class");
+  assert(html.includes("prancha-meta"), "Should have prancha-meta class");
+  assert(html.includes("prancha-header-right"), "Should have header-right class");
+});
+
+test("premium tables have proper styling classes", () => {
+  const fx = loadFixture("closet_linear_baseline");
+  const results = runEnginePipeline(fx.briefing, "test_prem_tbl");
+  const html = generateHtmlReport(fx.briefing, results, "test_prem_tbl");
+  // BOM table should exist with proper structure
+  assert(html.includes("<table>"), "Should have tables");
+  assert(html.includes("<th>"), "Should have table headers");
+  assert(html.includes("zone-header"), "Should have zone-header class");
+});
+
+test("report still generates valid HTML after premium", () => {
+  const fx = loadFixture("kitchen_basic");
+  const results = runEnginePipeline(fx.briefing, "test_prem_valid");
+  const html = generateHtmlReport(fx.briefing, results, "test_prem_valid");
+  assert(html.includes("<!DOCTYPE html>"), "Should be valid HTML");
+  assert(html.includes("</html>"), "Should close HTML");
+  assert(!html.includes("NaN"), "Should have no NaN");
+  assert(!html.includes("undefined"), "Should have no undefined");
+});
+
+// ================================================================
 // RESULTS
 // ================================================================
 console.log(`\n${"=".repeat(50)}`);
